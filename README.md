@@ -72,6 +72,25 @@ Parol hammasida bir xil: `Parol2026!`
 | `npm run db:studio` | Ma'lumotlarni brauzerda ko'rish |
 | `npm run db:seed` | Sinov ma'lumotini qayta yuklash (mavjud ma'lumot o'chadi) |
 
+## Ishlash tartibi
+
+Loyiha [texnik topshiriq](docs/TZ.md) asosida quriladi. Har qanday ish
+boshlanishidan oldin TZ'da tegishli talab topiladi; talab yo'q bo'lsa —
+avval hujjatga qo'shiladi, keyin kod yoziladi.
+
+Har bir tugallangan o'zgarishdan keyin:
+
+```bash
+npm run typecheck && npm run lint && npm test
+```
+
+```bash
+git add -A && git commit -m "Nima o'zgargani" && git push
+```
+
+TZ'dagi talab holati (✅/⏳) ham o'sha commit ichida yangilanadi — shunda
+hujjat va kod hech qachon bir-biridan uzoqlashmaydi.
+
 ## Asosiy oqim
 
 ```
