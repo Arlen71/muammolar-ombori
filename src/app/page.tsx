@@ -5,6 +5,16 @@ import { getJoriyFoydalanuvchi, boshSahifa } from "@/lib/auth";
 import { Tugma } from "@/components/ui";
 import { sonMatni } from "@/lib/labels";
 
+/*
+  Sahifa har so'rovda qaytadan render qilinadi.
+
+  Ikki sabab: ko'rsatilayotgan statistika jonli bo'lishi kerak va sahifa
+  kirgan foydalanuvchini taniydi. Bunisiz Next uni build vaqtida statik
+  render qilishga urinadi — build ishlab chiqarish bazasini talab qilib
+  qoladi va toza muhitda yiqiladi.
+*/
+export const dynamic = "force-dynamic";
+
 /**
  * Ochiq sahifa. Ombor yopiq bo'lgani uchun bu yerda faqat **anonim statistika**
  * ko'rsatiladi — muammo sarlavhalari ham, tashkilot nomlari ham chiqmaydi.

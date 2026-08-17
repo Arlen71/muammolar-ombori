@@ -47,6 +47,11 @@ next-env.d.ts
 # Prisma generatsiya qiladigan klient — `npm run db:generate` bilan qayta yaratiladi
 /src/generated/prisma
 
+# Cloudflare build natijasi va lokal holat
+/.open-next/
+/.wrangler/
+.dev.vars
+
 # Prisma CLI o'rnatadigan AI-agent hujjatlari (~420 KB vendor fayllari).
 # Ular loyiha manbasi emas va `prisma init` orqali qayta o'rnatiladi.
 /.agents/

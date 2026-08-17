@@ -1,62 +1,66 @@
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
+/**
+ * Prisma klienti.
+ *
+ * Ulanish `prisma+postgres://` protokoli orqali, HTTP ustida ketadi.
+ * Bu ataylab tanlangan va yagona qo'llab-quvvatlanadigan usul:
+ *
+ *   1. Cloudflare Workers'da har bir so'rov alohida, qisqa umrli muhitda
+ *      bajariladi. TCP ulanishlar hovuzini so'rovlar orasida saqlab bo'lmaydi,
+ *      har bir isolate esa o'z hovuzini ochsa, baza ulanishlari tez tugaydi.
+ *      HTTP hech qanday hovuz talab qilmaydi.
+ *   2. Lokal va ishlab chiqarish muhitlari bitta kod yo'lidan yuradi —
+ *      "lokalda ishlaydi, serverda ishlamaydi" holati yo'q.
+ *   3. `pg` drayveri, ulanishlar hovuzi sozlamalari va ular bilan bog'liq
+ *      uchta bog'liqlik umuman kerak emas.
+ */
 function createClient() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
     throw new Error(
       "DATABASE_URL o'rnatilmagan. .env faylini .env.example asosida to'ldiring."
     );
   }
-
-  /*
-    Ulanishlar hovuzini o'zimiz quramiz (adapterga faqat manzil berish o'rniga),
-    chunki ikkita narsa kerak:
-
-    1. `pool.on("error")` — bo'sh turgan ulanish uzilsa, node-postgres xato
-       chiqaradi. Uni ushlamasak, butun Node jarayoni yiqiladi. Bu ayniqsa
-       ma'lumotlar bazasi qayta ishga tushganda yuz beradi.
-    2. `idleTimeoutMillis` — uzoq turgan ulanishlar o'zi yopiladi, shuning uchun
-       server tomondan uzilgan "o'lik" ulanishga duch kelish ehtimoli kamayadi
-       (P1017 xatosi).
-  */
-  /*
-    Hovuz hajmi sozlanadigan, chunki lokal va ishlab chiqarish muhitlari juda farq qiladi:
-      - `prisma dev` (lokal) PGlite — WASM ichidagi Postgres. U bir nechta parallel
-        ulanishni ko'tara olmaydi va ortiqchasini uzib yuboradi (P1017 xatosi).
-        Shuning uchun lokalda DB_POOL_MAX=3 qilib qo'yilgan.
-      - Ishlab chiqarishdagi haqiqiy PostgreSQL standart holda 100 ta ulanish beradi,
-        u yerda 10 normal qiymat.
-  */
-  const hovuzHajmi = Number(process.env.DB_POOL_MAX ?? 10);
-
-  const pool = new Pool({
-    connectionString,
-    max: Number.isFinite(hovuzHajmi) && hovuzHajmi > 0 ? hovuzHajmi : 10,
-    idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
-  });
-
-  pool.on("error", (xato) => {
-    // Bo'sh ulanishdagi xato — hovuz uni o'zi almashtiradi, jarayonni yiqitmaymiz
-    console.error("PostgreSQL ulanishlar hovuzida xato:", xato.message);
-  });
+  if (!url.startsWith("prisma+postgres://")) {
+    throw new Error(
+      "DATABASE_URL `prisma+postgres://` bilan boshlanishi kerak.\n" +
+        "Prisma Console'dagi ulanish manzilini oling: https://console.prisma.io"
+    );
+  }
 
   return new PrismaClient({
-    adapter: new PrismaPg(pool),
+    accelerateUrl: url,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 }
 
-// Next.js dev rejimida hot-reload har safar yangi ulanish hovuzi ochmasligi uchun
-// klient global obyektda saqlanadi.
-const globalForPrisma = globalThis as unknown as {
-  prisma?: ReturnType<typeof createClient>;
-};
+type Klient = ReturnType<typeof createClient>;
 
-export const db = globalForPrisma.prisma ?? createClient();
+// Next.js dev rejimida hot-reload har safar yangi klient yaratmasligi uchun
+// u global obyektda saqlanadi.
+const globalForPrisma = globalThis as unknown as { prisma?: Klient };
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
+function klientniOl(): Klient {
+  const mavjud = globalForPrisma.prisma;
+  if (mavjud) return mavjud;
+
+  const yangi = createClient();
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = yangi;
+  return yangi;
 }
+
+/**
+ * Klient birinchi murojaatda yaratiladi, modul yuklanishida emas.
+ *
+ * Sababi: `next build` sahifalarni tahlil qilish uchun modullarni yuklaydi.
+ * Agar klient shu paytda yaratilsa, build ishlab chiqarish maxfiy
+ * ma'lumotlarini talab qilib qoladi — CI va toza muhitda build yiqiladi.
+ */
+export const db = new Proxy({} as Klient, {
+  get(_maqsad, xossa, qabulqiluvchi) {
+    const klient = klientniOl();
+    const qiymat = Reflect.get(klient as object, xossa, qabulqiluvchi);
+    return typeof qiymat === "function" ? qiymat.bind(klient) : qiymat;
+  },
+});

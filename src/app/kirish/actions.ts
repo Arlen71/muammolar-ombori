@@ -8,7 +8,7 @@ import { parolTekshir } from "@/lib/password";
 import { SESSIYA_COOKIE, cookieSozlamalari, sessiyaTokeniYarat } from "@/lib/session";
 import { boshSahifa, KUTISH_SAHIFASI } from "@/lib/routes";
 import { kirishSxemasi, zodXatolari, type AmalNatijasi } from "@/lib/validation";
-import { chekla, muvaffaqiyatsizUrinish, tiklash } from "@/lib/rate-limit";
+import { kirishChekla, muvaffaqiyatsizUrinish, tiklash } from "@/lib/rate-limit";
 import { auditYoz, soragichIp } from "@/lib/audit";
 
 /**
@@ -41,7 +41,7 @@ export async function kirishAmali(
   const ip = await soragichIp();
   const cheklovKaliti = `kirish:${telefon}:${ip ?? "nomalum"}`;
 
-  const holat = chekla(cheklovKaliti);
+  const holat = await kirishChekla(cheklovKaliti);
   if (!holat.ruxsat) {
     const daqiqa = Math.ceil(holat.qolganSoniya / 60);
     return {

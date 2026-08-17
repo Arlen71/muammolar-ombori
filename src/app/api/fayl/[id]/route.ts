@@ -1,17 +1,12 @@
-import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
-import { Readable } from "node:stream";
-
 import { db } from "@/lib/db";
 import { getJoriyFoydalanuvchi } from "@/lib/auth";
 import { auditYoz } from "@/lib/audit";
-import { faylYoli } from "@/lib/uploads";
+import { faylniOlish } from "@/lib/uploads";
 
 /**
  * Biriktirilgan faylni beradi.
  *
- * Fayllar `public/` da emas — ular tashkilotlarning ichki hujjatlari.
- * Har bir so'rovda ruxsat tekshiriladi:
+ * Fayllar R2 da va bucket ochiq emas — har bir so'rovda ruxsat tekshiriladi:
  *   - o'z tashkiloti muammosi bo'lsa — rahbar;
  *   - ombordagi muammo bo'lsa — tasdiqlangan dasturchi;
  *   - har doim — admin.
@@ -51,15 +46,10 @@ export async function GET(_soro: Request, ctx: RouteContext<"/api/fayl/[id]">) {
     return new Response("Bu faylga ruxsatingiz yo'q", { status: 403 });
   }
 
-  const yol = faylYoli(biriktirma.storedName);
-  if (!yol) return new Response("Fayl topilmadi", { status: 404 });
-
-  let hajm: number;
-  try {
-    hajm = (await stat(yol)).size;
-  } catch {
-    // Bazada yozuv bor, lekin diskda fayl yo'q (masalan seed ma'lumoti)
-    return new Response("Fayl diskda topilmadi", { status: 404 });
+  const fayl = await faylniOlish(biriktirma.storedName);
+  if (!fayl) {
+    // Bazada yozuv bor, lekin omborda fayl yo'q (masalan seed ma'lumoti)
+    return new Response("Fayl omborda topilmadi", { status: 404 });
   }
 
   await auditYoz({
@@ -70,12 +60,10 @@ export async function GET(_soro: Request, ctx: RouteContext<"/api/fayl/[id]">) {
     meta: { problemId: problem.id },
   });
 
-  const oqim = Readable.toWeb(createReadStream(yol)) as ReadableStream;
-
-  return new Response(oqim, {
+  return new Response(fayl.oqim, {
     headers: {
       "Content-Type": biriktirma.mimeType,
-      "Content-Length": String(hajm),
+      "Content-Length": String(fayl.hajm),
       // `attachment` — brauzer faylni ochmasdan yuklab oladi.
       // Bu yuklangan HTML/SVG orqali XSS bo'lish ehtimolini yo'q qiladi.
       "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(biriktirma.fileName)}`,

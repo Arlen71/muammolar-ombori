@@ -1,20 +1,22 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 import { hajmMatni } from "@/lib/uploads-client";
 
 /**
- * Biriktirilgan fayllarni saqlash.
+ * Biriktirilgan fayllarni saqlash — Cloudflare R2 da.
  *
- * Fayllar `public/` ichida EMAS — ular tashkilotlarning ichki hujjatlari
- * (jurnal namunalari, Excel jadvallar, skrinshotlar) va faqat tasdiqlangan
- * foydalanuvchilarga ko'rinishi kerak. Shuning uchun ular loyihadan tashqaridagi
- * papkaga yoziladi va `/api/fayl/[id]` marshruti orqali, ruxsat tekshirilgandan
- * keyin beriladi.
+ * Nega fayl tizimi emas: Cloudflare Workers'da har bir so'rov alohida,
+ * qisqa umrli muhitda bajariladi. Diskka yozish "ishlagandek" ko'rinadi,
+ * lekin fayl keyingi so'rovda yo'q bo'ladi — bu xatolikdan ham yomonroq,
+ * chunki jimgina ma'lumot yo'qotadi.
+ *
+ * Bucket ochiq EMAS. Fayllar faqat `/api/fayl/[id]` marshruti orqali,
+ * foydalanuvchi ruxsati tekshirilgandan keyin beriladi.
  */
+
+export { hajmMatni };
 
 /** Ruxsat etilgan turlar: kengaytma → MIME. */
 const RUXSAT_ETILGAN: Record<string, string[]> = {
@@ -33,21 +35,33 @@ const RUXSAT_ETILGAN: Record<string, string[]> = {
 
 export const RUXSAT_ETILGAN_KENGAYTMALAR = Object.keys(RUXSAT_ETILGAN);
 
-export function yuklashPapkasi(): string {
-  const papka = process.env.UPLOAD_DIR || "./uploads";
-  if (path.isAbsolute(papka)) return papka;
-  // turbopackIgnore: bu yo'l ish vaqtida sozlamadan olinadi, bundle'ga
-  // kiritiladigan fayl emas. Izohsiz Turbopack butun papkani bundle'ga
-  // qo'shishga urinadi va build hajmi keraksiz o'sadi.
-  return path.join(/* turbopackIgnore: true */ process.cwd(), papka);
-}
-
 export function maksimalHajm(): number {
   const n = Number(process.env.MAX_UPLOAD_BYTES ?? 10 * 1024 * 1024);
   return Number.isFinite(n) && n > 0 ? n : 10 * 1024 * 1024;
 }
 
-export { hajmMatni };
+async function ombor() {
+  const { env } = await getCloudflareContext({ async: true });
+  const bucket = env.BIRIKTIRMALAR;
+  if (!bucket) {
+    throw new Error(
+      "BIRIKTIRMALAR R2 bindingi topilmadi. wrangler.jsonc dagi r2_buckets " +
+        "sozlamasini va bucket yaratilganini tekshiring."
+    );
+  }
+  return bucket;
+}
+
+/** Fayl nomidan kengaytmani ajratadi (`path` moduli Workers'da ishlatilmaydi). */
+function kengaytma(nom: string): string {
+  const nuqta = nom.lastIndexOf(".");
+  return nuqta > 0 ? nom.slice(nuqta).toLowerCase() : "";
+}
+
+/** Yo'l qismlarini olib tashlaydi — faqat ko'rsatish uchun nom qoladi. */
+function tozaNom(nom: string): string {
+  return nom.split(/[/\\]/).pop()!.slice(0, 180);
+}
 
 export type FaylXatosi = { xato: string };
 export type FaylNatijasi = {
@@ -58,21 +72,23 @@ export type FaylNatijasi = {
 };
 
 /**
- * Faylni tekshirib diskka yozadi.
+ * Faylni tekshirib R2 ga yozadi.
  *
- * Xavfsizlik: saqlanadigan nom butunlay tizim tomonidan yaratiladi
+ * Xavfsizlik: saqlanadigan kalit butunlay tizim tomonidan yaratiladi
  * (`randomUUID` + ruxsat etilgan kengaytma). Foydalanuvchi bergan nom faqat
- * ko'rsatish uchun bazada saqlanadi va hech qachon yo'l sifatida ishlatilmaydi —
- * shu tufayli "../../etc/passwd" kabi hujum imkonsiz.
+ * ko'rsatish uchun bazada saqlanadi va hech qachon kalit sifatida
+ * ishlatilmaydi — shu tufayli "../" kabi hujum imkonsiz.
  */
 export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi> {
   if (fayl.size === 0) return { xato: "Fayl bo'sh" };
   if (fayl.size > maksimalHajm()) {
-    return { xato: `Fayl juda katta. Ruxsat etilgan eng katta hajm: ${hajmMatni(maksimalHajm())}` };
+    return {
+      xato: `Fayl juda katta. Ruxsat etilgan eng katta hajm: ${hajmMatni(maksimalHajm())}`,
+    };
   }
 
-  const kengaytma = path.extname(fayl.name).toLowerCase();
-  const ruxsatEtilganTurlar = RUXSAT_ETILGAN[kengaytma];
+  const keng = kengaytma(fayl.name);
+  const ruxsatEtilganTurlar = RUXSAT_ETILGAN[keng];
   if (!ruxsatEtilganTurlar) {
     return {
       xato: `Bu turdagi fayl qabul qilinmaydi. Ruxsat etilgan: ${RUXSAT_ETILGAN_KENGAYTMALAR.join(", ")}`,
@@ -81,41 +97,38 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
 
   // Brauzer ba'zan MIME'ni bo'sh yuboradi — kengaytma bo'yicha to'ldiramiz
   const mime = ruxsatEtilganTurlar.includes(fayl.type) ? fayl.type : ruxsatEtilganTurlar[0];
+  const kalit = `${crypto.randomUUID()}${keng}`;
 
-  const saqlanadiganNom = `${randomUUID()}${kengaytma}`;
-  const papka = yuklashPapkasi();
-  await mkdir(papka, { recursive: true });
-  await writeFile(
-    // turbopackIgnore: yuklash papkasi ish vaqtida sozlamadan olinadi va
-    // bundle'ga kiradigan fayl emas. Izohsiz build butun loyihani kuzatib chiqadi.
-    path.join(/* turbopackIgnore: true */ papka, saqlanadiganNom),
-    Buffer.from(await fayl.arrayBuffer())
-  );
+  await (await ombor()).put(kalit, await fayl.arrayBuffer(), {
+    httpMetadata: { contentType: mime },
+  });
 
   return {
-    // Ko'rsatish uchun nom: yo'l qismlarini olib tashlaymiz
-    fileName: path.basename(fayl.name).slice(0, 180),
-    storedName: saqlanadiganNom,
+    fileName: tozaNom(fayl.name),
+    storedName: kalit,
     mimeType: mime,
     size: fayl.size,
   };
 }
 
-/** Fayl yo'lini xavfsiz tarzda quradi — papkadan tashqariga chiqishga yo'l qo'ymaydi. */
-export function faylYoli(saqlanadiganNom: string): string | null {
-  // Saqlanadigan nom har doim tizim yaratgan UUID bo'lishi kerak
-  if (!/^[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(saqlanadiganNom)) return null;
-  const papka = yuklashPapkasi();
-  const toliq = path.join(/* turbopackIgnore: true */ papka, saqlanadiganNom);
-  // Qo'shimcha himoya: natija baribir papka ichida bo'lsin
-  if (!toliq.startsWith(papka + path.sep)) return null;
-  return toliq;
+/** Saqlangan kalit tizim yaratgan ko'rinishga mos keladimi. */
+function kalitTogrimi(kalit: string): boolean {
+  return /^[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(kalit);
+}
+
+/** Faylni R2 dan o'qiydi. Topilmasa yoki kalit noto'g'ri bo'lsa `null`. */
+export async function faylniOlish(
+  saqlanadiganNom: string
+): Promise<{ oqim: ReadableStream; hajm: number } | null> {
+  if (!kalitTogrimi(saqlanadiganNom)) return null;
+
+  const obyekt = await (await ombor()).get(saqlanadiganNom);
+  if (!obyekt) return null;
+
+  return { oqim: obyekt.body, hajm: obyekt.size };
 }
 
 export async function faylniOchir(saqlanadiganNom: string): Promise<void> {
-  const yol = faylYoli(saqlanadiganNom);
-  if (!yol) return;
-  await unlink(yol).catch(() => {
-    // Fayl allaqachon yo'q bo'lsa muammo emas
-  });
+  if (!kalitTogrimi(saqlanadiganNom)) return;
+  await (await ombor()).delete(saqlanadiganNom);
 }
