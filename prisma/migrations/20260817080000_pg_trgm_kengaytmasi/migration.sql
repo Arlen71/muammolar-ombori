@@ -1,0 +1,11 @@
+-- Trigram kengaytmasi: o'xshash (dublikat) muammolarni topish uchun.
+--
+-- Bu yagona qo'lda yozilgan migratsiya. Indekslar va cheklovlar ataylab bu yerda
+-- emas, `schema.prisma` da ifodalangan — aks holda `prisma migrate dev` ularni
+-- "ortiqcha" deb hisoblab o'chirishga urinadi.
+--
+-- Agar ishlab chiqarish serverida baza foydalanuvchisida kengaytma yaratish
+-- huquqi bo'lmasa, DBA'dan bir marta `CREATE EXTENSION pg_trgm;` ni so'rang.
+-- Dastur kengaytmasiz ham ishlaydi: o'xshashlik qidiruvi zaxira usulga o'tadi
+-- (qarang: src/lib/similar.ts).
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

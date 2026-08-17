@@ -1,0 +1,454 @@
+// Muammolar ombori — davlat tashkilotlari va dasturchilarni bog'lovchi tizim
+// Hujjat: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  Enumlar
+// ─────────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  LEADER // tashkilot rahbari
+  DEVELOPER
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING // dasturchi tasdiqlanishini kutmoqda
+  BLOCKED
+}
+
+enum OrgType {
+  MINISTRY // Vazirlik
+  STATE_COMMITTEE // Davlat qo'mitasi
+  AGENCY // Agentlik
+  KHOKIMIYAT // Hokimlik
+  EDUCATION // Ta'lim muassasasi
+  HEALTHCARE // Tibbiyot muassasasi
+  STATE_ENTERPRISE // Davlat korxonasi
+  OTHER
+}
+
+enum Region {
+  KARAKALPAKSTAN
+  ANDIJAN
+  BUKHARA
+  FERGANA
+  JIZZAKH
+  KHOREZM
+  NAMANGAN
+  NAVOIY
+  QASHQADARYO
+  SAMARKAND
+  SIRDARYO
+  SURKHANDARYO
+  TASHKENT_REGION
+  TASHKENT_CITY
+}
+
+enum ProblemStatus {
+  DRAFT // Qoralama
+  SUBMITTED // Yuborilgan — moderatsiya kutmoqda
+  APPROVED // Tasdiqlangan — omborda ko'rinadi
+  REJECTED // Rad etilgan
+  TAKEN // Dasturchi oldi
+  SOLUTION_OFFERED // Yechim taqdim etildi
+  RESOLVED // Hal qilindi
+  ARCHIVED // Dolzarb emas
+}
+
+/// 1-qadam: muammoning turi
+enum PainType {
+  MANUAL_REPETITIVE // Qo'lda takroriy ish
+  PAPERWORK // Qog'ozbozlik
+  DATA_LOSS_ERRORS // Ma'lumot yo'qoladi yoki xato bo'ladi
+  DATA_SCATTERED // Ma'lumot tarqoq, bir joyda emas
+  DELAYS_WAITING // Kutish va kechikish
+  NO_CONTROL // Nazorat qilib bo'lmaydi
+  HARD_REPORTING // Hisobot tayyorlash og'ir
+  BAD_EXISTING_SOFTWARE // Mavjud dastur qoniqtirmaydi
+}
+
+/// 2-qadam: hozir nimadan foydalaniladi
+enum ToolUsed {
+  PAPER // Qog'oz, jurnal
+  EXCEL
+  WORD
+  TELEGRAM
+  EMAIL
+  ONE_C // 1C
+  INTERNAL_APP // Ichki dastur
+  GOV_SYSTEM // Davlat tizimi
+  NONE // Hech narsa
+}
+
+/// 3-qadam: takrorlanish birligi
+enum FrequencyUnit {
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+/// 3-qadam: hal qilinmasa nima bo'ladi
+enum Consequence {
+  TIME_LOST // Vaqt yo'qotiladi
+  ERRORS_FINES // Xatolar va jarimalar
+  CITIZEN_COMPLAINTS // Fuqarolar norozi
+  REPORT_DELAYS // Yuqori tashkilotga hisobot kechikadi
+  LEGAL_NONCOMPLIANCE // Qonun talabi bajarilmayapti
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+/// 4-qadam: oyiga taxminan nechta yozuv
+enum DataVolume {
+  UNDER_100
+  FROM_100_TO_1000
+  FROM_1000_TO_10000
+  OVER_10000
+}
+
+/// 4-qadam: dasturdan necha kishi foydalanadi
+enum UsersCount {
+  FROM_1_TO_5
+  FROM_5_TO_20
+  FROM_20_TO_100
+  OVER_100
+}
+
+/// 4-qadam: ma'lumot maxfiyligi — xavfsizlik talablarini belgilaydi
+enum DataSensitivity {
+  PUBLIC // Ochiq
+  INTERNAL // Xizmat uchun
+  PERSONAL // Fuqarolarning shaxsiy ma'lumotlari bor
+  CONFIDENTIAL // Maxfiy
+}
+
+/// 4-qadam: qaysi tizim bilan bog'lanish kerak
+enum IntegrationTarget {
+  ONE_C
+  E_IJRO
+  MY_GOV
+  TAX // Soliq
+  BANK
+  SMS
+  OTHER
+}
+
+/// 4-qadam: qayerdan foydalaniladi
+enum AccessLocation {
+  OFFICE_ONLY // Faqat ofis ichida
+  INTERNET // Internetdan
+  MOBILE // Telefondan
+  BRANCHES // Filiallardan
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  Tashkilot va foydalanuvchilar
+// ─────────────────────────────────────────────────────────────────────
+
+model Organization {
+  id       String  @id @default(cuid())
+  name     String
+  type     OrgType @default(OTHER)
+  region   Region
+  district String?
+  /// STIR (soliq to'lovchi identifikatsiya raqami)
+  stir     String? @unique
+
+  /// Yuqori turuvchi tashkilot (masalan, vazirlik → hududiy boshqarma)
+  parentId String?
+  parent   Organization?  @relation("OrgHierarchy", fields: [parentId], references: [id])
+  children Organization[] @relation("OrgHierarchy")
+
+  users    User[]
+  problems Problem[]
+  supports ProblemSupporter[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([region])
+  @@index([type])
+}
+
+model User {
+  id           String     @id @default(cuid())
+  fullName     String
+  /// Lavozimi — rahbarlar uchun majburiy
+  position     String?
+  /// Login sifatida ishlatiladi. Format: +998XXXXXXXXX
+  phone        String     @unique
+  email        String?    @unique
+  passwordHash String
+  role         Role
+  status       UserStatus @default(ACTIVE)
+
+  /// Sessiyalarni bekor qilish uchun. Qiymat oshsa — barcha eski cookie'lar yaroqsiz bo'ladi.
+  sessionVersion Int @default(0)
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  developerProfile DeveloperProfile?
+
+  authoredProblems Problem[]              @relation("ProblemAuthor")
+  assignments      ProblemAssignment[]
+  statusChanges    ProblemStatusHistory[]
+  supports         ProblemSupporter[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([role, status])
+  @@index([organizationId])
+}
+
+model DeveloperProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Texnologiyalar: ["Next.js", "PostgreSQL", "1C"]
+  skills       String[]
+  portfolioUrl String?
+  about        String?
+
+  verifiedAt   DateTime?
+  /// Tasdiqlagan adminning id'si
+  verifiedById String?
+  rejectedNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  Muammo
+// ─────────────────────────────────────────────────────────────────────
+
+model Category {
+  id    String  @id @default(cuid())
+  slug  String  @unique
+  name  String
+  icon  String?
+  order Int     @default(0)
+
+  problems Problem[]
+}
+
+model Problem {
+  id String @id @default(cuid())
+  /// Inson o'qiy oladigan raqam: M-2026-0001
+  refCode String @unique
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  authorId       String
+  author         User         @relation("ProblemAuthor", fields: [authorId], references: [id])
+
+  // ── 1-qadam: Muammo nima? ──
+  title       String
+  description String
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id])
+  painTypes   PainType[]
+
+  // ── 2-qadam: Hozir bu ish qanday bajariladi? ──
+  currentProcess String?
+  toolsUsed      ToolUsed[]
+  toolsNote      String?
+  /// Jarayonda ishtirok etuvchi lavozimlar — dasturchi shundan rol modelini oladi
+  rolesInvolved  String[]
+
+  // ── 3-qadam: Ko'lam va yo'qotish ──
+  frequency        Int?
+  frequencyUnit    FrequencyUnit?
+  minutesPerCase   Int?
+  peopleAffected   Int?
+  citizensAffected Int?
+  consequence      Consequence?
+  urgency          Urgency        @default(MEDIUM)
+  deadline         DateTime?
+  deadlineReason   String?
+
+  // ── 4-qadam: Ma'lumot va cheklovlar ──
+  dataVolume          DataVolume?
+  usersCount          UsersCount?
+  dataSensitivity     DataSensitivity?
+  integrations        IntegrationTarget[]
+  integrationsNote    String?
+  accessFrom          AccessLocation[]
+  previousAttempt     Boolean             @default(false)
+  previousAttemptNote String?
+
+  // ── 5-qadam: Kutilayotgan natija va aloqa ──
+  desiredOutcome  String?
+  successMetric   String?
+  contactName     String?
+  contactPosition String?
+  contactPhone    String?
+
+  // ── Tizim hisoblaydi ──
+  /// Oyiga yo'qotilayotgan soat = chastota × davomiylik × jalb qilinganlar
+  monthlyHoursLost Float @default(0)
+  /// Kartochka to'liqligi, 0–100
+  completeness     Int   @default(0)
+  /// Omborni saralash uchun umumiy ball
+  impactScore      Float @default(0)
+
+  status         ProblemStatus @default(DRAFT)
+  moderationNote String?
+
+  // ── Dublikat ──
+  /// Bu muammo boshqasining takrori bo'lsa — asosiy muammo id'si
+  canonicalId String?
+  canonical   Problem?  @relation("Duplicates", fields: [canonicalId], references: [id])
+  duplicates  Problem[] @relation("Duplicates")
+
+  supporters  ProblemSupporter[]
+  attachments ProblemAttachment[]
+  history     ProblemStatusHistory[]
+  assignments ProblemAssignment[]
+
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  resolvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([organizationId])
+  @@index([categoryId])
+  @@index([canonicalId])
+  /// Ombordagi standart saralash: ta'sirli va yangi muammolar tepada
+  @@index([status, impactScore(sort: Desc), createdAt(sort: Desc)])
+}
+
+/// "Bizda ham shu muammo bor" — talab hajmini ko'rsatuvchi eng muhim signal
+model ProblemSupporter {
+  id        String  @id @default(cuid())
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  note      String?
+  createdAt DateTime @default(now())
+
+  /// Bitta tashkilot bitta muammoni faqat bir marta qo'llab-quvvatlaydi
+  @@unique([problemId, organizationId])
+  @@index([problemId])
+}
+
+model ProblemAttachment {
+  id        String  @id @default(cuid())
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  /// Foydalanuvchi ko'radigan nom
+  fileName   String
+  /// Diskdagi nom — tashqi kiritishdan mustaqil, xavfsiz
+  storedName String @unique
+  mimeType   String
+  size       Int
+
+  createdAt DateTime @default(now())
+
+  @@index([problemId])
+}
+
+model ProblemStatusHistory {
+  id        String  @id @default(cuid())
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  fromStatus ProblemStatus?
+  toStatus   ProblemStatus
+  actorId    String
+  actor      User           @relation(fields: [actorId], references: [id])
+  comment    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([problemId, createdAt])
+}
+
+model ProblemAssignment {
+  id        String  @id @default(cuid())
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  developerId String
+  developer   User   @relation(fields: [developerId], references: [id])
+
+  takenAt    DateTime  @default(now())
+  /// Dasturchi muammoni qo'yib yuborsa to'ldiriladi — muammo omborga qaytadi
+  releasedAt DateTime?
+  note       String?
+
+  /// Topshiriq faol bo'lsa problemId bilan bir xil, qo'yib yuborilganda null.
+  /// PostgreSQL unique indeksi bir nechta NULL'ga ruxsat bergani uchun bu
+  /// "bitta muammo — ayni paytda bitta dasturchi" qoidasini baza darajasida kafolatlaydi.
+  activeKey String? @unique
+
+  @@index([problemId])
+  @@index([developerId])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  Yordamchi
+// ─────────────────────────────────────────────────────────────────────
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type   String
+  title  String
+  body   String?
+  link   String?
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt])
+}
+
+model AuditLog {
+  id      String  @id @default(cuid())
+  actorId String?
+  actor   User?   @relation(fields: [actorId], references: [id])
+
+  action   String
+  entity   String
+  entityId String?
+  meta     Json?
+  ip       String?
+
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}

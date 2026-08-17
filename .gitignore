@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# yuklangan fayllar (biriktirmalar)
+/uploads
 
 # vercel
 .vercel
@@ -39,3 +43,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma generatsiya qiladigan klient — `npm run db:generate` bilan qayta yaratiladi
+/src/generated/prisma
+
+# Prisma CLI o'rnatadigan AI-agent hujjatlari (~420 KB vendor fayllari).
+# Ular loyiha manbasi emas va `prisma init` orqali qayta o'rnatiladi.
+/.agents/
+/.windsurf/
+/.claude/skills/
+/skills-lock.json

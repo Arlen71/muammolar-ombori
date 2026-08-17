@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Muammolar ombori — dizayn tizimi.
+
+  Ataylab faqat yorug' mavzu: davlat tashkilotlarida asosan yorug' ekran
+  ishlatiladi, qorong'i mavzu esa uslublar hajmini ikki barobar oshiradi va
+  MVP uchun qiymat bermaydi. Ranglar yuqori kontrastli (WCAG AA) tanlangan —
+  foydalanuvchilar orasida keksa xodimlar ham bo'ladi.
+*/
+
+@theme {
+  --color-asos: #ffffff;
+  --color-yuza: #f8fafc;
+  --color-chegara: #e2e8f0;
+
+  --color-matn: #0f172a;
+  --color-matn-ikkilamchi: #475569;
+  --color-matn-uchinchi: #94a3b8;
+
+  --color-asosiy: #1d4ed8;
+  --color-asosiy-quyuq: #1e40af;
+  --color-asosiy-ochiq: #eff6ff;
+
+  --color-muvaffaqiyat: #047857;
+  --color-ogohlantirish: #b45309;
+  --color-xato: #be123c;
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-yuza);
+    color: var(--color-matn);
+    font-family: var(--font-sans);
+    /* O'zbek matni uchun biroz kengroq satr oralig'i — o'qish osonroq */
+    line-height: 1.6;
+  }
+
+  /* Klaviatura bilan yuruvchi foydalanuvchilar uchun aniq fokus halqasi */
+  :focus-visible {
+    outline: 2px solid var(--color-asosiy);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Raqam kiritish maydonlaridagi strelkalarni olib tashlaymiz —
+     ular sensorli ekranda tasodifan bosiladi */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Faqat ekran o'quvchilar uchun matn */
+  .faqat-oquvchi {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+@media print {
+  .chop-etilmasin {
+    display: none !important;
+  }
 }
