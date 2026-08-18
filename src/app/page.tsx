@@ -15,36 +15,63 @@ import { sonMatni } from "@/lib/labels";
 */
 export const dynamic = "force-dynamic";
 
+/** Omborda ko'rinadigan holatlar. */
+const OMBORDAGI = ["APPROVED", "TAKEN", "SOLUTION_OFFERED", "RESOLVED"] as const;
+
+/**
+ * Anonim statistika.
+ *
+ * Baza yetib bo'lmasa `null` qaytaradi va sahifa baribir ochiladi. Ochiq
+ * sahifa statistika so'rovi tufayli qulab tushmasligi kerak: u tizim haqidagi
+ * asosiy ma'lumotni ko'rsatadi va kirish tugmasini beradi — bularning ikkisi
+ * ham bazaga bog'liq emas.
+ */
+async function statistika() {
+  try {
+    const [muammolar, tashkilotlar, sohalar, soatlar] = await Promise.all([
+      db.problem.count({ where: { status: { in: [...OMBORDAGI] } } }),
+      db.organization.count(),
+      db.problem
+        .groupBy({ by: ["categoryId"], where: { status: { in: [...OMBORDAGI] } } })
+        .then((r) => r.length),
+      db.problem
+        .aggregate({
+          _sum: { monthlyHoursLost: true },
+          where: { status: { in: [...OMBORDAGI] } },
+        })
+        .then((r) => Math.round(r._sum.monthlyHoursLost ?? 0)),
+    ]);
+    return { muammolar, tashkilotlar, sohalar, soatlar };
+  } catch (e) {
+    console.error("Bosh sahifa statistikasi olinmadi:", e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
+/** Kirgan foydalanuvchi. Baza yetib bo'lmasa mehmon deb hisoblanadi. */
+async function joriyFoydalanuvchiXavfsiz() {
+  try {
+    return await getJoriyFoydalanuvchi();
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Ochiq sahifa. Ombor yopiq bo'lgani uchun bu yerda faqat **anonim statistika**
  * ko'rsatiladi — muammo sarlavhalari ham, tashkilot nomlari ham chiqmaydi.
  */
 export default async function BoshSahifa() {
-  const [foydalanuvchi, muammolar, tashkilotlar, sohalar, soatlar] = await Promise.all([
-    getJoriyFoydalanuvchi(),
-    db.problem.count({
-      where: { status: { in: ["APPROVED", "TAKEN", "SOLUTION_OFFERED", "RESOLVED"] } },
-    }),
-    db.organization.count(),
-    db.problem
-      .groupBy({
-        by: ["categoryId"],
-        where: { status: { in: ["APPROVED", "TAKEN", "SOLUTION_OFFERED", "RESOLVED"] } },
-      })
-      .then((r) => r.length),
-    db.problem
-      .aggregate({
-        _sum: { monthlyHoursLost: true },
-        where: { status: { in: ["APPROVED", "TAKEN", "SOLUTION_OFFERED", "RESOLVED"] } },
-      })
-      .then((r) => Math.round(r._sum.monthlyHoursLost ?? 0)),
+  const [foydalanuvchi, son] = await Promise.all([
+    joriyFoydalanuvchiXavfsiz(),
+    statistika(),
   ]);
 
-  const raqamlar = [
-    { qiymat: muammolar, yorliq: "yig'ilgan muammo" },
-    { qiymat: tashkilotlar, yorliq: "davlat tashkiloti" },
-    { qiymat: sohalar, yorliq: "faoliyat sohasi" },
-    { qiymat: soatlar, yorliq: "oyiga yo'qotilayotgan soat" },
+  const raqamlar = son === null ? [] : [
+    { qiymat: son.muammolar, yorliq: "yig'ilgan muammo" },
+    { qiymat: son.tashkilotlar, yorliq: "davlat tashkiloti" },
+    { qiymat: son.sohalar, yorliq: "faoliyat sohasi" },
+    { qiymat: son.soatlar, yorliq: "oyiga yo'qotilayotgan soat" },
   ];
 
   return (
