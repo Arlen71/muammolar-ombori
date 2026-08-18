@@ -23,8 +23,14 @@ import type {
   UsersCount,
 } from "@/generated/prisma/enums";
 
-/** Sinov akkauntlarining paroli. Faqat ishlab chiqish uchun. */
-const SINOV_PAROLI = "Parol2026!";
+/**
+ * Sinov akkauntlarining paroli.
+ *
+ * Standart qiymat ochiq repoda turadi, shuning uchun u faqat lokal uchun.
+ * Internetdan ochiq muhitga seed qilayotganda albatta o'zingiznikini bering:
+ *   SEED_PASSWORD="..." npm run db:seed
+ */
+const SINOV_PAROLI = process.env.SEED_PASSWORD || "Parol2026!";
 
 const TURKUMLAR = [
   { slug: "hujjat-aylanishi", name: "Hujjat aylanishi", icon: "file-text" },

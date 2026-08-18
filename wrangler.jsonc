@@ -14,13 +14,19 @@
   // Biriktirilgan fayllar. Workers'da fayl tizimi yo'q — hammasi R2 da.
   // Bucket public EMAS: fayllar faqat /api/fayl/[id] orqali, ruxsat
   // tekshirilgandan keyin beriladi.
-  "r2_buckets": [
-    {
-      "binding": "BIRIKTIRMALAR",
-      "bucket_name": "muammolar-ombori-fayllar",
-      "preview_bucket_name": "muammolar-ombori-fayllar-preview"
-    }
-  ],
+  // VAQTINCHA O'CHIRILGAN: R2 Cloudflare hisobida hali yoqilmagan.
+  // Yoqilgach quyidagini oching va bucketlarni yarating:
+  //   npx wrangler r2 bucket create muammolar-ombori-fayllar
+  //   npx wrangler r2 bucket create muammolar-ombori-fayllar-preview
+  // Binding yo'q bo'lsa ilova qulab tushmaydi — sehrgar fayl yuklash
+  // o'rniga tushunarli xabar ko'rsatadi (qarang: omborUlanganmi()).
+  // "r2_buckets": [
+  //   {
+  //     "binding": "BIRIKTIRMALAR",
+  //     "bucket_name": "muammolar-ombori-fayllar",
+  //     "preview_bucket_name": "muammolar-ombori-fayllar-preview"
+  //   }
+  // ],
 
   // Kirishga urinishlar cheklovi. Xotiradagi hisoblagich Workers'da ishlamaydi,
   // chunki har bir isolate alohida. Cloudflare'ning o'z bindingi butun tarmoq

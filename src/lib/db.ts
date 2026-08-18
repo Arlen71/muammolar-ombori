@@ -23,8 +23,12 @@ function createClient() {
     );
   }
   if (!url.startsWith("prisma+postgres://")) {
+    // Qiymatning boshini ko'rsatamiz — maxfiy qismi (api_key) chiqmaydi,
+    // lekin protokol xatosini darhol aniqlash mumkin bo'ladi.
+    const bosh = url.slice(0, 24).replace(/[\r\n\t]/g, "·");
     throw new Error(
-      "DATABASE_URL `prisma+postgres://` bilan boshlanishi kerak.\n" +
+      `DATABASE_URL \`prisma+postgres://\` bilan boshlanishi kerak, ` +
+        `hozir esa "${bosh}…" (uzunligi ${url.length}).\n` +
         "Prisma Console'dagi ulanish manzilini oling: https://console.prisma.io"
     );
   }

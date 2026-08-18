@@ -6,14 +6,19 @@ import { db } from "@/lib/db";
 import { talabRahbar } from "@/lib/auth";
 import { QadamKorsatkichi } from "@/components/sehrgar/qadam-korsatkichi";
 import { Biriktirmalar } from "@/components/sehrgar/biriktirmalar";
-import { Quti } from "@/components/ui";
+import { Quti, Xabar } from "@/components/ui";
 import {
   QADAMLAR,
   QADAM_NOMLARI,
   qadamSxemalari,
   type QadamRaqami,
 } from "@/lib/problem-schema";
-import { hajmMatni, maksimalHajm, RUXSAT_ETILGAN_KENGAYTMALAR } from "@/lib/uploads";
+import {
+  hajmMatni,
+  maksimalHajm,
+  omborUlanganmi,
+  RUXSAT_ETILGAN_KENGAYTMALAR,
+} from "@/lib/uploads";
 import { SehrgarFormasi, type SehrgarMuammosi } from "./sehrgar-formasi";
 
 export const metadata: Metadata = { title: "Muammoni tasvirlash" };
@@ -43,6 +48,10 @@ export default async function SehrgarSahifasi(
   if (muammo.status !== "DRAFT" && muammo.status !== "REJECTED") {
     redirect(`/rahbar/muammo/${id}/korish`);
   }
+
+  // R2 Cloudflare hisobida yoqilmagan bo'lishi mumkin — u holda yuklash
+  // blokini ko'rsatish o'rniga tushunarli xabar beramiz.
+  const omborBor = qadamRaqami === 2 ? await omborUlanganmi() : false;
 
   const turkumlar = await db.category.findMany({
     orderBy: { order: "asc" },
@@ -124,17 +133,24 @@ export default async function SehrgarSahifasi(
 
       {qadamRaqami === 2 && (
         <div className="mt-5">
-          <Biriktirmalar
-            muammoId={muammo.id}
-            biriktirmalar={muammo.attachments.map((a) => ({
-              id: a.id,
-              fileName: a.fileName,
-              size: a.size,
-              mimeType: a.mimeType,
-            }))}
-            ruxsatEtilgan={RUXSAT_ETILGAN_KENGAYTMALAR}
-            maksimalHajmMatni={hajmMatni(maksimalHajm())}
-          />
+          {omborBor ? (
+            <Biriktirmalar
+              muammoId={muammo.id}
+              biriktirmalar={muammo.attachments.map((a) => ({
+                id: a.id,
+                fileName: a.fileName,
+                size: a.size,
+                mimeType: a.mimeType,
+              }))}
+              ruxsatEtilgan={RUXSAT_ETILGAN_KENGAYTMALAR}
+              maksimalHajmMatni={hajmMatni(maksimalHajm())}
+            />
+          ) : (
+            <Xabar turi="ogohlantirish" sarlavha="Fayl biriktirish hozircha ishlamaydi">
+              Fayl ombori (R2) hali ulanmagan. Muammoni fayl biriktirmasdan ham
+              yuborishingiz mumkin — keyinroq qo'shasiz. Administratorga xabar bering.
+            </Xabar>
+          )}
         </div>
       )}
 

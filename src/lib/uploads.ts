@@ -40,6 +40,22 @@ export function maksimalHajm(): number {
   return Number.isFinite(n) && n > 0 ? n : 10 * 1024 * 1024;
 }
 
+/**
+ * Fayl ombori ulanganmi.
+ *
+ * R2 Cloudflare hisobida alohida yoqiladi. Yoqilmagan bo'lsa ilova qulab
+ * tushmasligi, balki tushunarli xabar ko'rsatishi kerak — shuning uchun
+ * interfeys yuklash blokini ko'rsatishdan oldin shuni so'raydi.
+ */
+export async function omborUlanganmi(): Promise<boolean> {
+  try {
+    const { env } = await getCloudflareContext({ async: true });
+    return Boolean(env.BIRIKTIRMALAR);
+  } catch {
+    return false;
+  }
+}
+
 async function ombor() {
   const { env } = await getCloudflareContext({ async: true });
   const bucket = env.BIRIKTIRMALAR;
