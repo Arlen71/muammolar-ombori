@@ -41,7 +41,7 @@ export async function kirishAmali(
   const ip = await soragichIp();
   const cheklovKaliti = `kirish:${telefon}:${ip ?? "nomalum"}`;
 
-  const holat = await kirishChekla(cheklovKaliti);
+  const holat = kirishChekla(cheklovKaliti);
   if (!holat.ruxsat) {
     const daqiqa = Math.ceil(holat.qolganSoniya / 60);
     return {

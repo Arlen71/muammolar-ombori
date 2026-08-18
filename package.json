@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -18,15 +18,12 @@
     "db:check": "tsx scripts/check-db.ts",
     "db:seed": "tsx prisma/seed.ts",
     "e2e": "tsx scripts/e2e-check.ts",
-    "admin:create": "tsx scripts/create-admin.ts",
-    "cf:types": "wrangler types",
-    "cf:build": "opennextjs-cloudflare build",
-    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "admin:create": "tsx scripts/create-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.0",
     "@prisma/client": "^7.9.1",
+    "@vercel/blob": "^2.8.0",
     "clsx": "^2.1.1",
     "jose": "^6.2.9",
     "lucide-react": "^1.31.0",
@@ -39,7 +36,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.20.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -50,8 +46,7 @@
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
-    "typescript": "^5",
-    "wrangler": "^4.123.0"
+    "typescript": "^5"
   },
   "allowScripts": {
     "prisma@7.9.1": true,
@@ -62,5 +57,8 @@
     "esbuild@0.25.4": true,
     "esbuild@0.28.1": true,
     "workerd@1.20260811.1": true
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.1"
   }
 }

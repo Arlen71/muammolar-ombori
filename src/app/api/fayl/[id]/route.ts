@@ -60,15 +60,18 @@ export async function GET(_soro: Request, ctx: RouteContext<"/api/fayl/[id]">) {
     meta: { problemId: problem.id },
   });
 
-  return new Response(fayl.oqim, {
-    headers: {
-      "Content-Type": biriktirma.mimeType,
-      "Content-Length": String(fayl.hajm),
-      // `attachment` — brauzer faylni ochmasdan yuklab oladi.
-      // Bu yuklangan HTML/SVG orqali XSS bo'lish ehtimolini yo'q qiladi.
-      "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(biriktirma.fileName)}`,
-      "Cache-Control": "private, no-store",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  const sarlavhalar: Record<string, string> = {
+    "Content-Type": biriktirma.mimeType,
+    // `attachment` — brauzer faylni ochmasdan yuklab oladi.
+    // Bu yuklangan HTML/SVG orqali XSS bo'lish ehtimolini yo'q qiladi.
+    "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(biriktirma.fileName)}`,
+    "Cache-Control": "private, no-store",
+    "X-Content-Type-Options": "nosniff",
+  };
+
+  // Ombor hajmni bermasa sarlavhani umuman qo'ymaymiz — noto'g'ri qiymat
+  // brauzerni yuklashni yarim yo'lda to'xtatishga majbur qiladi.
+  if (fayl.hajm > 0) sarlavhalar["Content-Length"] = String(fayl.hajm);
+
+  return new Response(fayl.oqim, { headers: sarlavhalar });
 }

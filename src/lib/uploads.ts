@@ -1,19 +1,21 @@
 import "server-only";
 
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { del, put } from "@vercel/blob";
 
 import { hajmMatni } from "@/lib/uploads-client";
 
 /**
- * Biriktirilgan fayllarni saqlash — Cloudflare R2 da.
+ * Biriktirilgan fayllarni saqlash — Vercel Blob orqali.
  *
- * Nega fayl tizimi emas: Cloudflare Workers'da har bir so'rov alohida,
- * qisqa umrli muhitda bajariladi. Diskka yozish "ishlagandek" ko'rinadi,
- * lekin fayl keyingi so'rovda yo'q bo'ladi — bu xatolikdan ham yomonroq,
- * chunki jimgina ma'lumot yo'qotadi.
+ * Nega fayl tizimi emas: serverless muhitda disk vaqtinchalik va nusxalar
+ * orasida bo'linmaydi. Diskka yozish "ishlagandek" ko'rinadi, lekin fayl
+ * keyingi so'rovda yo'q bo'ladi — bu xatolikdan ham yomonroq, chunki
+ * jimgina ma'lumot yo'qotadi.
  *
- * Bucket ochiq EMAS. Fayllar faqat `/api/fayl/[id]` marshruti orqali,
- * foydalanuvchi ruxsati tekshirilgandan keyin beriladi.
+ * MAXFIYLIK: Blob URL'lari ochiq (topib bo'lmaydigan, lekin himoyalanmagan).
+ * Shuning uchun URL brauzerga HECH QACHON berilmaydi — u faqat bazada
+ * saqlanadi. Foydalanuvchi faylni `/api/fayl/[id]` orqali oladi, u yerda
+ * avval ruxsat tekshiriladi va fayl server tomondan uzatiladi.
  */
 
 export { hajmMatni };
@@ -41,34 +43,16 @@ export function maksimalHajm(): number {
 }
 
 /**
- * Fayl ombori ulanganmi.
+ * Fayl ombori sozlanganmi.
  *
- * R2 Cloudflare hisobida alohida yoqiladi. Yoqilmagan bo'lsa ilova qulab
- * tushmasligi, balki tushunarli xabar ko'rsatishi kerak — shuning uchun
- * interfeys yuklash blokini ko'rsatishdan oldin shuni so'raydi.
+ * Vercel Blob store yaratilganda `BLOB_READ_WRITE_TOKEN` avtomatik qo'shiladi.
+ * Sozlanmagan bo'lsa ilova qulab tushmasligi, balki tushunarli xabar
+ * ko'rsatishi kerak — interfeys yuklash blokini ko'rsatishdan oldin shuni so'raydi.
  */
 export async function omborUlanganmi(): Promise<boolean> {
-  try {
-    const { env } = await getCloudflareContext({ async: true });
-    return Boolean(env.BIRIKTIRMALAR);
-  } catch {
-    return false;
-  }
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
-async function ombor() {
-  const { env } = await getCloudflareContext({ async: true });
-  const bucket = env.BIRIKTIRMALAR;
-  if (!bucket) {
-    throw new Error(
-      "BIRIKTIRMALAR R2 bindingi topilmadi. wrangler.jsonc dagi r2_buckets " +
-        "sozlamasini va bucket yaratilganini tekshiring."
-    );
-  }
-  return bucket;
-}
-
-/** Fayl nomidan kengaytmani ajratadi (`path` moduli Workers'da ishlatilmaydi). */
 function kengaytma(nom: string): string {
   const nuqta = nom.lastIndexOf(".");
   return nuqta > 0 ? nom.slice(nuqta).toLowerCase() : "";
@@ -88,12 +72,11 @@ export type FaylNatijasi = {
 };
 
 /**
- * Faylni tekshirib R2 ga yozadi.
+ * Faylni tekshirib omborga yozadi.
  *
- * Xavfsizlik: saqlanadigan kalit butunlay tizim tomonidan yaratiladi
+ * Xavfsizlik: saqlanadigan yo'l butunlay tizim tomonidan yaratiladi
  * (`randomUUID` + ruxsat etilgan kengaytma). Foydalanuvchi bergan nom faqat
- * ko'rsatish uchun bazada saqlanadi va hech qachon kalit sifatida
- * ishlatilmaydi — shu tufayli "../" kabi hujum imkonsiz.
+ * ko'rsatish uchun bazada saqlanadi va hech qachon yo'l sifatida ishlatilmaydi.
  */
 export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi> {
   if (fayl.size === 0) return { xato: "Fayl bo'sh" };
@@ -110,41 +93,60 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
       xato: `Bu turdagi fayl qabul qilinmaydi. Ruxsat etilgan: ${RUXSAT_ETILGAN_KENGAYTMALAR.join(", ")}`,
     };
   }
+  if (!(await omborUlanganmi())) {
+    return { xato: "Fayl ombori sozlanmagan. Administratorga murojaat qiling." };
+  }
 
   // Brauzer ba'zan MIME'ni bo'sh yuboradi — kengaytma bo'yicha to'ldiramiz
   const mime = ruxsatEtilganTurlar.includes(fayl.type) ? fayl.type : ruxsatEtilganTurlar[0];
-  const kalit = `${crypto.randomUUID()}${keng}`;
 
-  await (await ombor()).put(kalit, await fayl.arrayBuffer(), {
-    httpMetadata: { contentType: mime },
+  const natija = await put(`biriktirmalar/${crypto.randomUUID()}${keng}`, fayl, {
+    access: "public",
+    contentType: mime,
+    // Yo'lni o'zimiz to'liq belgilaymiz — tasodifiy qo'shimcha kerak emas
+    addRandomSuffix: false,
   });
 
   return {
     fileName: tozaNom(fayl.name),
-    storedName: kalit,
+    // URL bazada saqlanadi, brauzerga hech qachon berilmaydi
+    storedName: natija.url,
     mimeType: mime,
     size: fayl.size,
   };
 }
 
-/** Saqlangan kalit tizim yaratgan ko'rinishga mos keladimi. */
-function kalitTogrimi(kalit: string): boolean {
-  return /^[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(kalit);
+/**
+ * Saqlangan qiymat haqiqiy Blob URL'imi.
+ *
+ * Bazadagi yozuv buzilgan bo'lsa ham server ixtiyoriy manzilga so'rov
+ * yubormasligi kerak (SSRF himoyasi).
+ */
+function urlIshonchlimi(qiymat: string): boolean {
+  try {
+    const u = new URL(qiymat);
+    return u.protocol === "https:" && u.hostname.endsWith(".blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
 }
 
-/** Faylni R2 dan o'qiydi. Topilmasa yoki kalit noto'g'ri bo'lsa `null`. */
+/** Faylni ombordan o'qiydi. Topilmasa yoki manzil ishonchsiz bo'lsa `null`. */
 export async function faylniOlish(
   saqlanadiganNom: string
 ): Promise<{ oqim: ReadableStream; hajm: number } | null> {
-  if (!kalitTogrimi(saqlanadiganNom)) return null;
+  if (!urlIshonchlimi(saqlanadiganNom)) return null;
 
-  const obyekt = await (await ombor()).get(saqlanadiganNom);
-  if (!obyekt) return null;
+  const javob = await fetch(saqlanadiganNom);
+  if (!javob.ok || !javob.body) return null;
 
-  return { oqim: obyekt.body, hajm: obyekt.size };
+  const hajm = Number(javob.headers.get("content-length") ?? 0);
+  return { oqim: javob.body, hajm };
 }
 
 export async function faylniOchir(saqlanadiganNom: string): Promise<void> {
-  if (!kalitTogrimi(saqlanadiganNom)) return;
-  await (await ombor()).delete(saqlanadiganNom);
+  if (!urlIshonchlimi(saqlanadiganNom)) return;
+  await del(saqlanadiganNom).catch(() => {
+    // Fayl allaqachon o'chirilgan bo'lsa muammo emas
+  });
 }

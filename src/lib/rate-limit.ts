@@ -1,22 +1,20 @@
 import "server-only";
 
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-
 /**
  * Kirishga urinishlar cheklovi — parolni brute-force qilishga qarshi.
  *
- * Ikki amalga oshirish:
+ * 15 daqiqada 5 ta muvaffaqiyatsiz urinish, keyin 15 daqiqa blok.
  *
- *   1. **Cloudflare Rate Limiting bindingi** (ishlab chiqarish). Butun tarmoq
- *      bo'ylab hisoblaydi. Cheklov: 60 soniyada 5 ta urinish — binding faqat
- *      10 yoki 60 soniyalik oynani qo'llab-quvvatlaydi.
+ * CHEKLOVI (bilib turib qabul qilingan):
+ * Hisoblagich jarayon xotirasida. Serverless muhitda (Vercel) bir nechta
+ * nusxa parallel ishlashi mumkin va har biri o'z hisobini yuritadi, ya'ni
+ * amaldagi chegara nusxalar soniga ko'payadi. Bu himoyani butunlay yo'q
+ * qilmaydi — bitta nusxa bir necha so'rovga xizmat qiladi — lekin qat'iy
+ * kafolat ham bermaydi.
  *
- *   2. **Xotiradagi hisoblagich** (lokal ishlab chiqish). Binding topilmasa
- *      ishlatiladi. 15 daqiqada 5 ta muvaffaqiyatsiz urinish, keyin 15 daqiqa blok.
- *
- * Nega ikkitasi: Workers'da har bir so'rov alohida, qisqa umrli muhitda
- * bajariladi va isolate'lar bir-birining xotirasini ko'rmaydi — oddiy `Map`
- * u yerda hech narsani cheklamaydi.
+ * Qat'iy kafolat kerak bo'lganda hisoblagichni tashqi omborga (Redis yoki
+ * bazadagi jadval) ko'chirish kerak. Pilot bosqichi uchun hozirgisi yetarli:
+ * parollar `scrypt` bilan xeshlangan va sessiyalar bekor qilinadi.
  */
 
 type Yozuv = { urinishlar: number; birinchiUrinish: number; blokTa: number };
@@ -37,29 +35,8 @@ function tozala(hozir: number) {
   }
 }
 
-async function cloudflareBindingi() {
-  try {
-    const { env } = await getCloudflareContext({ async: true });
-    return env.KIRISH_CHEKLOVI ?? null;
-  } catch {
-    // Cloudflare muhitidan tashqarida (masalan testlar) — zaxira usul ishlaydi
-    return null;
-  }
-}
-
-/**
- * Urinishga ruxsat bormi?
- *
- * Cloudflare bindingi bilan: **har bir chaqiruv hisoblanadi**, shuning uchun
- * bu funksiya bitta kirish urinishida faqat bir marta chaqirilishi kerak.
- */
-export async function kirishChekla(kalit: string): Promise<CheklovHolati> {
-  const binding = await cloudflareBindingi();
-  if (binding) {
-    const { success } = await binding.limit({ key: kalit });
-    return success ? { ruxsat: true, qolganSoniya: 0 } : { ruxsat: false, qolganSoniya: 60 };
-  }
-
+/** Urinishga ruxsat bormi? Hisoblagichni oshirmaydi. */
+export function kirishChekla(kalit: string): CheklovHolati {
   const hozir = Date.now();
   const y = yozuvlar.get(kalit);
   if (!y) return { ruxsat: true, qolganSoniya: 0 };
@@ -69,11 +46,7 @@ export async function kirishChekla(kalit: string): Promise<CheklovHolati> {
   return { ruxsat: true, qolganSoniya: 0 };
 }
 
-/**
- * Muvaffaqiyatsiz urinishni qayd etadi.
- * Cloudflare bindingi ishlatilganda hisob allaqachon `kirishChekla` da
- * yuritilgani uchun bu funksiya faqat lokal hisoblagichga ta'sir qiladi.
- */
+/** Muvaffaqiyatsiz urinishni qayd etadi va kerak bo'lsa bloklaydi. */
 export function muvaffaqiyatsizUrinish(kalit: string): void {
   const hozir = Date.now();
   tozala(hozir);
@@ -92,7 +65,7 @@ export function muvaffaqiyatsizUrinish(kalit: string): void {
   }
 }
 
-/** Muvaffaqiyatli kirishdan keyin lokal hisoblagichni tozalaydi. */
+/** Muvaffaqiyatli kirishdan keyin hisoblagichni tozalaydi. */
 export function tiklash(kalit: string): void {
   yozuvlar.delete(kalit);
 }

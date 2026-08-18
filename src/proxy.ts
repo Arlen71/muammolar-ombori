@@ -6,21 +6,15 @@ import { boshSahifa, bolimQoidasi, KIRISH_SAHIFASI, ochiqYolmi } from "@/lib/rou
 /**
  * Marshrut himoyasi.
  *
- * NEGA `middleware.ts`, `proxy.ts` EMAS:
- * Next.js 16 bu faylni `proxy.ts` deb qayta nomladi, lekin `proxy` majburan
- * Node.js runtime'da ishlaydi va uni o'zgartirib bo'lmaydi. Cloudflare Workers
- * uchun mo'ljallangan OpenNext adapteri esa hozircha faqat edge runtime'dagi
- * middleware'ni qo'llab-quvvatlaydi. Next hujjatlari aynan shu holat uchun eski
- * `middleware` konvensiyasida qolishni tavsiya qiladi.
- *
- * Bu kod edge'da muammosiz ishlaydi: bazaga murojaat yo'q, faqat cookie imzosi
- * tekshiriladi (`jose` edge'da ishlaydi).
+ * Next.js 16 da bu fayl `proxy.ts` deb ataladi (ilgari `middleware.ts` edi) va
+ * Node.js runtime'da ishlaydi.
  *
  * Bu yerda faqat **qo'pol** tekshiruv bo'ladi: cookie imzosi va rol.
- * Bloklangan foydalanuvchi, tasdiqlanmagan dasturchi va bekor qilingan sessiya
- * sahifa/action darajasida (`src/lib/auth.ts`) qayta tekshiriladi.
+ * Bazaga murojaat qilinmaydi — bloklangan foydalanuvchi, tasdiqlanmagan
+ * dasturchi va bekor qilingan sessiya sahifa/action darajasida
+ * (`src/lib/auth.ts`) qayta tekshiriladi.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   const sessiya = await sessiyaTokeniniOqi(
@@ -33,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
     Sababi: cookie imzosi to'g'ri bo'lsa ham sessiya yaroqsiz bo'lishi mumkin —
     foydalanuvchi o'chirilgan, bloklangan yoki admin sessiyalarni bekor qilgan.
-    Agar bu yerda yo'naltirsak, cheksiz halqa hosil bo'ladi:
+    Agar proxy bu yerda yo'naltirsa, cheksiz halqa hosil bo'ladi:
       /rahbar → (baza: foydalanuvchi yo'q) → /kirish → (cookie bor) → /rahbar → …
     Bazani faqat sahifa qatlami ko'ra oladi, shuning uchun bu qaror o'sha yerda.
   */
