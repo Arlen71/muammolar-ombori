@@ -320,7 +320,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | № | Talab | Holat |
 |---|---|---|
 | T-8.1 | PostgreSQL 14+ | ✅ |
-| T-8.2 | Ma'lumot O'zbekiston hududidagi serverda saqlanadi | ✅ (deploy qoidasi) |
+| T-8.2 | Ma'lumot O'zbekiston hududidagi serverda saqlanadi | ⏳ (pilotda Frankfurt — qarang 7.1) |
 | T-8.3 | Kod TypeScript, `strict` rejimda, xatosiz kompilyatsiya | ✅ |
 | T-8.4 | ESLint ogohlantirishsiz | ✅ |
 | T-8.5 | Build ogohlantirishsiz | ✅ |
@@ -332,6 +332,16 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.11 | WCAG AA kontrast darajasi | ✅ |
 
 ---
+
+### 7.1 Ma'lumot rezidentligi haqida ogohlantirish
+
+Pilot bosqichida ilova Vercel'da, baza esa Prisma Postgres'ning Frankfurt
+mintaqasida joylashgan. Bu `T-8.2` talabini **bajarmaydi**.
+
+Sinov uchun bu maqbul: bazada faqat namunaviy ma'lumot bor, real fuqaro
+ma'lumotlari yo'q. Ammo tizim haqiqiy foydalanishga o'tishdan oldin baza
+O'zbekiston hududidagi serverga ko'chirilishi shart. Ilova bunga tayyor —
+`DATABASE_URL` ni o'zgartirish kifoya, kodda o'zgarish kerak emas.
 
 ## 8. Ma'lumotlar modeli
 
@@ -411,6 +421,8 @@ Quyidagi stsenariy to'liq ishlashi shart:
 | Framework | Next.js 16 (App Router) | Frontend va backend bitta kod bazasida |
 | Til | TypeScript (strict) | Xatolarni kompilyatsiya vaqtida ushlash |
 | Baza | PostgreSQL 17 + Prisma 7 | Tipli so'rovlar, migratsiyalar |
+| Hosting | Vercel | Next.js uchun mo'ljallangan, moslashtirish kerak emas |
+| Fayl ombori | Vercel Blob | Serverless muhitda disk vaqtinchalik |
 | Uslub | Tailwind CSS 4 | Tez, konfiguratsiya CSS ichida |
 | Autentifikatsiya | O'z yechimimiz (`jose` + `scrypt`) | Kam bog'liqlik, audit oson |
 | Testlar | Node ichki test runneri | Qo'shimcha kutubxonasiz |

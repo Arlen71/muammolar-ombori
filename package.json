@@ -9,8 +9,6 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
-    "db:start": "prisma dev -n takliflar -d",
-    "db:stop": "prisma dev stop takliflar",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",

@@ -26,18 +26,18 @@ cp .env.example .env
 node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 ```
 
-Lokal ma'lumotlar bazasini ko'taring (hech narsa o'rnatish shart emas — Docker ham,
-PostgreSQL ham kerak emas):
+Ma'lumotlar bazasi — Prisma Postgres, HTTP orqali. [Prisma Console](https://console.prisma.io)
+da baza yarating va **`prisma+postgres://`** bilan boshlanadigan manzilni
+`.env` dagi `DATABASE_URL` ga qo'ying.
+
+> Nega TCP emas: serverless muhitda ulanishlar hovuzini so'rovlar orasida
+> saqlab bo'lmaydi. HTTP hech qanday hovuz talab qilmaydi va lokal muhit
+> ishlab chiqarish bilan aynan bir xil ishlaydi.
+
+Jadvallarni yarating va sinov ma'lumotini yuklang:
 
 ```bash
-npm run db:start
-```
-
-Buyruq bergan `postgres://...` manzilini `.env` dagi `DATABASE_URL` ga qo'ying,
-so'ng jadvallarni yarating va sinov ma'lumotini yuklang:
-
-```bash
-npm run db:migrate && npm run db:seed
+npm run db:deploy && npm run db:seed
 ```
 
 Dasturni ishga tushiring:
@@ -48,7 +48,14 @@ npm run dev
 
 ### Sinov akkauntlari
 
-Parol hammasida bir xil: `Parol2026!`
+Parol hammasida bir xil: `Parol2026!` (lokal standart).
+
+Internetdan ochiq muhitga seed qilayotganda albatta o'zingiznikini bering,
+chunki standart parol shu ochiq repoda turadi:
+
+```bash
+SEED_PASSWORD="..." npm run db:seed
+```
 
 | Rol | Telefon | Nima ko'radi |
 |---|---|---|
@@ -70,6 +77,7 @@ Parol hammasida bir xil: `Parol2026!`
 | `npm run admin:create` | Administrator yaratish yoki parolini tiklash |
 | `npm run db:check` | Baza diagnostikasi (deploydan keyin birinchi shuni yuriting) |
 | `npm run db:studio` | Ma'lumotlarni brauzerda ko'rish |
+| `npm run db:deploy` | Migratsiyalarni qo'llash |
 | `npm run db:seed` | Sinov ma'lumotini qayta yuklash (mavjud ma'lumot o'chadi) |
 
 ## Ishlash tartibi
@@ -130,11 +138,11 @@ tasdiqlanganmi, sessiya bekor qilinganmi — bularni sahifa qatlami
 sahifaga yo'naltirish ham `proxy.ts` da emas, `/kirish` sahifasining o'zida:
 aks holda yaroqsiz cookie bilan cheksiz yo'naltirish halqasi hosil bo'ladi.
 
-**Biriktirilgan fayllar `public/` da emas.** Ular tashkilotlarning ichki
-hujjatlari, shuning uchun `uploads/` papkasida yotadi va faqat
-`/api/fayl/[id]` orqali, ruxsat tekshirilgandan keyin beriladi. Diskdagi nom
-har doim tizim yaratgan UUID — foydalanuvchi bergan nom hech qachon yo'l
-sifatida ishlatilmaydi.
+**Biriktirilgan fayllarning manzili brauzerga berilmaydi.** Ular Vercel Blob
+da saqlanadi va Blob URL'lari ochiq bo'lgani uchun URL faqat bazada qoladi:
+foydalanuvchi faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat
+tekshiriladi. Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi
+bergan nom hech qachon yo'l sifatida ishlatilmaydi.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.
@@ -147,56 +155,44 @@ teng, qo'yib yuborilganda `null`.
 o'sha foydalanuvchining barcha ochiq cookie'lari darhol yaroqsiz bo'ladi.
 Bloklash va parolni tiklash shu maydonni avtomatik oshiradi.
 
-## Ishlab chiqarishga joylashtirish
+## Joylashtirish (Vercel)
 
-1. **PostgreSQL 14+** o'rnating (O'zbekiston hududidagi serverda — shaxsiy
-   ma'lumotlar to'g'risidagi qonun talabi).
-2. `.env` ni tayyorlang:
-   - `DATABASE_URL` — serverdagi baza manzili
-   - `SESSION_SECRET` — **albatta yangi**, tasodifiy kalit
-   - `DB_POOL_MAX="10"` — lokaldagi `1` emas (pastdagi izohga qarang)
-   - `UPLOAD_DIR` — zaxira nusxasi olinadigan doimiy papka
-3. Migratsiyalarni qo'llang: `npm run db:deploy`
-4. Birinchi administratorni yarating:
+Loyiha GitHub'ga ulangan: `main` ga har bir push avtomatik deploy bo'ladi.
+
+Birinchi marta sozlash:
+
+1. [vercel.com/new](https://vercel.com/new) da GitHub bilan kiring va
+   `muammolar-ombori` reposini import qiling. Next.js o'zi aniqlanadi.
+2. Muhit o'zgaruvchilarini qo'shing:
+   - `DATABASE_URL` — Prisma Console'dagi `prisma+postgres://` manzili
+   - `SESSION_SECRET` — yangi tasodifiy kalit (lokaldagi bilan bir xil bo'lmasin):
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+     ```
+3. Deploy tugmasini bosing.
+4. Birinchi administratorni yarating (lokaldan, bulut bazasiga):
    ```bash
    npm run admin:create -- --ism "Ism Familiya" --tel 901112233
    ```
-   Parol avtomatik yaratiladi va **bir marta** ekranga chiqadi — uni darhol
-   xavfsiz joyga ko'chiring. Boshqa foydalanuvchilar shu admin orqali,
-   «Foydalanuvchilar» bo'limidan qo'shiladi.
-5. Yig'ing va ishga tushiring: `npm run build && npm start`
-6. Oldiga `nginx` qo'ying: HTTPS, `X-Forwarded-For` (audit jurnalidagi IP shundan
-   olinadi) va fayl yuklash hajmi (`client_max_body_size 10m`).
-7. `npm run db:check` bilan tekshiring.
 
-### Admin parolini yo'qotib qo'ysangiz
+### Fayl biriktirish
 
-```bash
-npm run admin:create -- --tel 901112233 --parolni-tikla
-```
+Vercel loyihasida **Storage → Blob** bo'limidan Blob store yarating.
+`BLOB_READ_WRITE_TOKEN` avtomatik qo'shiladi va fayl biriktirish ishlay
+boshlaydi. Sozlanmaguncha ilova ishlaydi, sehrgar faqat fayl yuklash
+o'rniga tushunarli xabar ko'rsatadi.
 
-Yangi parol beriladi va o'sha adminning barcha ochiq sessiyalari darhol uziladi.
-Bu buyruq faqat `ADMIN` rolidagi akkauntlarda ishlaydi — oddiy foydalanuvchilar
-parolini admin panelidan tiklash kerak.
+Blob URL'lari ochiq bo'lgani uchun ular brauzerga berilmaydi — fayl
+`/api/fayl/[id]` orqali, ruxsat tekshirilgandan keyin server tomondan
+uzatiladi.
 
-Boshqa variantlar:
+### Ma'lumot rezidentligi
 
-| Buyruq | Vazifasi |
-|---|---|
-| `npm run admin:create` | Interaktiv: ism va telefonni so'raydi |
-| `... -- --yana` | Tizimda admin bo'lsa ham yana bittasini qo'shadi |
-| `... -- --parol "..."` | Parolni avtomatik yaratish o'rniga o'zingiz belgilaysiz |
-| `... -- --lavozim "..."` | Lavozimni ko'rsatadi |
-
-Skript ishlab chiqarishda ham ishlaydi (seeddan farqli), mavjud ma'lumotga
-tegmaydi va har bir amalni audit jurnaliga yozadi.
-
-### Nega lokalda `DB_POOL_MAX=1`
-
-`npm run db:start` PGlite — WASM ichida ishlaydigan PostgreSQL 17 — ni ko'taradi.
-U bir nechta parallel ulanishni ko'tara olmaydi va ortiqchasini uzib yuboradi
-(`P1017` xatosi). Bitta ulanishda barcha so'rovlar navbatga tushadi va muammo
-yo'qoladi. Haqiqiy PostgreSQL'da bunday cheklov yo'q — u yerda `10` qo'ying.
+TZ'dagi `T-8.2` talabi — ma'lumot O'zbekiston hududida saqlanishi — Vercel
+va Prisma Postgres bilan **bajarilmaydi** (baza Frankfurtda). Sinov va pilot
+uchun bu maqbul, lekin real fuqaro ma'lumotlari bilan ishlashdan oldin
+O'zbekistondagi serverga ko'chirish shart. Ilova bunga tayyor: `DATABASE_URL`
+ni o'zgartirish kifoya.
 
 ## Keyingi bosqichga qoldirilgan
 
