@@ -122,7 +122,7 @@ src/lib/scoring.ts          Oylik yo'qotish, to'liqlik, ta'sir balli (+ testlar)
 src/lib/labels.ts           Barcha o'zbekcha matnlar bir joyda
 src/lib/auth.ts             Sessiya va rol tekshiruvlari (bazadan)
 src/lib/similar.ts          Dublikat qidiruvi (pg_trgm, zaxira usul bilan)
-src/proxy.ts                Marshrut himoyasi (Next 16 da middleware shunday ataladi)
+src/middleware.ts           Marshrut himoyasi (edge runtime, bazaga tegmaydi)
 src/app/rahbar/             Rahbar: sehrgar, muammolar, qo'llab-quvvatlash
 src/app/ombor/              Dasturchi: ombor, filtrlar, "Men olaman"
 src/app/admin/              Administrator: moderatsiya, dublikatlar, akkauntlar
@@ -131,18 +131,19 @@ src/app/api/fayl/[id]/      Biriktirmalarni ruxsat tekshirib berish
 
 ### Bilib qo'yish kerak bo'lgan qarorlar
 
-**Xavfsizlik ikki qatlamli.** `proxy.ts` faqat cookie imzosi va rolni ko'radi —
+**Xavfsizlik ikki qatlamli.** `middleware.ts` faqat cookie imzosi va rolni ko'radi —
 u bazaga murojaat qila olmaydi. Foydalanuvchi bloklanganmi, dasturchi
 tasdiqlanganmi, sessiya bekor qilinganmi — bularni sahifa qatlami
 (`src/lib/auth.ts`) qayta tekshiradi. Shu sababli kirish sahifasidan bosh
-sahifaga yo'naltirish ham `proxy.ts` da emas, `/kirish` sahifasining o'zida:
+sahifaga yo'naltirish ham middleware'da emas, `/kirish` sahifasining o'zida:
 aks holda yaroqsiz cookie bilan cheksiz yo'naltirish halqasi hosil bo'ladi.
 
-**Biriktirilgan fayllarning manzili brauzerga berilmaydi.** Ular Vercel Blob
-da saqlanadi va Blob URL'lari ochiq bo'lgani uchun URL faqat bazada qoladi:
-foydalanuvchi faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat
-tekshiriladi. Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi
-bergan nom hech qachon yo'l sifatida ishlatilmaydi.
+**Biriktirmalar ikki qavat himoyalangan.** Blob ombori `private` rejimda:
+faylni internetdan havola bilan ochib bo'lmaydi, uni faqat token bilan server
+o'qiy oladi. Bazada ochiq manzil emas, ichki yo'l saqlanadi. Foydalanuvchi
+faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat tekshiriladi.
+Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi bergan nom
+hech qachon yo'l sifatida ishlatilmaydi.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.
@@ -177,14 +178,19 @@ Birinchi marta sozlash:
 
 ### Fayl biriktirish
 
-Vercel loyihasida **Storage → Blob** bo'limidan Blob store yarating.
-`BLOB_READ_WRITE_TOKEN` avtomatik qo'shiladi va fayl biriktirish ishlay
-boshlaydi. Sozlanmaguncha ilova ishlaydi, sehrgar faqat fayl yuklash
-o'rniga tushunarli xabar ko'rsatadi.
+Biriktirmalar **`private` rejimdagi** Vercel Blob omborida saqlanadi.
+Omborni yarating:
 
-Blob URL'lari ochiq bo'lgani uchun ular brauzerga berilmaydi — fayl
-`/api/fayl/[id]` orqali, ruxsat tekshirilgandan keyin server tomondan
-uzatiladi.
+```bash
+npx vercel blob create-store muammolar-fayllar --access private --yes
+```
+
+Buyruq `BLOB_READ_WRITE_TOKEN` ni loyihaga o'zi qo'shadi. Shundan keyin
+**qayta deploy qiling** — Vercel muhit o'zgaruvchilarini deploy paytida
+biriktiradi, mavjud build yangi o'zgaruvchini ko'rmaydi.
+
+Ombor ulanmaguncha ilova ishlashda davom etadi: sehrgar fayl yuklash
+o'rniga tushunarli xabar ko'rsatadi.
 
 ### Ma'lumot rezidentligi
 

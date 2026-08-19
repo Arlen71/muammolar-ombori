@@ -100,6 +100,7 @@ qanday texnik atama ishlatmasligi kerak.
 | T-2.3 | Qoralama avtomatik saqlanadi (o'zgarishdan 1,5 s keyin) | ✅ |
 | T-2.4 | Sahifa yopilib qayta ochilsa, yozilganlar joyida turadi | ✅ |
 | T-2.5 | Fayl biriktirish (Excel, PDF, rasm, Word) — 10 tagacha, har biri ≤10 MB | ✅ |
+| T-2.15 | Biriktirmalar yopiq omborda; ochiq havola bilan ochib bo'lmaydi | ✅ |
 | T-2.6 | Kartochka to'liqligi foizda ko'rsatiladi | ✅ |
 | T-2.7 | Yuborishdan oldin «dasturchi buni shunday ko'radi» oldindan ko'rish | ✅ |
 | T-2.8 | Sarlavha yozilayotganda o'xshash muammolar haqida ogohlantirish | ✅ |
@@ -303,7 +304,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-7.5 | Kirishda urinishlar cheklovi (5 marta / 15 daqiqa) | ✅ |
 | T-7.6 | Foydalanuvchi topilmasa ham parol tekshirilgandek vaqt ketadi | ✅ |
 | T-7.7 | Ruxsat ikki qatlamda: `proxy.ts` (rol) + sahifa (baza) | ✅ |
-| T-7.8 | Biriktirmalar `public/` da EMAS, ruxsat tekshirib beriladi | ✅ |
+| T-7.8 | Biriktirmalar `private` omborda; faqat token bilan o'qiladi va ruxsat tekshirilgandan keyin beriladi | ✅ |
 | T-7.9 | Fayl nomi tizim tomonidan yaratiladi (UUID), yo'l sifatida ishlatilmaydi | ✅ |
 | T-7.10 | Fayllar `Content-Disposition: attachment` bilan beriladi (XSS oldini olish) | ✅ |
 | T-7.11 | Aloqa raqami faqat muammoni olgan dasturchiga ko'rinadi | ✅ |
