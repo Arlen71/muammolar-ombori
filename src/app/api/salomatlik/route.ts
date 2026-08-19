@@ -44,6 +44,12 @@ export async function GET() {
       MAX_UPLOAD_BYTES: holati(process.env.MAX_UPLOAD_BYTES),
       VERCEL_ENV: process.env.VERCEL_ENV ?? "berilmagan",
     },
+    // Qaysi build jonli ekanini bilish uchun. Sozlama o'zgartirilgandan
+    // keyin qayta deploy bo'lgan-bo'lmaganini shundan aniqlash mumkin.
+    deploy: {
+      commit: (process.env.VERCEL_GIT_COMMIT_SHA ?? "berilmagan").slice(0, 7),
+      xabar: process.env.VERCEL_GIT_COMMIT_MESSAGE ?? "berilmagan",
+    },
     BLOB_READ_WRITE_TOKEN: {
       bor: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
       izoh: "Bo'lmasa fayl biriktirish o'chiq bo'ladi, qolgani ishlaydi",
