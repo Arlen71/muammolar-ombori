@@ -177,11 +177,14 @@ async function main() {
         "", "jiddiy"
       );
 
+      // DIQQAT: "rad etilmadi" deb tekshirish yetarli emas — server xatosi (500)
+      // ham shu shartga tushib, nuqsonni yashirib qo'yadi. Shuning uchun
+      // aniq kutilgan kodlarni sanaymiz.
       const tasdiqlangan = await ol(F(ochiqBiriktirma.id), dasturchiC);
       tekshir(
         "tasdiqlangan dasturchi ombordagi faylga kira oladi",
-        tasdiqlangan.status !== 403 && tasdiqlangan.status !== 401,
-        `status ${tasdiqlangan.status}`
+        [200, 404].includes(tasdiqlangan.status),
+        `status ${tasdiqlangan.status} (200 yoki 404 kutiladi)`
       );
 
       tekshir(
@@ -201,7 +204,7 @@ async function main() {
       const oz = await ol(F(qoralamaBiriktirma.id), rahbarC);
       tekshir(
         "o'z tashkiloti rahbari faylga kira oladi",
-        oz.status !== 403 && oz.status !== 401,
+        haqiqiyYol ? oz.status === 200 : [200, 404].includes(oz.status),
         `status ${oz.status}`
       );
 
