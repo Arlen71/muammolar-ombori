@@ -1,12 +1,20 @@
 import { db } from "@/lib/db";
+import { getJoriyFoydalanuvchi } from "@/lib/auth";
 
 /**
  * Sozlamalar diagnostikasi: `/api/salomatlik`
  *
- * Deploydan keyin nima ishlamayotganini tez aniqlash uchun. Maxfiy
- * qiymatlarni QAYTARMAYDI — faqat o'zgaruvchi bor-yo'qligi, protokoli va
- * bazaga ulanish natijasi. Parol, api_key va sessiya kaliti hech qachon
- * javobda ko'rinmaydi.
+ * Ikki darajali javob:
+ *
+ *   - **Har kim uchun**: faqat `ok` yoki `muammo bor`. Bu monitoring uchun
+ *     yetarli va tashqi kuzatuvchiga tizim sozlamalari haqida hech narsa
+ *     aytmaydi.
+ *   - **Administrator uchun**: to'liq tafsilot — qaysi o'zgaruvchi
+ *     yetishmayapti, bazaga ulanish xatosi, jonli commit.
+ *
+ * Maxfiy qiymatlarning O'ZI hech qachon qaytarilmaydi. Ilgari bu endpoint
+ * hammaga to'liq tafsilot berardi — bu ortiqcha oshkoralik edi: hujumchiga
+ * tizim qanday sozlanganini va nima buzuq ekanini bepul aytib berardi.
  */
 export const dynamic = "force-dynamic";
 
@@ -69,12 +77,29 @@ export async function GET() {
     baza = { ulandi: false, xato };
   }
 
-  const hammasiJoyida = sozlamalar.DATABASE_URL.togrimi &&
+  const hammasiJoyida =
+    sozlamalar.DATABASE_URL.togrimi &&
     sozlamalar.SESSION_SECRET.yetarliUzunmi &&
     baza.ulandi;
 
+  const holat = hammasiJoyida ? "ok" : "muammo bor";
+  const javobSarlavhalari = { "Cache-Control": "no-store" };
+  const kod = hammasiJoyida ? 200 : 503;
+
+  // Tafsilotni faqat administrator ko'radi
+  let admin = false;
+  try {
+    admin = (await getJoriyFoydalanuvchi())?.role === "ADMIN";
+  } catch {
+    // Baza yetib bo'lmasa foydalanuvchini aniqlab bo'lmaydi — mehmon deb hisoblaymiz
+  }
+
+  if (!admin) {
+    return Response.json({ holat }, { status: kod, headers: javobSarlavhalari });
+  }
+
   return Response.json(
-    { holat: hammasiJoyida ? "ok" : "muammo bor", sozlamalar, baza, msVaqt: Date.now() - boshlandi },
-    { status: hammasiJoyida ? 200 : 503, headers: { "Cache-Control": "no-store" } }
+    { holat, sozlamalar, baza, msVaqt: Date.now() - boshlandi },
+    { status: kod, headers: javobSarlavhalari }
   );
 }
