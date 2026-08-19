@@ -1,6 +1,6 @@
 import "server-only";
 
-import { del, put } from "@vercel/blob";
+import { del, get, put } from "@vercel/blob";
 
 import { hajmMatni } from "@/lib/uploads-client";
 
@@ -12,10 +12,13 @@ import { hajmMatni } from "@/lib/uploads-client";
  * keyingi so'rovda yo'q bo'ladi — bu xatolikdan ham yomonroq, chunki
  * jimgina ma'lumot yo'qotadi.
  *
- * MAXFIYLIK: Blob URL'lari ochiq (topib bo'lmaydigan, lekin himoyalanmagan).
- * Shuning uchun URL brauzerga HECH QACHON berilmaydi — u faqat bazada
- * saqlanadi. Foydalanuvchi faylni `/api/fayl/[id]` orqali oladi, u yerda
- * avval ruxsat tekshiriladi va fayl server tomondan uzatiladi.
+ * MAXFIYLIK: ombor `private` rejimda. Fayllarni internetdan URL bilan
+ * ochib bo'lmaydi — ularni faqat `BLOB_READ_WRITE_TOKEN` bilan server
+ * o'qiy oladi. Bazada ochiq manzil emas, ichki yo'l saqlanadi.
+ *
+ * Bu ikki qavatli himoya: foydalanuvchi faylni `/api/fayl/[id]` orqali
+ * oladi va u yerda avval ruxsat tekshiriladi. Bazadagi yozuv sizib chiqsa
+ * ham fayl ochilmaydi — chunki yo'lning o'zi hech narsa bermaydi.
  */
 
 export { hajmMatni };
@@ -101,7 +104,7 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
   const mime = ruxsatEtilganTurlar.includes(fayl.type) ? fayl.type : ruxsatEtilganTurlar[0];
 
   const natija = await put(`biriktirmalar/${crypto.randomUUID()}${keng}`, fayl, {
-    access: "public",
+    access: "private",
     contentType: mime,
     // Yo'lni o'zimiz to'liq belgilaymiz — tasodifiy qo'shimcha kerak emas
     addRandomSuffix: false,
@@ -109,43 +112,43 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
 
   return {
     fileName: tozaNom(fayl.name),
-    // URL bazada saqlanadi, brauzerga hech qachon berilmaydi
-    storedName: natija.url,
+    // Ichki yo'l saqlanadi (ochiq URL emas) va brauzerga hech qachon berilmaydi
+    storedName: natija.pathname,
     mimeType: mime,
     size: fayl.size,
   };
 }
 
 /**
- * Saqlangan qiymat haqiqiy Blob URL'imi.
+ * Saqlangan qiymat biz yaratgan yo'l ko'rinishidami.
  *
- * Bazadagi yozuv buzilgan bo'lsa ham server ixtiyoriy manzilga so'rov
- * yubormasligi kerak (SSRF himoyasi).
+ * Bazadagi yozuv buzilgan yoki qo'lda o'zgartirilgan bo'lsa ham, ombordan
+ * faqat o'zimiz yozgan naqshdagi fayllar so'raladi.
  */
-function urlIshonchlimi(qiymat: string): boolean {
-  try {
-    const u = new URL(qiymat);
-    return u.protocol === "https:" && u.hostname.endsWith(".blob.vercel-storage.com");
-  } catch {
-    return false;
-  }
+function yolIshonchlimi(qiymat: string): boolean {
+  return /^biriktirmalar\/[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(qiymat);
 }
 
-/** Faylni ombordan o'qiydi. Topilmasa yoki manzil ishonchsiz bo'lsa `null`. */
+/**
+ * Faylni ombordan o'qiydi. Topilmasa yoki yo'l ishonchsiz bo'lsa `null`.
+ *
+ * Oddiy `fetch` emas, SDK ning `get()` funksiyasi ishlatiladi: ombor private
+ * bo'lgani uchun faylni faqat token bilan o'qish mumkin.
+ */
 export async function faylniOlish(
   saqlanadiganNom: string
 ): Promise<{ oqim: ReadableStream; hajm: number } | null> {
-  if (!urlIshonchlimi(saqlanadiganNom)) return null;
+  if (!yolIshonchlimi(saqlanadiganNom)) return null;
 
-  const javob = await fetch(saqlanadiganNom);
-  if (!javob.ok || !javob.body) return null;
+  const natija = await get(saqlanadiganNom, { access: "private" });
+  if (!natija || !natija.stream) return null;
 
-  const hajm = Number(javob.headers.get("content-length") ?? 0);
-  return { oqim: javob.body, hajm };
+  // `get()` hajmni qaytarmaydi; marshrut hajmsiz ham to'g'ri ishlaydi
+  return { oqim: natija.stream, hajm: 0 };
 }
 
 export async function faylniOchir(saqlanadiganNom: string): Promise<void> {
-  if (!urlIshonchlimi(saqlanadiganNom)) return;
+  if (!yolIshonchlimi(saqlanadiganNom)) return;
   await del(saqlanadiganNom).catch(() => {
     // Fayl allaqachon o'chirilgan bo'lsa muammo emas
   });
