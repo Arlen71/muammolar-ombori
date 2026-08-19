@@ -313,6 +313,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-7.14 | Audit jurnali: kirish, holat o'zgarishi, fayl yuklab olish | ✅ |
 | T-7.15 | `npm audit` toza bo'lishi shart | ✅ |
 | T-7.16 | Ikki bosqichli autentifikatsiya (2FA) | ⏳ |
+| T-7.17 | Diagnostika endpointi sozlama tafsilotini faqat adminga beradi | ✅ |
 
 ---
 
@@ -331,6 +332,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.9 | Bir sahifa ≤5 ta baza so'rovi | ✅ |
 | T-8.10 | Klaviatura bilan to'liq boshqarish, fokus halqasi | ✅ |
 | T-8.11 | WCAG AA kontrast darajasi | ✅ |
+| T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 36 ta hujum stsenariysi) | ✅ |
 
 ---
 

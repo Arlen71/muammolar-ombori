@@ -72,6 +72,7 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm run build` | Ishlab chiqarish uchun yig'ish |
 | `npm test` | Hisob-kitob mantiqi testlari |
 | `npm run e2e` | Rollar va ruxsatlar tekshiruvi (dev server ochiq bo'lsin) |
+| `npm run security` | Xavfsizlik tekshiruvi — 36 ta hujum stsenariysi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
 | `npm run admin:create` | Administrator yaratish yoki parolini tiklash |
