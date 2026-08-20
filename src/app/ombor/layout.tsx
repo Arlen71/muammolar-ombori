@@ -9,8 +9,8 @@ export default async function OmborLayout({ children }: LayoutProps<"/ombor">) {
     <AppShell
       foydalanuvchi={foydalanuvchi}
       havolalar={[
-        { yol: "/ombor", matn: "Muammolar ombori" },
-        { yol: "/ombor/mening", matn: "Men olgan muammolar" },
+        { yol: "/ombor", matn: "Muammolar ombori", belgi: "ombor" },
+        { yol: "/ombor/mening", matn: "Men olgan muammolar", belgi: "royxat" },
       ]}
     >
       {children}

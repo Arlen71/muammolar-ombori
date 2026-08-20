@@ -2,17 +2,14 @@
 
 import * as React from "react";
 
+import { useOyna } from "@/components/oyna";
 import { Tugma } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 /**
  * Modal oyna.
  *
- * Brauzerning o'z `<dialog>` elementi ustiga qurilgan. Sabab: `showModal()`
- * fokusni oyna ichida ushlab turadi, `Esc` ni o'zi qayta ishlaydi, orqa
- * fondagi kontentni ekran o'quvchidan yashiradi va elementni top-layer'ga
- * chiqaradi — ya'ni `z-index` bilan kurashish kerak emas. Bularning
- * hammasini qo'lda yozganda odatda kamida bittasi unutiladi.
+ * Ochilish/yopilish mantig'i `useOyna` da — u tortma bilan bir xil.
  */
 export function Modal({
   ochiq,
@@ -33,51 +30,24 @@ export function Modal({
   /** Pastki qatordagi tugmalar */
   poyloq?: React.ReactNode;
 }) {
-  const oyna = React.useRef<HTMLDialogElement>(null);
-
-  React.useEffect(() => {
-    const el = oyna.current;
-    if (!el) return;
-
-    if (ochiq && !el.open) el.showModal();
-    if (!ochiq && el.open) el.close();
-  }, [ochiq]);
-
-  // Orqadagi sahifa siljib ketmasligi uchun — `showModal()` buni o'zi qilmaydi
-  React.useEffect(() => {
-    if (!ochiq) return;
-    const oldingi = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = oldingi;
-    };
-  }, [ochiq]);
-
-  /*
-    Fon bosilganda yopiladi. `<dialog>` da fon — elementning o'zi, shuning
-    uchun bosilgan nishon aynan dialog bo'lsa, demak kontentdan tashqari
-    joy bosilgan.
-  */
-  function fondaBosildi(hodisa: React.MouseEvent<HTMLDialogElement>) {
-    if (hodisa.target === oyna.current) yop();
-  }
+  const { oyna, fondaBosildi } = useOyna(ochiq, yop);
+  const sarlavhaId = React.useId();
 
   return (
     <dialog
       ref={oyna}
-      onClose={yop}
       onClick={fondaBosildi}
-      aria-labelledby="modal-sarlavha"
+      aria-labelledby={sarlavhaId}
       className={cn(
-        "m-auto w-[calc(100vw-2rem)] rounded-xl border border-chegara bg-yuza p-0 text-matn shadow-3",
-        "max-h-[calc(100dvh-4rem)] overflow-visible",
+        "oyna-markaz m-auto w-[calc(100vw-2rem)] rounded-xl border border-chegara bg-yuza p-0 text-matn shadow-3",
+        "max-h-[calc(100dvh-4rem)]",
         kenglik
       )}
     >
       <div className="flex max-h-[calc(100dvh-4rem)] flex-col">
         <div className="flex items-start justify-between gap-4 border-b border-chegara px-5 py-4">
           <div className="min-w-0">
-            <h2 id="modal-sarlavha" className="text-base font-semibold text-matn">
+            <h2 id={sarlavhaId} className="text-base font-semibold text-matn">
               {sarlavha}
             </h2>
             {izoh && <p className="mt-0.5 text-sm text-matn-ikkilamchi">{izoh}</p>}
@@ -86,7 +56,7 @@ export function Modal({
             type="button"
             onClick={yop}
             aria-label="Yopish"
-            className="-mr-1.5 -mt-1 inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
+            className="-mr-1.5 -mt-1 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
           >
             <svg viewBox="0 0 20 20" fill="none" className="size-5" aria-hidden="true">
               <path

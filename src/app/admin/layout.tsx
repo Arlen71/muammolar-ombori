@@ -8,12 +8,12 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <AppShell
       foydalanuvchi={admin}
       havolalar={[
-        { yol: "/admin", matn: "Boshqaruv" },
-        { yol: "/admin/moderatsiya", matn: "Moderatsiya" },
-        { yol: "/admin/dublikatlar", matn: "Dublikatlar" },
-        { yol: "/admin/dasturchilar", matn: "Dasturchilar" },
-        { yol: "/admin/tashkilotlar", matn: "Tashkilotlar" },
-        { yol: "/admin/foydalanuvchilar", matn: "Foydalanuvchilar" },
+        { yol: "/admin", matn: "Boshqaruv", belgi: "boshqaruv" },
+        { yol: "/admin/moderatsiya", matn: "Moderatsiya", belgi: "moderatsiya" },
+        { yol: "/admin/dublikatlar", matn: "Dublikatlar", belgi: "dublikat" },
+        { yol: "/admin/dasturchilar", matn: "Dasturchilar", belgi: "dasturchilar" },
+        { yol: "/admin/tashkilotlar", matn: "Tashkilotlar", belgi: "tashkilotlar" },
+        { yol: "/admin/foydalanuvchilar", matn: "Foydalanuvchilar", belgi: "foydalanuvchilar" },
       ]}
     >
       {children}

@@ -227,15 +227,31 @@
     backdrop-filter: blur(2px);
   }
 
-  /* Modal ochilishi — 150 ms, tez va sezilarli */
-  dialog[open] {
-    animation: modal-kirish 0.15s ease-out;
+  /*
+    Oyna ochilishi. Ikki xil: markazdagi modal pastdan ko'tariladi, yon
+    panel chetdan suriladi — harakat yo'nalishi element qayerdan
+    kelayotganini aytadi, shu tufayli ekran to'satdan o'zgarmaydi.
+    Davomiylik 150–200 ms: bundan uzunroq bo'lsa interfeys sekin tuyuladi.
+  */
+  .oyna-markaz[open] {
+    animation: oyna-markazdan 0.15s ease-out;
   }
 
-  @keyframes modal-kirish {
+  @keyframes oyna-markazdan {
     from {
       opacity: 0;
       transform: translateY(6px) scale(0.98);
+    }
+  }
+
+  .oyna-chap[open] {
+    animation: oyna-chapdan 0.2s ease-out;
+  }
+
+  @keyframes oyna-chapdan {
+    from {
+      opacity: 0;
+      transform: translateX(-100%);
     }
   }
 }

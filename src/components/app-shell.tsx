@@ -1,15 +1,20 @@
-import Link from "next/link";
-
 import { chiqishAmali } from "@/app/kirish/actions";
-import { NavHavolalar, type Havola } from "@/components/nav-links";
+import { MavzuTugmasi } from "@/components/mavzu";
+import { YonPanel, type Havola } from "@/components/yon-panel";
 import { ROL } from "@/lib/labels";
+import { cn } from "@/lib/utils";
 import type { JoriyFoydalanuvchi } from "@/lib/auth";
 
 export type { Havola };
 
 /**
- * Kirgan foydalanuvchilar uchun umumiy sahifa ramkasi:
- * yuqorida navigatsiya, o'ngda foydalanuvchi va chiqish tugmasi.
+ * Kirgan foydalanuvchilar uchun umumiy sahifa ramkasi.
+ *
+ * Navigatsiya ilgari yuqori qatorda edi. Yon panelga o'tkazildi, chunki
+ * bo'limlar soni o'sib bormoqda (administratorda oltita) va gorizontal
+ * qatorda ular telefon ekranida siljitib ko'riladigan tasmaga aylanardi —
+ * ya'ni bir vaqtning o'zida hamma bo'limni ko'rib bo'lmasdi. Chapdagi
+ * ustunda esa ro'yxat vertikal o'sadi va joy yetadi.
  */
 export function AppShell({
   foydalanuvchi,
@@ -20,54 +25,77 @@ export function AppShell({
   havolalar?: Havola[];
   children: React.ReactNode;
 }) {
+  const poyloq = (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 px-2 py-1">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium leading-tight text-matn">
+            {foydalanuvchi.fullName}
+          </p>
+          <p className="truncate text-xs leading-tight text-matn-uchinchi">
+            {foydalanuvchi.organizationName ?? ROL[foydalanuvchi.role]}
+          </p>
+        </div>
+        <MavzuTugmasi className="shrink-0" />
+      </div>
+
+      <form action={chiqishAmali}>
+        <button
+          type="submit"
+          className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
+        >
+          Chiqish
+        </button>
+      </form>
+    </div>
+  );
+
+  const menyuBor = havolalar.length > 0;
+
   return (
-    <>
-      <header className="chop-etilmasin border-b border-chegara bg-yuza">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-          <Link href="/" className="shrink-0 font-semibold tracking-tight text-matn">
+    /*
+      Chapdagi bo'shliq faqat yon panel mavjud bo'lganda qo'yiladi. Aks holda
+      menyusiz ekranlar (masalan "arizangiz ko'rib chiqilmoqda") katta
+      monitorda 256 piksel bo'sh joydan keyin boshlanardi.
+    */
+    <div className={cn("flex min-h-full w-full flex-col", menyuBor && "lg:pl-64")}>
+      {menyuBor ? (
+        <YonPanel
+          havolalar={havolalar}
+          poyloq={poyloq}
+          mobilPoyloq={<MavzuTugmasi />}
+        />
+      ) : (
+        /*
+          Menyusiz ekranlar ham (masalan "arizangiz ko'rib chiqilmoqda")
+          chiqish tugmasi va mavzu almashtirgichiga muhtoj — aks holda
+          tasdiqlanmagan dasturchi tizimdan chiqa olmay qolardi.
+        */
+        <header className="chop-etilmasin flex h-14 items-center gap-3 border-b border-chegara bg-yuza px-4">
+          <span className="font-semibold tracking-tight text-matn">
             Muammolar ombori
-          </Link>
-
-          {havolalar.length > 0 && (
-            <nav className="hidden items-center gap-1 sm:flex" aria-label="Asosiy menyu">
-              <NavHavolalar havolalar={havolalar} />
-            </nav>
-          )}
-
-          <div className="ml-auto flex items-center gap-3">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium leading-tight text-matn">
-                {foydalanuvchi.fullName}
-              </p>
-              <p className="text-xs leading-tight text-matn-uchinchi">
-                {foydalanuvchi.organizationName ?? ROL[foydalanuvchi.role]}
-              </p>
-            </div>
+          </span>
+          <div className="ml-auto flex items-center gap-1">
+            <MavzuTugmasi />
             <form action={chiqishAmali}>
               <button
                 type="submit"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
               >
                 Chiqish
               </button>
             </form>
           </div>
-        </div>
+        </header>
+      )}
 
-        {havolalar.length > 0 && (
-          <nav
-            className="flex gap-1 overflow-x-auto border-t border-chegara px-4 py-2 sm:hidden"
-            aria-label="Asosiy menyu"
-          >
-            <NavHavolalar havolalar={havolalar} mobil />
-          </nav>
-        )}
-      </header>
-
-      <main id="asosiy" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main
+        id="asosiy"
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:py-8"
+      >
         {children}
       </main>
-    </>
+    </div>
   );
 }
 

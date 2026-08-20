@@ -8,8 +8,8 @@ export default async function RahbarLayout({ children }: LayoutProps<"/rahbar">)
     <AppShell
       foydalanuvchi={rahbar}
       havolalar={[
-        { yol: "/rahbar", matn: "Mening muammolarim" },
-        { yol: "/rahbar/boshqalar", matn: "Boshqa tashkilotlarda" },
+        { yol: "/rahbar", matn: "Mening muammolarim", belgi: "royxat" },
+        { yol: "/rahbar/boshqalar", matn: "Boshqa tashkilotlarda", belgi: "qollab" },
       ]}
     >
       {children}
