@@ -82,6 +82,20 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm run db:deploy` | Migratsiyalarni qo'llash |
 | `npm run db:seed` | Sinov ma'lumotini qayta yuklash (mavjud ma'lumot o'chadi) |
 
+### Tekshiruv skriptlari o'z ma'lumotini yaratadi
+
+`npm run e2e` va `npm run security` bazaga vaqtinchalik yozuv qo'shadi
+(`E2E-` va `XAVF-` prefiksli) va oxirida o'chiradi. Ikkalasi ham
+boshlanishida eski qoldiqni tozalaydi — skript Ctrl+C bilan
+to'xtatilganda `finally` bloki ishlamaydi va yozuv bazada qolib ketardi.
+
+Nega bu muhim: bir vaqtlar "qoralama omborda 404 beradi" tekshiruvi
+bazadan `status: "DRAFT"` bo'yicha qidirardi. `prisma/seed.ts` esa
+qoralama yaratmaydi — ya'ni toza o'rnatishda tekshiruv jimgina
+o'tkazib yuborilardi va faqat uzilib qolgan yurishdan qolgan axlat
+yozuv tufayli ishlab kelgan. Bajarilmagan tekshiruv yiqilganidan
+yomonroq: yiqilgani ko'rinadi, yo'qolgani esa yo'q.
+
 ## Ishlash tartibi
 
 Loyiha [texnik topshiriq](docs/TZ.md) asosida quriladi. Har qanday ish

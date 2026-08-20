@@ -98,6 +98,35 @@ async function main() {
     include: { problem: { select: { id: true, organizationId: true } } },
   });
 
+  /*
+    Oldingi uzilib qolgan yurishlardan qolgan qoldiqni tozalaymiz.
+
+    Quyidagi `finally` bloki odatda hammasini o'chiradi, lekin skript
+    Ctrl+C bilan to'xtatilsa yoki jarayon yiqilsa u ishga tushmaydi va
+    bazada "Xavfsizlik sinovi uchun vaqtinchalik qoralama" qolib ketadi.
+    U rahbarning ish stolida ko'rinib turadi va chalkashtiradi.
+
+    Shuning uchun tozalash boshida ham qilinadi: `XAVF-` prefiksi faqat
+    shu skript yaratadigan yozuvlarga qo'yiladi, ya'ni bu yerda haqiqiy
+    ma'lumot o'chib ketmaydi.
+  */
+  const eskiQoldiqlar = await db.problem.findMany({
+    where: { refCode: { startsWith: "XAVF-" } },
+    select: { id: true, attachments: { select: { storedName: true } } },
+  });
+  if (eskiQoldiqlar.length > 0) {
+    for (const q of eskiQoldiqlar) {
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const { del } = await import("@vercel/blob");
+        for (const b of q.attachments) await del(b.storedName).catch(() => {});
+      }
+      await db.problem.delete({ where: { id: q.id } }).catch(() => {});
+    }
+    console.log(
+      `  (oldingi yurishdan qolgan ${eskiQoldiqlar.length} ta yozuv tozalandi)\n`
+    );
+  }
+
   // Vaqtinchalik qoralama + biriktirma: e'lon qilinmagan fayl sinovi uchun
   // Sarlavhalarni tekshirish uchun omborda haqiqiy fayl bo'lishi kerak
   let haqiqiyYol: string | null = null;

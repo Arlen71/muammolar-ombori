@@ -52,6 +52,46 @@ function yonaltiradi(j: Javob, yol: string): boolean {
 }
 
 /** Bazadan bir marta o'qib olinadigan hamma narsa. */
+/** Sinov uchun yaratilgan yozuvlar shu prefiks bilan belgilanadi. */
+const SINOV_PREFIKSI = "E2E-";
+
+/**
+ * Qoralama fikstirasi.
+ *
+ * Nega bazadan izlanmaydi: `prisma/seed.ts` qoralama yaratmaydi, ya'ni
+ * toza o'rnatishda `status: "DRAFT"` bo'yicha qidiruv hech narsa
+ * topmasdi va "qoralama omborda 404 beradi" tekshiruvi jimgina
+ * o'tkazib yuborilardi. Uzoq vaqt u faqat xavfsizlik skriptidan qolib
+ * ketgan axlat yozuv tufayli ishlab kelgan — ya'ni qamrov xayoliy edi.
+ *
+ * Endi tekshiruv o'z fikstirasini yaratadi va oxirida o'chiradi.
+ */
+async function qoralamaTayyorla(muallifId: string, tashkilotId: string) {
+  // Oldingi uzilib qolgan yurishlardan qolgan qoldiq
+  await db.problem.deleteMany({ where: { refCode: { startsWith: SINOV_PREFIKSI } } });
+
+  const turkum = await db.category.findFirstOrThrow();
+  return db.problem.create({
+    data: {
+      refCode: `${SINOV_PREFIKSI}${Date.now()}`,
+      organizationId: tashkilotId,
+      authorId: muallifId,
+      title: "E2E sinovi uchun vaqtinchalik qoralama",
+      description: "Bu yozuv skript tomonidan yaratilgan va darhol o'chiriladi.",
+      categoryId: turkum.id,
+      status: "DRAFT",
+    },
+    select: { id: true },
+  });
+}
+
+/** Sinov yaratgan barcha yozuvlarni o'chiradi. */
+async function qoralamaniOchir() {
+  await db.problem
+    .deleteMany({ where: { refCode: { startsWith: SINOV_PREFIKSI } } })
+    .catch(() => {});
+}
+
 async function malumotYig() {
   const [admin, rahbar, dasturchi, kutayotgan] = await Promise.all([
     db.user.findFirstOrThrow({ where: { role: "ADMIN" } }),
@@ -66,7 +106,7 @@ async function malumotYig() {
       where: { organizationId: { not: rahbar.organizationId! } },
       select: { id: true },
     }),
-    db.problem.findFirst({ where: { status: "DRAFT" }, select: { id: true } }),
+    qoralamaTayyorla(rahbar.id, rahbar.organizationId!),
     db.problem.findFirst({
       where: { status: "APPROVED", contactPhone: { not: null } },
       select: { id: true, contactPhone: true, title: true },
@@ -95,7 +135,7 @@ async function malumotYig() {
     }),
     faylId: fayl?.id ?? null,
     begonaMuammoId: begonaMuammo?.id ?? null,
-    qoralamaId: qoralama?.id ?? null,
+    qoralamaId: qoralama.id,
     ochiqMuammo,
   };
 }
@@ -104,8 +144,11 @@ async function main() {
   console.log(`Tekshiruv manzili: ${ASOS}\n`);
 
   const m = await malumotYig();
-  // Bazadagi ulanishlarni bo'shatamiz — quyida faqat HTTP ishlatiladi
-  await db.$disconnect();
+  /*
+    Ilgari bu yerda `db.$disconnect()` chaqirilardi. Endi ulanish oxirigacha
+    ochiq qoladi: HTTP tekshiruvlari tugagach vaqtinchalik qoralamani
+    o'chirish kerak. Ulanish bitta va u `finally` da yopiladi.
+  */
 
   console.log("Kirmagan mehmon:");
   {
@@ -164,10 +207,24 @@ async function main() {
     tekshir("/admin ga kira olmaydi", yonaltiradi(await ol("/admin", m.dasturchiC), "/ombor"));
     tekshir("/rahbar ga kira olmaydi", yonaltiradi(await ol("/rahbar", m.dasturchiC), "/ombor"));
 
-    if (m.qoralamaId) {
-      const j = await ol(`/ombor/${m.qoralamaId}`, m.dasturchiC);
-      tekshir("qoralama omborda 404 beradi", j.status === 404, `status ${j.status}`);
-    }
+    /*
+      Bazada qoralama bo'lmasa, tekshiruv o'tkazib yuborilmaydi — YIQILADI.
+
+      Ilgari bu shart `if (m.qoralamaId)` ichida edi va qoralama
+      topilmaganda tekshiruv jimgina o'tkazib yuborilardi. Natijada
+      qamrov hech kim sezmasdan kamayib qolgan edi: yagona qoralama
+      xavfsizlik skriptidan qolib ketgan axlat yozuv bo'lib chiqdi, u
+      o'chirilganda esa tekshiruv shunchaki ro'yxatdan yo'qoldi.
+
+      Bajarilmagan tekshiruv yiqilganidan yomonroq: yiqilgani ko'rinadi,
+      yo'qolgani esa yo'q.
+    */
+    const qoralamaJavobi = await ol(`/ombor/${m.qoralamaId}`, m.dasturchiC);
+    tekshir(
+      "qoralama omborda 404 beradi",
+      qoralamaJavobi.status === 404,
+      `status ${qoralamaJavobi.status}`
+    );
 
     if (m.ochiqMuammo?.contactPhone) {
       const j = await ol(`/ombor/${m.ochiqMuammo.id}`, m.dasturchiC);
@@ -213,12 +270,16 @@ async function main() {
     );
   }
 
+  await qoralamaniOchir();
+  await db.$disconnect().catch(() => {});
+
   console.log(`\n${otdi} ta o'tdi, ${yiqildi} ta yiqildi`);
   process.exit(yiqildi > 0 ? 1 : 0);
 }
 
 main().catch(async (e) => {
   console.error("XATO:", e instanceof Error ? e.message : e);
+  await qoralamaniOchir();
   await db.$disconnect().catch(() => {});
   process.exit(1);
 });
