@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { MavzuTugmasi } from "@/components/mavzu";
 import { boshSahifa, getJoriyFoydalanuvchi } from "@/lib/auth";
 import { KirishFormasi } from "./kirish-formasi";
 
@@ -18,7 +19,12 @@ export default async function KirishSahifasi(props: PageProps<"/kirish">) {
   const keyingi = typeof params.keyingi === "string" ? params.keyingi : undefined;
 
   return (
-    <main id="asosiy" className="flex min-h-screen items-center justify-center px-4 py-12">
+    <main id="asosiy" className="relative flex min-h-screen items-center justify-center px-4 py-12">
+      {/* Mavzu tugmasi burchakda — kirishdan oldin ham tanlash mumkin bo'lsin */}
+      <div className="absolute right-3 top-3">
+        <MavzuTugmasi />
+      </div>
+
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block">

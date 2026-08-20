@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { db } from "@/lib/db";
 import { getJoriyFoydalanuvchi, boshSahifa } from "@/lib/auth";
+import { MavzuTugmasi } from "@/components/mavzu";
 import { Tugma } from "@/components/ui";
 import { sonMatni } from "@/lib/labels";
 
@@ -79,6 +80,8 @@ export default async function BoshSahifa() {
       <header className="border-b border-chegara bg-yuza">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <span className="font-semibold tracking-tight text-matn">Muammolar ombori</span>
+          <div className="ml-auto flex items-center gap-2">
+          <MavzuTugmasi />
           {foydalanuvchi ? (
             <Link href={boshSahifa(foydalanuvchi.role)}>
               <Tugma olcham="kichik" korinish="ikkilamchi">
@@ -90,6 +93,7 @@ export default async function BoshSahifa() {
               <Tugma olcham="kichik">Kirish</Tugma>
             </Link>
           )}
+          </div>
         </div>
       </header>
 
