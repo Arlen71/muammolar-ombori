@@ -116,7 +116,7 @@ export default async function SehrgarSahifasi(
       />
 
       {muammo.status === "REJECTED" && muammo.moderationNote && (
-        <div className="mb-6 rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-800 ring-1 ring-inset ring-rose-200">
+        <div className="mb-6 rounded-lg bg-xato-yuza px-4 py-3 text-sm text-xato ring-1 ring-inset ring-xato-chegara">
           <p className="font-semibold">Muammo rad etilgan</p>
           <p className="mt-1">{muammo.moderationNote}</p>
           <p className="mt-1">Kamchilikni tuzatib, qaytadan yuboring.</p>

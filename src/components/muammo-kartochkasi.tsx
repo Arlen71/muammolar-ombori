@@ -178,17 +178,17 @@ export function MuammoKartochkasi({
         <div
           className={
             qollabSoni > 0
-              ? "rounded-xl bg-emerald-50 px-4 py-3"
+              ? "rounded-xl bg-muvaffaqiyat-yuza px-4 py-3"
               : "rounded-xl border border-chegara px-4 py-3"
           }
         >
-          <p className={qollabSoni > 0 ? "text-xs text-emerald-800/80" : "text-xs text-matn-ikkilamchi"}>
+          <p className={qollabSoni > 0 ? "text-xs text-muvaffaqiyat/80" : "text-xs text-matn-ikkilamchi"}>
             Shu muammo bor tashkilot
           </p>
           <p
             className={
               qollabSoni > 0
-                ? "mt-0.5 text-lg font-semibold text-emerald-800"
+                ? "mt-0.5 text-lg font-semibold text-muvaffaqiyat"
                 : "mt-0.5 text-lg font-semibold text-matn"
             }
           >
@@ -198,7 +198,7 @@ export function MuammoKartochkasi({
       </div>
 
       {qollabSoni > 0 && (
-        <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900 ring-1 ring-inset ring-emerald-200">
+        <div className="rounded-lg bg-muvaffaqiyat-yuza px-4 py-3 text-sm text-muvaffaqiyat ring-1 ring-inset ring-muvaffaqiyat-chegara">
           <p className="font-medium">
             Bu muammo yana {qollabSoni} ta tashkilotda uchraydi
           </p>
@@ -326,7 +326,7 @@ export function MuammoKartochkasi({
         </dl>
 
         {muammo.dataSensitivity && (
-          <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-inset ring-amber-200">
+          <div className="mt-4 rounded-lg bg-ogohlantirish-yuza px-4 py-3 text-sm text-ogohlantirish ring-1 ring-inset ring-ogohlantirish-chegara">
             <p className="font-medium">Maxfiylik: {MAXFIYLIK[muammo.dataSensitivity]}</p>
             <p className="mt-1">{MAXFIYLIK_IZOHI[muammo.dataSensitivity]}</p>
           </div>
@@ -350,7 +350,7 @@ export function MuammoKartochkasi({
             </p>
           )}
           {muammo.successMetric && (
-            <div className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-900 ring-1 ring-inset ring-emerald-200">
+            <div className="mt-4 rounded-lg bg-muvaffaqiyat-yuza px-4 py-3 text-sm text-muvaffaqiyat ring-1 ring-inset ring-muvaffaqiyat-chegara">
               <span className="font-medium">Muvaffaqiyat mezoni: </span>
               {muammo.successMetric}
             </div>

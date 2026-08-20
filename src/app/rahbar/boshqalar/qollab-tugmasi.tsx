@@ -34,7 +34,7 @@ export function QollabTugmasi({
     return (
       <form action={bekorAmali} className="flex items-center gap-3">
         <input type="hidden" name="muammoId" value={muammoId} />
-        <span className="inline-flex items-center rounded-lg bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800 ring-1 ring-inset ring-emerald-200">
+        <span className="inline-flex items-center rounded-lg bg-muvaffaqiyat-yuza px-3 py-1.5 text-sm font-medium text-muvaffaqiyat ring-1 ring-inset ring-muvaffaqiyat-chegara">
           Bizda ham shu muammo bor
         </span>
         <button

@@ -76,7 +76,7 @@ export default async function BoshSahifa() {
 
   return (
     <>
-      <header className="border-b border-chegara bg-white">
+      <header className="border-b border-chegara bg-yuza">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <span className="font-semibold tracking-tight text-matn">Muammolar ombori</span>
           {foydalanuvchi ? (
@@ -109,7 +109,7 @@ export default async function BoshSahifa() {
           {raqamlar.map((r) => (
             <div
               key={r.yorliq}
-              className="rounded-xl border border-chegara bg-white px-5 py-6"
+              className="rounded-xl border border-chegara bg-yuza px-5 py-6"
             >
               <dt className="text-sm text-matn-ikkilamchi">{r.yorliq}</dt>
               <dd className="mt-1 text-3xl font-semibold tabular-nums text-matn">
@@ -149,7 +149,7 @@ export default async function BoshSahifa() {
           ))}
         </section>
 
-        <div className="mt-16 rounded-xl border border-chegara bg-white p-6 sm:p-8">
+        <div className="mt-16 rounded-xl border border-chegara bg-yuza p-6 sm:p-8">
           <h2 className="font-medium text-matn">Ombor yopiq</h2>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-matn-ikkilamchi">
             Muammolar davlat tashkilotlarining ichki ish jarayonlariga tegishli,
@@ -159,7 +159,7 @@ export default async function BoshSahifa() {
         </div>
       </main>
 
-      <footer className="border-t border-chegara bg-white">
+      <footer className="border-t border-chegara bg-yuza">
         <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-matn-uchinchi">
           Muammolar ombori · Davlat tashkilotlari uchun
         </div>

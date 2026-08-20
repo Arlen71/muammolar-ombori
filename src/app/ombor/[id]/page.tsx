@@ -102,7 +102,7 @@ export default async function OmborMuammosi(props: PageProps<"/ombor/[id]">) {
             {muammo.history.map((h) => (
               <li
                 key={h.id}
-                className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border border-chegara bg-white px-4 py-2.5 text-sm"
+                className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border border-chegara bg-yuza px-4 py-2.5 text-sm"
               >
                 <span className="text-matn">
                   <strong>{MUAMMO_HOLATI[h.toStatus]}</strong>

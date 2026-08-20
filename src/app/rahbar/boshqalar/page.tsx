@@ -92,7 +92,7 @@ export default async function BoshqalarSahifasi(props: PageProps<"/rahbar/boshqa
                     <strong className="text-matn">{soatMatni(m.monthlyHoursLost)}</strong>
                   </span>
                   {m._count.supporters > 0 && (
-                    <span className="text-emerald-700">
+                    <span className="text-muvaffaqiyat">
                       Yana {m._count.supporters} ta tashkilot qo'shilgan
                     </span>
                   )}

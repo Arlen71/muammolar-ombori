@@ -45,7 +45,7 @@ export function Biriktirmalar({
   const kiritish = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="rounded-xl border border-chegara bg-white p-5">
+    <section className="rounded-xl border border-chegara bg-yuza p-5">
       <h2 className="font-medium text-matn">Namuna fayllarni biriktiring</h2>
       <p className="mt-1 text-sm leading-relaxed text-matn-ikkilamchi">
         Hozir ishlatayotgan Excel jadvalingiz, qog'oz blanka rasmi yoki jurnal
@@ -67,7 +67,7 @@ export function Biriktirmalar({
               <form action={biriktirmaniOchir.bind(null, b.id)}>
                 <button
                   type="submit"
-                  className="shrink-0 rounded-md px-2 py-1 text-sm text-matn-ikkilamchi hover:bg-rose-50 hover:text-xato"
+                  className="shrink-0 rounded-md px-2 py-1 text-sm text-matn-ikkilamchi hover:bg-xato-yuza hover:text-xato"
                 >
                   O'chirish
                 </button>
@@ -90,7 +90,7 @@ export function Biriktirmalar({
             name="fayllar"
             multiple
             accept={ruxsatEtilgan.join(",")}
-            className="block w-full max-w-md text-sm text-matn-ikkilamchi file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-matn hover:file:bg-slate-200"
+            className="block w-full max-w-md text-sm text-matn-ikkilamchi file:mr-3 file:rounded-lg file:border-0 file:bg-yuza-2 file:px-4 file:py-2 file:text-sm file:font-medium file:text-matn hover:file:bg-yuza-3"
           />
           <YuklashTugmasi />
         </div>

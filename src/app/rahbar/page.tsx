@@ -44,7 +44,7 @@ export default async function RahbarBoshSahifa() {
           { yorliq: "Hal qilindi", qiymat: String(halQilingan) },
           { yorliq: "Oyiga yo'qotish", qiymat: soatMatni(jamiSoat) },
         ].map((k) => (
-          <div key={k.yorliq} className="rounded-xl border border-chegara bg-white px-4 py-3">
+          <div key={k.yorliq} className="rounded-xl border border-chegara bg-yuza px-4 py-3">
             <p className="text-xs text-matn-ikkilamchi">{k.yorliq}</p>
             <p className="mt-0.5 text-xl font-semibold text-matn">{k.qiymat}</p>
           </div>
@@ -90,7 +90,7 @@ export default async function RahbarBoshSahifa() {
                             <span>To'liqlik</span>
                             <span className="tabular-nums">{m.completeness}%</span>
                           </div>
-                          <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                          <div className="h-1.5 overflow-hidden rounded-full bg-yuza-2">
                             <div
                               className="h-full rounded-full bg-asosiy transition-all"
                               style={{ width: `${m.completeness}%` }}
@@ -147,7 +147,7 @@ export default async function RahbarBoshSahifa() {
                       </div>
 
                       {m.status === "REJECTED" && m.moderationNote && (
-                        <p className="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-800">
+                        <p className="mt-3 rounded-lg bg-xato-yuza px-3 py-2 text-sm text-xato">
                           <strong>Rad etish sababi:</strong> {m.moderationNote}
                         </p>
                       )}

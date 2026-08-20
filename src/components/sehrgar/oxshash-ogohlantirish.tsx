@@ -63,21 +63,21 @@ export function OxshashOgohlantirish({
   if (yopilgan || oxshashlar.length === 0) return null;
 
   return (
-    <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm ring-1 ring-inset ring-amber-200">
+    <div className="rounded-lg bg-ogohlantirish-yuza px-4 py-3 text-sm ring-1 ring-inset ring-ogohlantirish-chegara">
       <div className="flex items-start justify-between gap-3">
-        <p className="font-medium text-amber-900">
+        <p className="font-medium text-ogohlantirish">
           Bunga o'xshash {oxshashlar.length} ta muammo allaqachon bor
         </p>
         <button
           type="button"
           onClick={() => setYopilgan(true)}
-          className="shrink-0 text-xs text-amber-800 underline-offset-2 hover:underline"
+          className="shrink-0 text-xs text-ogohlantirish underline-offset-2 hover:underline"
         >
           Yopish
         </button>
       </div>
 
-      <p className="mt-1 text-amber-900/90">
+      <p className="mt-1 text-ogohlantirish/90">
         Agar shulardan biri aynan sizdagi muammo bo'lsa, yangisini yaratish o'rniga
         «Boshqa tashkilotlarda» bo'limidan uni qo'llab-quvvatlang — shunda dasturchilar
         muammo nechta tashkilotda uchrashini ko'radi.
@@ -88,10 +88,10 @@ export function OxshashOgohlantirish({
           <li key={o.id}>
             <Link
               href="/rahbar/boshqalar"
-              className="block rounded-md bg-white/70 px-3 py-2 hover:bg-white"
+              className="block rounded-md bg-yuza/70 px-3 py-2 hover:bg-yuza"
             >
-              <span className="font-medium text-amber-950">{o.title}</span>
-              <span className="mt-0.5 block text-xs text-amber-800">
+              <span className="font-medium text-ogohlantirish">{o.title}</span>
+              <span className="mt-0.5 block text-xs text-ogohlantirish">
                 {o.organizationName}
                 {o.supporterCount > 0 && ` · yana ${o.supporterCount} ta tashkilotda bor`}
               </span>

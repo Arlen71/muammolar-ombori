@@ -51,21 +51,21 @@ export default async function ModeratsiyaSahifasi() {
 
               <div className="mt-6 border-t border-chegara pt-5">
                 {oxshashlar[i].length > 0 && (
-                  <div className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm ring-1 ring-inset ring-amber-200">
-                    <p className="font-medium text-amber-900">
+                  <div className="mb-4 rounded-lg bg-ogohlantirish-yuza px-4 py-3 text-sm ring-1 ring-inset ring-ogohlantirish-chegara">
+                    <p className="font-medium text-ogohlantirish">
                       Omborda o'xshash muammo bor — birlashtirishni ko'rib chiqing
                     </p>
-                    <ul className="mt-1.5 space-y-1 text-amber-900/90">
+                    <ul className="mt-1.5 space-y-1 text-ogohlantirish/90">
                       {oxshashlar[i].map((o) => (
                         <li key={o.id}>
                           {o.title}{" "}
-                          <span className="text-amber-800/70">
+                          <span className="text-ogohlantirish/70">
                             ({o.organizationName}, {Math.round(o.oxshashlik * 100)}% o'xshash)
                           </span>
                         </li>
                       ))}
                     </ul>
-                    <p className="mt-2 text-xs text-amber-800">
+                    <p className="mt-2 text-xs text-ogohlantirish">
                       Birlashtirish «Dublikatlar» bo'limida amalga oshiriladi.
                     </p>
                   </div>

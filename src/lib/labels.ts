@@ -75,16 +75,29 @@ export const MUAMMO_HOLATI: Record<ProblemStatus, string> = {
   ARCHIVED: "Arxivlangan",
 };
 
-/** Holat nishonchasining Tailwind sinflari. */
+/**
+ * Holat nishonchasining Tailwind sinflari.
+ *
+ * Faqat semantik tokenlar ishlatiladi (`globals.css` ga qarang) — shu tufayli
+ * qorong'i mavzuga o'tganda bu jadvalga umuman tegilmaydi.
+ *
+ * Sakkizta holatga sakkizta rang berilmadi: ko'z sakkiz rangni ajrata olmaydi.
+ * Ular ma'nosiga qarab guruhlangan — kutilmoqda (sariq), omborda (ko'k),
+ * dasturchi ishlamoqda (binafsha), tugadi (yashil), rad etildi (qizil).
+ * `TAKEN` va `SOLUTION_OFFERED` bitta oiladan, ikkinchisi to'ldirilgan fon
+ * bilan kuchliroq ko'rsatilgan — u zanjirning oxiriga yaqinroq.
+ */
 export const MUAMMO_HOLATI_RANGI: Record<ProblemStatus, string> = {
-  DRAFT: "bg-slate-100 text-slate-700 ring-slate-200",
-  SUBMITTED: "bg-amber-50 text-amber-800 ring-amber-200",
-  APPROVED: "bg-sky-50 text-sky-800 ring-sky-200",
-  REJECTED: "bg-rose-50 text-rose-800 ring-rose-200",
-  TAKEN: "bg-violet-50 text-violet-800 ring-violet-200",
-  SOLUTION_OFFERED: "bg-indigo-50 text-indigo-800 ring-indigo-200",
-  RESOLVED: "bg-emerald-50 text-emerald-800 ring-emerald-200",
-  ARCHIVED: "bg-neutral-100 text-neutral-600 ring-neutral-200",
+  DRAFT: "bg-yuza-2 text-matn-ikkilamchi ring-chegara",
+  SUBMITTED: "bg-ogohlantirish-yuza text-ogohlantirish ring-ogohlantirish-chegara",
+  APPROVED: "bg-malumot-yuza text-malumot ring-malumot-chegara",
+  REJECTED: "bg-xato-yuza text-xato ring-xato-chegara",
+  TAKEN: "bg-jarayon-yuza text-jarayon ring-jarayon-chegara",
+  // To'ldirilgan fon: `text-yuza` — kartochka foni matn rangi sifatida.
+  // Ikkala mavzuda ham teskari juftlik hosil bo'ladi, kontrast saqlanadi.
+  SOLUTION_OFFERED: "bg-jarayon text-yuza ring-jarayon",
+  RESOLVED: "bg-muvaffaqiyat-yuza text-muvaffaqiyat ring-muvaffaqiyat-chegara",
+  ARCHIVED: "bg-transparent text-matn-uchinchi ring-chegara",
 };
 
 export const MUAMMO_TURI: Record<PainType, string> = {
@@ -132,11 +145,12 @@ export const SHOSHILINCHLIK: Record<Urgency, string> = {
   CRITICAL: "Juda shoshilinch",
 };
 
+/** Shoshilinchlik nishonchasi — sovuqdan issiqqa qarab kuchayadi. */
 export const SHOSHILINCHLIK_RANGI: Record<Urgency, string> = {
-  LOW: "bg-slate-100 text-slate-700 ring-slate-200",
-  MEDIUM: "bg-sky-50 text-sky-800 ring-sky-200",
-  HIGH: "bg-amber-50 text-amber-800 ring-amber-200",
-  CRITICAL: "bg-rose-50 text-rose-800 ring-rose-200",
+  LOW: "bg-yuza-2 text-matn-ikkilamchi ring-chegara",
+  MEDIUM: "bg-malumot-yuza text-malumot ring-malumot-chegara",
+  HIGH: "bg-ogohlantirish-yuza text-ogohlantirish ring-ogohlantirish-chegara",
+  CRITICAL: "bg-xato-yuza text-xato ring-xato-chegara",
 };
 
 export const MALUMOT_HAJMI: Record<DataVolume, string> = {

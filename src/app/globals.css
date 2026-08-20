@@ -3,39 +3,187 @@
 /*
   Muammolar ombori — dizayn tizimi.
 
-  Ataylab faqat yorug' mavzu: davlat tashkilotlarida asosan yorug' ekran
-  ishlatiladi, qorong'i mavzu esa uslublar hajmini ikki barobar oshiradi va
-  MVP uchun qiymat bermaydi. Ranglar yuqori kontrastli (WCAG AA) tanlangan —
-  foydalanuvchilar orasida keksa xodimlar ham bo'ladi.
+  TUZILISHI
+  Ranglar ikki qatlamda ta'riflanadi:
+
+    1. Xom qiymatlar — `:root` (yorug') va `.dark` (qorong'i) ichida.
+       Faqat shu ikki blokda haqiqiy hex qiymat bo'ladi.
+    2. Semantik tokenlar — `@theme inline` ichida, xom qiymatlarga havola.
+       Tailwind shulardan `bg-yuza`, `text-matn` kabi sinflarni yasaydi.
+
+  Shu tufayli mavzu almashganda komponentlarga umuman tegilmaydi: faqat
+  `.dark` sinfi qo'shiladi va barcha token qiymatlari almashadi.
+
+  QOIDA: komponentda hech qachon `bg-slate-100` kabi xom rang yozilmaydi —
+  faqat token sinflari. Yagona istisno — `labels.ts` dagi holat nishonchalari,
+  ular bir joyda to'plangan va ikkala mavzu uchun ham yozilgan.
 */
 
-@theme {
-  --color-asos: #ffffff;
-  --color-yuza: #f8fafc;
-  --color-chegara: #e2e8f0;
+/* Qorong'i mavzu `.dark` sinfi orqali boshqariladi (tizim emas, foydalanuvchi tanlovi) */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  --color-matn: #0f172a;
-  --color-matn-ikkilamchi: #475569;
-  --color-matn-uchinchi: #94a3b8;
+:root {
+  /* ── Yuzalar: pastdan yuqoriga ── */
+  --u-asos: #f6f8fb; /* sahifa foni */
+  --u-yuza: #ffffff; /* kartochka, panel */
+  --u-yuza-2: #f1f5f9; /* jadval sarlavhasi, ichki blok */
+  --u-yuza-3: #e2e8f0; /* ajratgich, progress orqa foni */
 
-  --color-asosiy: #1d4ed8;
-  --color-asosiy-quyuq: #1e40af;
-  --color-asosiy-ochiq: #eff6ff;
+  --u-chegara: #e2e8f0; /* kartochka konturi, ajratgich — bezak */
+  --u-chegara-kuchli: #8190a5; /* forma maydonlari — fondan 3:1 ajralishi shart */
 
-  --color-muvaffaqiyat: #047857;
-  --color-ogohlantirish: #b45309;
-  --color-xato: #be123c;
+  /* ── Matn ── */
+  --u-matn: #0f172a;
+  --u-matn-2: #475569;
+  --u-matn-3: #626f86;
+
+  /* ── Brend ── */
+  --u-asosiy: #1d4ed8;
+  --u-asosiy-quyuq: #1e40af;
+  --u-asosiy-yuza: #eff6ff;
+  --u-asosiy-chegara: #bfdbfe;
+  --u-asosiy-matn: #ffffff; /* asosiy fon ustidagi matn */
+
+  /* ── Holatlar: matn / yuza / chegara uchligi ── */
+  --u-muvaffaqiyat: #047857;
+  --u-muvaffaqiyat-yuza: #ecfdf5;
+  --u-muvaffaqiyat-chegara: #a7f3d0;
+
+  --u-ogohlantirish: #b45309;
+  --u-ogohlantirish-yuza: #fffbeb;
+  --u-ogohlantirish-chegara: #fde68a;
+
+  --u-xato: #be123c;
+  --u-xato-yuza: #fff1f2;
+  --u-xato-chegara: #fecdd3;
+
+  --u-malumot: #1e40af;
+  --u-malumot-yuza: #eff6ff;
+  --u-malumot-chegara: #bfdbfe;
+
+  --u-jarayon: #6d28d9; /* «dasturchi oldi» kabi oraliq holat */
+  --u-jarayon-yuza: #f5f3ff;
+  --u-jarayon-chegara: #ddd6fe;
+
+  /* ── Soyalar ── */
+  --u-soya-1: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --u-soya-2: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --u-soya-3: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -4px rgba(15, 23, 42, 0.1);
+}
+
+.dark {
+  /*
+    Qorong'i mavzuda ranglar yorug'ining teskarisi EMAS — ular alohida
+    tanlangan. Holat ranglari yorug'idagi qiymatlar bilan qorong'i fonda
+    WCAG AA dan o'tmaydi, shuning uchun matn ochroq, yuza esa juda quyuq.
+  */
+  --u-asos: #0b1120;
+  --u-yuza: #131c2e;
+  --u-yuza-2: #1c2637;
+  --u-yuza-3: #263145;
+
+  --u-chegara: #263145;
+  --u-chegara-kuchli: #5c6b82;
+
+  --u-matn: #e8edf5;
+  --u-matn-2: #a3b0c2;
+  --u-matn-3: #7d8ba0;
+
+  --u-asosiy: #60a5fa;
+  --u-asosiy-quyuq: #93c5fd;
+  --u-asosiy-yuza: #172554;
+  --u-asosiy-chegara: #1e3a8a;
+  --u-asosiy-matn: #0b1120;
+
+  --u-muvaffaqiyat: #6ee7b7;
+  --u-muvaffaqiyat-yuza: #052e21;
+  --u-muvaffaqiyat-chegara: #065f46;
+
+  --u-ogohlantirish: #fcd34d;
+  --u-ogohlantirish-yuza: #2e2005;
+  --u-ogohlantirish-chegara: #78350f;
+
+  --u-xato: #fda4af;
+  --u-xato-yuza: #340a14;
+  --u-xato-chegara: #9f1239;
+
+  --u-malumot: #93c5fd;
+  --u-malumot-yuza: #172554;
+  --u-malumot-chegara: #1e3a8a;
+
+  --u-jarayon: #c4b5fd;
+  --u-jarayon-yuza: #241a4d;
+  --u-jarayon-chegara: #5b21b6;
+
+  --u-soya-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --u-soya-2: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --u-soya-3: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+  --color-asos: var(--u-asos);
+  --color-yuza: var(--u-yuza);
+  --color-yuza-2: var(--u-yuza-2);
+  --color-yuza-3: var(--u-yuza-3);
+  --color-chegara: var(--u-chegara);
+  --color-chegara-kuchli: var(--u-chegara-kuchli);
+
+  --color-matn: var(--u-matn);
+  --color-matn-ikkilamchi: var(--u-matn-2);
+  --color-matn-uchinchi: var(--u-matn-3);
+
+  --color-asosiy: var(--u-asosiy);
+  --color-asosiy-quyuq: var(--u-asosiy-quyuq);
+  --color-asosiy-ochiq: var(--u-asosiy-yuza);
+  --color-asosiy-chegara: var(--u-asosiy-chegara);
+  --color-asosiy-matn: var(--u-asosiy-matn);
+
+  --color-muvaffaqiyat: var(--u-muvaffaqiyat);
+  --color-muvaffaqiyat-yuza: var(--u-muvaffaqiyat-yuza);
+  --color-muvaffaqiyat-chegara: var(--u-muvaffaqiyat-chegara);
+
+  --color-ogohlantirish: var(--u-ogohlantirish);
+  --color-ogohlantirish-yuza: var(--u-ogohlantirish-yuza);
+  --color-ogohlantirish-chegara: var(--u-ogohlantirish-chegara);
+
+  --color-xato: var(--u-xato);
+  --color-xato-yuza: var(--u-xato-yuza);
+  --color-xato-chegara: var(--u-xato-chegara);
+
+  --color-malumot: var(--u-malumot);
+  --color-malumot-yuza: var(--u-malumot-yuza);
+  --color-malumot-chegara: var(--u-malumot-chegara);
+
+  --color-jarayon: var(--u-jarayon);
+  --color-jarayon-yuza: var(--u-jarayon-yuza);
+  --color-jarayon-chegara: var(--u-jarayon-chegara);
+
+  --shadow-1: var(--u-soya-1);
+  --shadow-2: var(--u-soya-2);
+  --shadow-3: var(--u-soya-3);
 
   --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /*
+    Zich (dashboard) shkala. Boshqaruv panelida ekranga ko'proq ma'lumot
+    sig'ishi kerak, shuning uchun oraliqlar marketing sahifalaridagidan kichik.
+  */
+  --spacing-panel: 1.25rem;
+  --radius-quti: 0.75rem;
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
-    background-color: var(--color-yuza);
+    background-color: var(--color-asos);
     color: var(--color-matn);
     font-family: var(--font-sans);
     /* O'zbek matni uchun biroz kengroq satr oralig'i — o'qish osonroq */
@@ -60,6 +208,36 @@
     -moz-appearance: textfield;
     appearance: textfield;
   }
+
+  /* Jadvaldagi raqamlar ustma-ust tushishi uchun */
+  th,
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+    Modal ortidagi qorayish.
+
+    Ikkala mavzuda ham quyuq bo'lib qoladi — bu token emas, ataylab shunday:
+    parda vazifasi orqadagi kontentni bostirish, yorug' mavzuda uni oqartirsak
+    modal fondan ajralmay qoladi.
+  */
+  dialog::backdrop {
+    background-color: rgb(2 6 23 / 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Modal ochilishi — 150 ms, tez va sezilarli */
+  dialog[open] {
+    animation: modal-kirish 0.15s ease-out;
+  }
+
+  @keyframes modal-kirish {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+  }
 }
 
 @layer utilities {
@@ -74,6 +252,18 @@
     clip-path: inset(50%);
     white-space: nowrap;
     border-width: 0;
+  }
+}
+
+/* Harakatni kamaytirishni so'raganlar uchun animatsiyalarni o'chiramiz */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

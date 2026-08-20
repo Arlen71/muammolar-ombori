@@ -31,7 +31,7 @@ export function NavHavolalar({
               mobil ? "shrink-0 px-3 py-1.5 text-sm" : "px-3 py-2 text-sm",
               faol
                 ? "bg-asosiy-ochiq text-asosiy"
-                : "text-matn-ikkilamchi hover:bg-slate-100 hover:text-matn"
+                : "text-matn-ikkilamchi hover:bg-yuza-2 hover:text-matn"
             )}
           >
             {h.matn}

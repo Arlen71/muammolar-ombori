@@ -37,7 +37,7 @@ export function BelgilashGuruhi({
               "flex cursor-pointer items-start gap-2.5 rounded-lg border p-3 text-sm transition-colors",
               belgilangan
                 ? "border-asosiy bg-asosiy-ochiq"
-                : "border-chegara bg-white hover:bg-slate-50"
+                : "border-chegara bg-yuza hover:bg-yuza-2"
             )}
           >
             <input
@@ -92,7 +92,7 @@ export function TanlovGuruhi({
               "flex cursor-pointer items-start gap-2.5 rounded-lg border p-3 text-sm transition-colors",
               belgilangan
                 ? "border-asosiy bg-asosiy-ochiq"
-                : "border-chegara bg-white hover:bg-slate-50"
+                : "border-chegara bg-yuza hover:bg-yuza-2"
             )}
           >
             <input
@@ -161,7 +161,7 @@ export function TegKiritish({
               <button
                 type="button"
                 onClick={() => setTeglar(teglar.filter((x) => x !== t))}
-                className="rounded p-0.5 text-asosiy hover:bg-blue-100"
+                className="rounded p-0.5 text-asosiy hover:bg-asosiy-ochiq"
                 aria-label={`«${t}» ni o'chirish`}
               >
                 <svg viewBox="0 0 20 20" fill="currentColor" className="size-4">
@@ -188,7 +188,7 @@ export function TegKiritish({
         <button
           type="button"
           onClick={() => qosh(matn)}
-          className="shrink-0 rounded-lg border border-chegara px-4 text-sm font-medium text-matn-ikkilamchi hover:bg-slate-50"
+          className="shrink-0 rounded-lg border border-chegara px-4 text-sm font-medium text-matn-ikkilamchi hover:bg-yuza-2"
         >
           Qo'shish
         </button>
@@ -347,7 +347,7 @@ export function YoqotishHisoblagichi({
       <div
         className={cn(
           "rounded-xl border p-5 transition-colors",
-          soat > 0 ? "border-asosiy/30 bg-asosiy-ochiq" : "border-dashed border-chegara bg-white"
+          soat > 0 ? "border-asosiy/30 bg-asosiy-ochiq" : "border-dashed border-chegara bg-yuza"
         )}
         aria-live="polite"
       >

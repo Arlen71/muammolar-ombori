@@ -331,7 +331,8 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.8 | Baza ulanishi uzilsa jarayon yiqilmaydi | ✅ |
 | T-8.9 | Bir sahifa ≤5 ta baza so'rovi | ✅ |
 | T-8.10 | Klaviatura bilan to'liq boshqarish, fokus halqasi | ✅ |
-| T-8.11 | WCAG AA kontrast darajasi | ✅ |
+| T-8.11 | WCAG AA kontrast darajasi (`npm run contrast` — 38 ta juftlik, ikkala mavzu) | ✅ |
+| T-8.13 | Qorong'i mavzu; rang qiymatlari faqat token orqali | ✅ |
 | T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 36 ta hujum stsenariysi) | ✅ |
 
 ---
@@ -345,6 +346,24 @@ Sinov uchun bu maqbul: bazada faqat namunaviy ma'lumot bor, real fuqaro
 ma'lumotlari yo'q. Ammo tizim haqiqiy foydalanishga o'tishdan oldin baza
 O'zbekiston hududidagi serverga ko'chirilishi shart. Ilova bunga tayyor —
 `DATABASE_URL` ni o'zgartirish kifoya, kodda o'zgarish kerak emas.
+
+---
+
+### 7.2 Kontrast talabi qanday tekshiriladi
+
+`T-8.11` avval "bajarilgan" deb belgilangan, ammo bu ko'z bilan baholangan
+edi va noto'g'ri chiqdi: meta matn (muammo kodi, sana) oq fonda **2.56:1**
+bergan — AA uchun kerakli 4.5:1 dan ancha past. Nuqson faqat qiymatlar
+hisoblab chiqilganda ko'rindi.
+
+Shuning uchun tekshiruv endi skriptga aylantirildi: `npm run contrast`
+`globals.css` dagi ikkala mavzuning tokenlarini o'qiydi va har bir
+matn/fon juftligining nisbatini hisoblaydi. Bitta juftlik yiqilsa,
+buyruq xato kodi bilan tugaydi.
+
+Nima uchun bu muhim: mavzu rangini o'zgartirish bir soniyalik ish, uning
+kontrastni buzganini esa ekranga qarab sezib bo'lmaydi — ayniqsa yaxshi
+monitorda va yorug' xonada.
 
 ## 8. Ma'lumotlar modeli
 
@@ -440,3 +459,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | Versiya | Sana | O'zgarish |
 |---|---|---|
 | 1.0 | 2026-08-17 | Birinchi versiya. MVP bajarildi: T-1…T-8 bo'yicha ✅ belgilangan barcha talablar |
+| 1.1 | 2026-08-19 | Dizayn tizimi: ikki mavzuli token qatlami, qorong'i mavzu (T-8.13). T-8.11 avtomatik tekshiruvga o'tkazildi va shu jarayonda ikkita haqiqiy kontrast nuqsoni tuzatildi |

@@ -33,8 +33,8 @@ export function QadamKorsatkichi({
                     faol
                       ? "bg-asosiy"
                       : tayyor
-                        ? "bg-emerald-500"
-                        : "bg-slate-200 group-hover:bg-slate-300"
+                        ? "bg-muvaffaqiyat"
+                        : "bg-yuza-3 group-hover:bg-yuza-3"
                   )}
                 />
                 <span

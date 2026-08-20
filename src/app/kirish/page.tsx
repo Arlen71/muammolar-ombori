@@ -31,7 +31,7 @@ export default async function KirishSahifasi(props: PageProps<"/kirish">) {
           </p>
         </div>
 
-        <div className="rounded-xl border border-chegara bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-xl border border-chegara bg-yuza p-6 shadow-sm sm:p-8">
           <h1 className="mb-6 text-lg font-semibold text-matn">Tizimga kirish</h1>
           <KirishFormasi keyingi={keyingi} />
         </div>

@@ -39,7 +39,7 @@ export function MuammoQatori({
   return (
     <Link
       href={yol}
-      className="block rounded-xl border border-chegara bg-white p-4 transition-colors hover:border-asosiy/50 hover:bg-asosiy-ochiq/30"
+      className="block rounded-xl border border-chegara bg-yuza p-4 transition-colors hover:border-asosiy/50 hover:bg-asosiy-ochiq/30"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -66,7 +66,7 @@ export function MuammoQatori({
         </span>
 
         {muammo._count.supporters > 0 && (
-          <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-emerald-800 ring-1 ring-inset ring-emerald-200">
+          <span className="inline-flex items-center rounded-md bg-muvaffaqiyat-yuza px-2 py-0.5 text-muvaffaqiyat ring-1 ring-inset ring-muvaffaqiyat-chegara">
             {muammo._count.supporters + 1} ta tashkilotda shu muammo bor
           </span>
         )}
@@ -81,7 +81,7 @@ export function MuammoQatori({
           <span className="text-matn-uchinchi">{muammo._count.attachments} ta fayl</span>
         )}
 
-        {olgan && <span className="text-violet-700">Oldi: {olgan}</span>}
+        {olgan && <span className="text-jarayon">Oldi: {olgan}</span>}
 
         <span className="ml-auto text-xs text-matn-uchinchi">{muammo.refCode}</span>
       </div>

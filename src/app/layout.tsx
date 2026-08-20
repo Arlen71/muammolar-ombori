@@ -22,7 +22,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#1d4ed8",
+  // Brauzer paneli sahifa foniga qo'shilib ketsin — mobil qurilmada
+  // ranglar bir-biriga urishib turmasligi uchun
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f8fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -31,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col antialiased">
         <a
           href="#asosiy"
-          className="faqat-oquvchi focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-yuza focus:ring-2 focus:ring-asosiy focus:px-4 focus:py-2 focus:shadow-lg"
         >
           Asosiy qismga o'tish
         </a>

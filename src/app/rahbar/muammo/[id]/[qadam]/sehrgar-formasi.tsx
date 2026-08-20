@@ -398,7 +398,7 @@ export function SehrgarFormasi({
           </Maydon>
 
           <Maydon yorliq="Bu muammoni ilgari hal qilishga urinilganmi?">
-            <label className="flex items-center gap-2.5 rounded-lg border border-chegara bg-white p-3 text-sm">
+            <label className="flex items-center gap-2.5 rounded-lg border border-chegara bg-yuza p-3 text-sm">
               <input
                 type="checkbox"
                 name="previousAttempt"

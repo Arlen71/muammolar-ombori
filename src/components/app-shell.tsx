@@ -22,7 +22,7 @@ export function AppShell({
 }) {
   return (
     <>
-      <header className="chop-etilmasin border-b border-chegara bg-white">
+      <header className="chop-etilmasin border-b border-chegara bg-yuza">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
           <Link href="/" className="shrink-0 font-semibold tracking-tight text-matn">
             Muammolar ombori
@@ -46,7 +46,7 @@ export function AppShell({
             <form action={chiqishAmali}>
               <button
                 type="submit"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-slate-100 hover:text-matn"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
               >
                 Chiqish
               </button>

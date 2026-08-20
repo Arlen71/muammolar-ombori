@@ -102,7 +102,7 @@ export function ParolTiklashTugmasi({ userId }: { userId: string }) {
 
   if (holat.muvaffaqiyat) {
     return (
-      <p className="break-words rounded-md bg-emerald-50 px-2.5 py-1.5 font-mono text-xs text-emerald-900">
+      <p className="break-words rounded-md bg-muvaffaqiyat-yuza px-2.5 py-1.5 font-mono text-xs text-muvaffaqiyat">
         {holat.muvaffaqiyat}
       </p>
     );
@@ -114,7 +114,7 @@ export function ParolTiklashTugmasi({ userId }: { userId: string }) {
       {holat.xato && <span className="mr-2 text-xs text-xato">{holat.xato}</span>}
       <button
         type="submit"
-        className="rounded-md px-2 py-1 text-sm text-matn-ikkilamchi hover:bg-slate-100 hover:text-matn"
+        className="rounded-md px-2 py-1 text-sm text-matn-ikkilamchi hover:bg-yuza-2 hover:text-matn"
       >
         Parolni tiklash
       </button>

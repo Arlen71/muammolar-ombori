@@ -9,9 +9,9 @@ import { DasturchiAmali } from "./dasturchi-amali";
 export const metadata: Metadata = { title: "Dasturchilar" };
 
 const HOLAT_RANGI = {
-  PENDING: "bg-amber-50 text-amber-800 ring-amber-200",
-  ACTIVE: "bg-emerald-50 text-emerald-800 ring-emerald-200",
-  BLOCKED: "bg-rose-50 text-rose-800 ring-rose-200",
+  PENDING: "bg-ogohlantirish-yuza text-ogohlantirish ring-ogohlantirish-chegara",
+  ACTIVE: "bg-muvaffaqiyat-yuza text-muvaffaqiyat ring-muvaffaqiyat-chegara",
+  BLOCKED: "bg-xato-yuza text-xato ring-xato-chegara",
 } as const;
 
 export default async function DasturchilarSahifasi() {

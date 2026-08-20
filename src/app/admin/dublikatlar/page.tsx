@@ -66,7 +66,7 @@ export default async function DublikatlarSahifasi() {
         <div className="space-y-4">
           {juftliklar.map(({ yangi, eski }) => (
             <Quti key={`${yangi.id}-${eski.id}`} className="p-5">
-              <p className="mb-4 text-sm font-medium text-amber-800">
+              <p className="mb-4 text-sm font-medium text-ogohlantirish">
                 {Math.round(eski.oxshashlik * 100)}% o'xshash
               </p>
 

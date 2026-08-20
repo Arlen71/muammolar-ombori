@@ -73,6 +73,7 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm test` | Hisob-kitob mantiqi testlari |
 | `npm run e2e` | Rollar va ruxsatlar tekshiruvi (dev server ochiq bo'lsin) |
 | `npm run security` | Xavfsizlik tekshiruvi — 36 ta hujum stsenariysi |
+| `npm run contrast` | Rang kontrasti — ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
 | `npm run admin:create` | Administrator yaratish yoki parolini tiklash |
@@ -145,6 +146,19 @@ o'qiy oladi. Bazada ochiq manzil emas, ichki yo'l saqlanadi. Foydalanuvchi
 faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat tekshiriladi.
 Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi bergan nom
 hech qachon yo'l sifatida ishlatilmaydi.
+
+**Ranglar komponentda yozilmaydi.** `globals.css` ikki qatlamli: xom hex
+qiymatlar faqat `:root` (yorug') va `.dark` (qorong'i) bloklarida, komponentlar
+esa faqat semantik tokenlarni (`bg-yuza`, `text-matn`, `ring-xato-chegara`)
+ishlatadi. Shu tufayli mavzu almashtirish uchun bironta komponentga tegilmaydi.
+`npm run contrast` har bir matn/fon juftligini WCAG AA ga solishtiradi va
+mos kelmasa yiqiladi — mavzu qiymatini o'zgartirib, kontrastni bilmasdan
+buzib qo'yishning oldini oladi.
+
+**Ikki xil chegara tokeni bor.** `chegara` — kartochka konturi va ajratgich,
+bu bezak. `chegara-kuchli` — forma maydonlari; ular fondan kamida 3:1
+ajralishi shart (WCAG 1.4.11), aks holda maydon qayerda boshlanishi
+ko'rinmaydi.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.

@@ -17,7 +17,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "e2e": "tsx scripts/e2e-check.ts",
     "admin:create": "tsx scripts/create-admin.ts",
-    "security": "tsx scripts/security-check.ts"
+    "security": "tsx scripts/security-check.ts",
+    "contrast": "tsx scripts/contrast-check.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.0",
