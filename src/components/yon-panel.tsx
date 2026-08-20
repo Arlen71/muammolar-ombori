@@ -103,7 +103,7 @@ function PanelIchi({
         <Link
           href="/"
           onClick={yop}
-          className="truncate font-semibold tracking-tight text-matn"
+          className="flex min-h-11 min-w-0 items-center truncate font-semibold tracking-tight text-matn"
         >
           Muammolar ombori
         </Link>
@@ -179,7 +179,11 @@ export function YonPanel({
           <Menu size={20} aria-hidden="true" />
         </button>
 
-        <Link href="/" className="truncate font-semibold tracking-tight text-matn">
+        {/* `min-h-11` — barmoq bilan bosiladigan nishon 44px dan past bo'lmasin */}
+        <Link
+          href="/"
+          className="flex min-h-11 min-w-0 items-center truncate font-semibold tracking-tight text-matn"
+        >
           Muammolar ombori
         </Link>
 

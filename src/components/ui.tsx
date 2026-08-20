@@ -40,9 +40,18 @@ const TUGMA_KORINISHI: Record<TugmaKorinishi, string> = {
   shaffof: "bg-transparent text-matn-ikkilamchi hover:bg-yuza-2 hover:text-matn",
 };
 
+/*
+  Balandliklar. `orta` va `katta` — 44px va 48px, ya'ni sensorli ekranda
+  barmoq bilan bosish uchun tavsiya etilgan eng kam o'lchamdan kam emas.
+
+  `kichik` sichqoncha bilan ishlashda 36px bo'lib qoladi (jadval qatoriga
+  sig'ishi kerak), lekin sensorli qurilmada 44px ga o'sadi. `pointer-coarse`
+  aynan shuni ajratadi: kursor aniq emas, ya'ni barmoq yoki stilus.
+  Ekran kengligiga qarab ajratib bo'lmaydi — sensorli katta ekran ham,
+  sichqonchali kichik oyna ham bor.
+*/
 const TUGMA_OLCHAMI: Record<TugmaOlchami, string> = {
-  // 44px balandlik — sensorli ekranda barmoq bilan bosish uchun eng kam o'lcham
-  kichik: "h-9 px-3 text-sm gap-1.5",
+  kichik: "h-9 px-3 text-sm gap-1.5 pointer-coarse:h-11",
   orta: "h-11 px-4 text-sm gap-2",
   katta: "h-12 px-6 text-base gap-2",
 };

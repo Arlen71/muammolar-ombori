@@ -55,9 +55,16 @@ export default async function FoydalanuvchilarSahifasi() {
             */}
             <JadvalSarlavha>Rol va holat</JadvalSarlavha>
             <JadvalSarlavha>Oxirgi kirish</JadvalSarlavha>
-            <JadvalSarlavha>
-              <span className="sr-only">Amallar</span>
-            </JadvalSarlavha>
+            {/*
+              Sarlavha ko'rinadigan matn, `sr-only` emas.
+
+              `sr-only` element `position: absolute` bo'ladi va o'zining
+              oqimdagi joyida qoladi. Gorizontal siljiydigan jadvalda bu
+              joy ekrandan ancha o'ngda bo'lishi mumkin — natijada hujjat
+              kengligi o'sib, BUTUN SAHIFA yon tomonga siljiy boshlaydi.
+              375px da bu 267 pikselni tashkil qilgan.
+            */}
+            <JadvalSarlavha>Amal</JadvalSarlavha>
           </JadvalQator>
         </JadvalBosh>
 

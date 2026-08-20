@@ -89,9 +89,19 @@ export function AppShell({
         </header>
       )}
 
+      {/*
+        `min-w-0` — sirtdan keraksiz ko'rinadi, lekin usiz keng jadvallar
+        sahifani kengaytirib yuboradi.
+
+        Flex bolasining standart `min-width` qiymati `auto`, ya'ni u
+        kontentidan tor bo'lishdan bosh tortadi. Jadval `overflow-x-auto`
+        o'ram ichida bo'lsa ham, o'ramning o'zi shu sababli kengayib
+        ketadi va siljish jadvalda emas, butun sahifada paydo bo'ladi —
+        telefonda bu eng bezovta qiluvchi nuqson.
+      */}
       <main
         id="asosiy"
-        className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:py-8"
+        className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:py-8"
       >
         {children}
       </main>
