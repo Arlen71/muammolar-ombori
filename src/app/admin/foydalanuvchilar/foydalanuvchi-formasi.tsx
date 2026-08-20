@@ -1,18 +1,38 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { foydalanuvchiYarat, parolniTiklash } from "../actions";
-import { Kiritish, Maydon, Tanlov, Tugma, Xabar } from "@/components/ui";
+import { ModalOchgich } from "@/components/modal";
+import { Kiritish, Maydon, Tanlov, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
 
-function Yuborish({ matn, kutish }: { matn: string; kutish: string }) {
-  const { pending } = useFormStatus();
+type Rol = { value: string; label: string };
+type Tashkilot = { id: string; name: string };
+
+/** Sahifa sarlavhasidagi tugma va u ochadigan modal. */
+export function FoydalanuvchiQoshish({
+  rollar,
+  tashkilotlar,
+}: {
+  rollar: Rol[];
+  tashkilotlar: Tashkilot[];
+}) {
   return (
-    <Tugma type="submit" className="w-full" disabled={pending}>
-      {pending ? kutish : matn}
-    </Tugma>
+    <ModalOchgich
+      yorliq="Yangi akkaunt"
+      sarlavha="Yangi akkaunt yaratish"
+      izoh="Boshlang'ich parol yaratilgandan keyin bir marta ko'rsatiladi — uni nusxalab, egasiga yetkazing."
+    >
+      {/*
+        Oyna muvaffaqiyatdan keyin ataylab yopilmaydi: yaratilgan
+        boshlang'ich parol aynan shu xabarda ko'rsatiladi va u boshqa
+        hech qayerda saqlanmaydi. Oyna o'zi yopilib ketsa, administrator
+        parolni nusxalab ulgurmay qolardi.
+      */}
+      {() => <FoydalanuvchiFormasi rollar={rollar} tashkilotlar={tashkilotlar} />}
+    </ModalOchgich>
   );
 }
 
@@ -20,8 +40,8 @@ export function FoydalanuvchiFormasi({
   rollar,
   tashkilotlar,
 }: {
-  rollar: { value: string; label: string }[];
-  tashkilotlar: { id: string; name: string }[];
+  rollar: Rol[];
+  tashkilotlar: Tashkilot[];
 }) {
   const [holat, amal] = useActionState<AmalNatijasi, FormData>(foydalanuvchiYarat, {});
   const [rol, setRol] = useState("LEADER");
@@ -92,7 +112,9 @@ export function FoydalanuvchiFormasi({
         </Xabar>
       )}
 
-      <Yuborish matn="Akkaunt yaratish" kutish="Yaratilmoqda…" />
+      <Yuborish kutish="Yaratilmoqda…" className="w-full">
+        Akkaunt yaratish
+      </Yuborish>
     </form>
   );
 }

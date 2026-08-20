@@ -1,20 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { dublikatniBirlashtir } from "../actions";
-import { Tugma, Xabar } from "@/components/ui";
+import { Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function Yuborish() {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" olcham="kichik" disabled={pending}>
-      {pending ? "Birlashtirilmoqda…" : "Birlashtirish"}
-    </Tugma>
-  );
-}
 
 export function BirlashtirishFormasi({
   takrorId,
@@ -42,7 +33,9 @@ export function BirlashtirishFormasi({
         «{takrorSarlavha}» arxivlanadi va uning tashkiloti «{asosiySarlavha}» ni
         qo'llab-quvvatlovchi sifatida qo'shiladi.
       </p>
-      <Yuborish />
+      <Yuborish kutish="Birlashtirilmoqda…" olcham="kichik">
+        Birlashtirish
+      </Yuborish>
     </form>
   );
 }

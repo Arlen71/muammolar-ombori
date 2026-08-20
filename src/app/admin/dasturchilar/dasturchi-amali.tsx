@@ -1,28 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { dasturchiniBlokla, dasturchiniTasdiqla } from "../actions";
 import { Kiritish, Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function Yuborish({
-  matn,
-  kutish,
-  korinish,
-}: {
-  matn: string;
-  kutish: string;
-  korinish?: "asosiy" | "xavfli";
-}) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" korinish={korinish} olcham="kichik" disabled={pending}>
-      {pending ? kutish : matn}
-    </Tugma>
-  );
-}
 
 export function DasturchiAmali({
   userId,
@@ -51,7 +34,9 @@ export function DasturchiAmali({
           <input type="hidden" name="userId" value={userId} />
           <Kiritish name="sabab" placeholder="Bloklash sababi (ixtiyoriy)" />
           <div className="flex gap-2">
-            <Yuborish matn="Ha, bloklash" kutish="Bloklanmoqda…" korinish="xavfli" />
+            <Yuborish kutish="Bloklanmoqda…" korinish="xavfli" olcham="kichik">
+              Ha, bloklash
+            </Yuborish>
             <Tugma
               type="button"
               korinish="shaffof"
@@ -67,7 +52,9 @@ export function DasturchiAmali({
           {holat !== "ACTIVE" && (
             <form action={tasdiqAmali}>
               <input type="hidden" name="userId" value={userId} />
-              <Yuborish matn="Tasdiqlash" kutish="Tasdiqlanmoqda…" />
+              <Yuborish kutish="Tasdiqlanmoqda…" olcham="kichik">
+                Tasdiqlash
+              </Yuborish>
             </form>
           )}
           {holat !== "BLOCKED" && (

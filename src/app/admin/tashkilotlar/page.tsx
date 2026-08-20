@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 
 import { db } from "@/lib/db";
 import { SahifaSarlavhasi } from "@/components/app-shell";
-import { Quti } from "@/components/ui";
-import { HUDUD, TASHKILOT_TURI, variantlar } from "@/lib/labels";
-import { TashkilotFormasi } from "./tashkilot-formasi";
+import {
+  Jadval,
+  JadvalBosh,
+  JadvalKatak,
+  JadvalQator,
+  JadvalSarlavha,
+  JadvalTana,
+} from "@/components/ui";
+import { HUDUD, TASHKILOT_TURI, sonMatni, variantlar } from "@/lib/labels";
+import { TashkilotQoshish } from "./tashkilot-formasi";
 
 export const metadata: Metadata = { title: "Tashkilotlar" };
 
@@ -18,40 +25,63 @@ export default async function TashkilotlarSahifasi() {
 
   return (
     <>
+      {/*
+        Yaratish formasi ilgari o'ng ustunda doim ochiq turardi va ro'yxatga
+        atigi ikki uchdan bir joy qolardi. Ammo administrator bu sahifaga
+        asosan ro'yxatni ko'rish uchun kiradi, tashkilot esa kamdan-kam
+        qo'shiladi. Endi forma modalda — ro'yxat butun kenglikni oladi va
+        jadvalga sig'adi.
+      */}
       <SahifaSarlavhasi
         sarlavha="Tashkilotlar"
         izoh={`${tashkilotlar.length} ta tashkilot ro'yxatga olingan`}
+        amal={
+          <TashkilotQoshish
+            turlar={variantlar(TASHKILOT_TURI)}
+            hududlar={variantlar(HUDUD)}
+          />
+        }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-2.5">
-          {tashkilotlar.map((t) => (
-            <Quti key={t.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-              <div className="min-w-0">
-                <p className="font-medium text-matn">{t.name}</p>
-                <p className="mt-0.5 text-sm text-matn-uchinchi">
-                  {TASHKILOT_TURI[t.type]} · {HUDUD[t.region]}
-                  {t.district ? `, ${t.district}` : ""}
-                  {t.stir ? ` · STIR ${t.stir}` : ""}
-                </p>
-              </div>
-              <p className="shrink-0 text-sm text-matn-ikkilamchi">
-                {t._count.users} foydalanuvchi · {t._count.problems} muammo
-              </p>
-            </Quti>
-          ))}
-        </div>
+      <Jadval>
+        <JadvalBosh>
+          <JadvalQator className="hover:bg-transparent">
+            <JadvalSarlavha className="w-full">Tashkilot</JadvalSarlavha>
+            <JadvalSarlavha>Turi</JadvalSarlavha>
+            <JadvalSarlavha>Hudud</JadvalSarlavha>
+            <JadvalSarlavha className="text-right">Foydalanuvchi</JadvalSarlavha>
+            <JadvalSarlavha className="text-right">Muammo</JadvalSarlavha>
+          </JadvalQator>
+        </JadvalBosh>
 
-        <div>
-          <Quti className="p-5">
-            <h2 className="mb-4 font-medium text-matn">Yangi tashkilot qo'shish</h2>
-            <TashkilotFormasi
-              turlar={variantlar(TASHKILOT_TURI)}
-              hududlar={variantlar(HUDUD)}
-            />
-          </Quti>
-        </div>
-      </div>
+        <JadvalTana>
+          {tashkilotlar.map((t) => (
+            <JadvalQator key={t.id}>
+              <JadvalKatak>
+                <span className="font-medium">{t.name}</span>
+                {t.stir && (
+                  <span className="mt-0.5 block text-xs text-matn-uchinchi">
+                    STIR {t.stir}
+                  </span>
+                )}
+              </JadvalKatak>
+              <JadvalKatak>{TASHKILOT_TURI[t.type]}</JadvalKatak>
+              <JadvalKatak>
+                {HUDUD[t.region]}
+                {t.district && (
+                  <span className="block text-xs text-matn-uchinchi">{t.district}</span>
+                )}
+              </JadvalKatak>
+              <JadvalKatak className="text-right tabular-nums">
+                {sonMatni(t._count.users)}
+              </JadvalKatak>
+              <JadvalKatak className="text-right tabular-nums">
+                {sonMatni(t._count.problems)}
+              </JadvalKatak>
+            </JadvalQator>
+          ))}
+        </JadvalTana>
+      </Jadval>
     </>
   );
 }

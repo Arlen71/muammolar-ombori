@@ -1,18 +1,39 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { tashkilotYarat } from "../actions";
-import { Kiritish, Maydon, Tanlov, Tugma, Xabar } from "@/components/ui";
+import { ModalOchgich } from "@/components/modal";
+import { Kiritish, Maydon, Tanlov, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
 
-function Yuborish() {
-  const { pending } = useFormStatus();
+type Variant = { value: string; label: string };
+
+/** Sahifa sarlavhasidagi tugma va u ochadigan modal. */
+export function TashkilotQoshish({
+  turlar,
+  hududlar,
+}: {
+  turlar: Variant[];
+  hududlar: Variant[];
+}) {
   return (
-    <Tugma type="submit" className="w-full" disabled={pending}>
-      {pending ? "Qo'shilmoqda…" : "Tashkilotni qo'shish"}
-    </Tugma>
+    <ModalOchgich
+      yorliq="Yangi tashkilot"
+      sarlavha="Yangi tashkilot qo'shish"
+      izoh="Tashkilot qo'shilgach, unga rahbar akkaunti yaratish mumkin bo'ladi."
+    >
+      {/*
+        Modal muvaffaqiyatdan keyin OCHIQ qoladi.
+
+        Administrator odatda tashkilotlarni ketma-ket kiritadi, va forma
+        o'zi tozalanib, ustida yashil xabar chiqadi — ya'ni keyingisini
+        darhol yozish mumkin. Oyna avtomatik yopilsa, har safar tugmani
+        qayta bosishga to'g'ri kelardi.
+      */}
+      {() => <TashkilotFormasi turlar={turlar} hududlar={hududlar} />}
+    </ModalOchgich>
   );
 }
 
@@ -20,8 +41,8 @@ export function TashkilotFormasi({
   turlar,
   hududlar,
 }: {
-  turlar: { value: string; label: string }[];
-  hududlar: { value: string; label: string }[];
+  turlar: Variant[];
+  hududlar: Variant[];
 }) {
   const [holat, amal] = useActionState<AmalNatijasi, FormData>(tashkilotYarat, {});
   const x = holat.maydonXatolari;
@@ -63,7 +84,9 @@ export function TashkilotFormasi({
         <Kiritish id="stir" name="stir" inputMode="numeric" placeholder="201234567" />
       </Maydon>
 
-      <Yuborish />
+      <Yuborish kutish="Qo'shilmoqda…" className="w-full">
+        Tashkilotni qo'shish
+      </Yuborish>
     </form>
   );
 }

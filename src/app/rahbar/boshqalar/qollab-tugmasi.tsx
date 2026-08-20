@@ -1,20 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { qollabQuvvatla, qollabQuvvatlashniBekorQil } from "./actions";
 import { Kiritish, Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function Yuborish({ matn, kutish, ...props }: { matn: string; kutish: string } & Parameters<typeof Tugma>[0]) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" disabled={pending} {...props}>
-      {pending ? kutish : matn}
-    </Tugma>
-  );
-}
 
 export function QollabTugmasi({
   muammoId,
@@ -70,7 +61,9 @@ export function QollabTugmasi({
         className="max-w-lg"
       />
       <div className="flex gap-2">
-        <Yuborish matn="Qo'shilaman" kutish="Saqlanmoqda…" olcham="kichik" />
+        <Yuborish kutish="Saqlanmoqda…" olcham="kichik">
+          Qo'shilaman
+        </Yuborish>
         <Tugma type="button" korinish="shaffof" olcham="kichik" onClick={() => setOchiq(false)}>
           Bekor qilish
         </Tugma>

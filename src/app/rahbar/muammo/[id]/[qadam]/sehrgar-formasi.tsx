@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { qadamniSaqla } from "@/app/rahbar/actions";
 import { Avtosaqlash } from "@/components/sehrgar/avtosaqlash";
@@ -14,6 +13,7 @@ import {
   YoqotishHisoblagichi,
 } from "@/components/sehrgar/maydonlar";
 import { Kiritish, KattaMatn, Maydon, Tanlov, Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import {
   INTEGRATSIYA,
   KIRISH_JOYI,
@@ -73,15 +73,6 @@ const LAVOZIM_TAKLIFLARI = [
   "Kadrlar inspektori",
   "Ijrochi xodim",
 ];
-
-function KeyingiTugmasi({ qadam }: { qadam: QadamRaqami }) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" disabled={pending}>
-      {pending ? "Saqlanmoqda…" : qadam < 5 ? "Saqlash va davom etish" : "Saqlash va ko'rish"}
-    </Tugma>
-  );
-}
 
 export function SehrgarFormasi({
   muammo,
@@ -514,7 +505,9 @@ export function SehrgarFormasi({
             </Tugma>
           </Link>
         )}
-        <KeyingiTugmasi qadam={qadam} />
+        <Yuborish kutish="Saqlanmoqda…">
+          {qadam < 5 ? "Saqlash va davom etish" : "Saqlash va ko'rish"}
+        </Yuborish>
         <div className="ml-auto">
           <Avtosaqlash muammoId={muammo.id} qadam={qadam} />
         </div>

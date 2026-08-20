@@ -1,20 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { muammoniYop } from "@/app/rahbar/actions";
-import { KattaMatn, Quti, Tugma, Xabar } from "@/components/ui";
+import { KattaMatn, Quti, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function Yuborish() {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" disabled={pending}>
-      {pending ? "Saqlanmoqda…" : "Ha, muammo hal qilindi"}
-    </Tugma>
-  );
-}
 
 /**
  * Siklni yopish — ataylab RAHBAR qiladi, dasturchi emas.
@@ -56,7 +47,7 @@ export function YopishFormasi({
           rows={2}
           placeholder="Qisqacha izoh: nima o'zgardi? (ixtiyoriy)"
         />
-        <Yuborish />
+        <Yuborish kutish="Saqlanmoqda…">Ha, muammo hal qilindi</Yuborish>
       </form>
     </Quti>
   );

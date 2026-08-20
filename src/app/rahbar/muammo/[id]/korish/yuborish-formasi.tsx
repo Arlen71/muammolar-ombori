@@ -1,20 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { muammoniYubor, qoralamaniOchir } from "@/app/rahbar/actions";
 import { Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function YuborishTugmasi({ tayyor }: { tayyor: boolean }) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" olcham="katta" disabled={pending || !tayyor}>
-      {pending ? "Yuborilmoqda…" : "Moderatsiyaga yuborish"}
-    </Tugma>
-  );
-}
 
 export function YuborishFormasi({
   muammoId,
@@ -42,7 +33,9 @@ export function YuborishFormasi({
       <div className="flex flex-wrap items-center gap-3">
         <form action={amal}>
           <input type="hidden" name="muammoId" value={muammoId} />
-          <YuborishTugmasi tayyor={tayyor} />
+          <Yuborish kutish="Yuborilmoqda…" olcham="katta" disabled={!tayyor}>
+            Moderatsiyaga yuborish
+          </Yuborish>
         </form>
 
         {qoralamami && (

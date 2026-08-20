@@ -1,28 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { muammoniRadEt, muammoniTasdiqla } from "../actions";
 import { KattaMatn, Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function Yuborish({
-  matn,
-  kutish,
-  korinish,
-}: {
-  matn: string;
-  kutish: string;
-  korinish?: "asosiy" | "xavfli";
-}) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" korinish={korinish} olcham="kichik" disabled={pending}>
-      {pending ? kutish : matn}
-    </Tugma>
-  );
-}
 
 export function ModeratsiyaAmali({ muammoId }: { muammoId: string }) {
   const [tasdiqHolati, tasdiqAmali] = useActionState<AmalNatijasi, FormData>(
@@ -54,7 +37,9 @@ export function ModeratsiyaAmali({ muammoId }: { muammoId: string }) {
             placeholder="Nima yetishmayapti? Rahbar nimani tuzatishi kerak?"
           />
           <div className="flex gap-2">
-            <Yuborish matn="Rad etib qaytarish" kutish="Yuborilmoqda…" korinish="xavfli" />
+            <Yuborish kutish="Yuborilmoqda…" korinish="xavfli" olcham="kichik">
+              Rad etib qaytarish
+            </Yuborish>
             <Tugma
               type="button"
               korinish="shaffof"
@@ -69,7 +54,9 @@ export function ModeratsiyaAmali({ muammoId }: { muammoId: string }) {
         <div className="flex flex-wrap gap-2">
           <form action={tasdiqAmali}>
             <input type="hidden" name="muammoId" value={muammoId} />
-            <Yuborish matn="Tasdiqlash va omborga qo'shish" kutish="Tasdiqlanmoqda…" />
+            <Yuborish kutish="Tasdiqlanmoqda…" olcham="kichik">
+              Tasdiqlash va omborga qo'shish
+            </Yuborish>
           </form>
           <Tugma
             type="button"

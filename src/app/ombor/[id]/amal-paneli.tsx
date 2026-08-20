@@ -1,21 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { muammoniOl, muammoniQoyibYubor, yechimTaqdimEtildi } from "../actions";
 import { KattaMatn, Kiritish, Quti, Tugma, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
 import type { ProblemStatus } from "@/generated/prisma/enums";
-
-function Yuborish({ matn, kutish }: { matn: string; kutish: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" disabled={pending}>
-      {pending ? kutish : matn}
-    </Tugma>
-  );
-}
 
 /** Dasturchining muammo sahifasidagi amallar paneli. */
 export function AmalPaneli({
@@ -70,7 +61,7 @@ export function AmalPaneli({
         </p>
         <form action={olishAmali} className="mt-4">
           <input type="hidden" name="muammoId" value={muammoId} />
-          <Yuborish matn="Men olaman" kutish="Biriktirilmoqda…" />
+          <Yuborish kutish="Biriktirilmoqda…">Men olaman</Yuborish>
         </form>
       </Quti>
     );
@@ -106,7 +97,7 @@ export function AmalPaneli({
               placeholder="Kim bilan gaplashdingiz va nima taklif qildingiz?"
               required
             />
-            <Yuborish matn="Yechim taqdim etildi" kutish="Saqlanmoqda…" />
+            <Yuborish kutish="Saqlanmoqda…">Yechim taqdim etildi</Yuborish>
           </form>
         </>
       )}

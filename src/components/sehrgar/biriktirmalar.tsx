@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useRef } from "react";
-import { useFormStatus } from "react-dom";
 
 import { biriktirmaniOchir, fayllarniYukla } from "@/app/rahbar/actions";
-import { Tugma, Xabar } from "@/components/ui";
+import { Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import { hajmMatni } from "@/lib/uploads-client";
 import type { AmalNatijasi } from "@/lib/validation";
 
@@ -14,15 +14,6 @@ export type Biriktirma = {
   size: number;
   mimeType: string;
 };
-
-function YuklashTugmasi() {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" korinish="ikkilamchi" olcham="kichik" disabled={pending}>
-      {pending ? "Yuklanmoqda…" : "Yuklash"}
-    </Tugma>
-  );
-}
 
 /**
  * Fayl biriktirish bloki.
@@ -92,7 +83,9 @@ export function Biriktirmalar({
             accept={ruxsatEtilgan.join(",")}
             className="block w-full max-w-md text-sm text-matn-ikkilamchi file:mr-3 file:rounded-lg file:border-0 file:bg-yuza-2 file:px-4 file:py-2 file:text-sm file:font-medium file:text-matn hover:file:bg-yuza-3"
           />
-          <YuklashTugmasi />
+          <Yuborish kutish="Yuklanmoqda…" korinish="ikkilamchi" olcham="kichik">
+          Yuklash
+        </Yuborish>
         </div>
 
         <p className="text-xs text-matn-uchinchi">

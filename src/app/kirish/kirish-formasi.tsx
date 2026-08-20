@@ -1,20 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
 
 import { kirishAmali } from "./actions";
-import { Kiritish, Maydon, Tugma, Xabar } from "@/components/ui";
+import { Kiritish, Maydon, Xabar } from "@/components/ui";
+import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
-
-function YuborishTugmasi() {
-  const { pending } = useFormStatus();
-  return (
-    <Tugma type="submit" olcham="katta" className="w-full" disabled={pending}>
-      {pending ? "Tekshirilmoqda…" : "Kirish"}
-    </Tugma>
-  );
-}
 
 export function KirishFormasi({ keyingi }: { keyingi?: string }) {
   const [holat, amal] = useActionState<AmalNatijasi, FormData>(kirishAmali, {});
@@ -61,7 +52,9 @@ export function KirishFormasi({ keyingi }: { keyingi?: string }) {
         />
       </Maydon>
 
-      <YuborishTugmasi />
+      <Yuborish kutish="Tekshirilmoqda…" olcham="katta" className="w-full">
+        Kirish
+      </Yuborish>
     </form>
   );
 }

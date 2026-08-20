@@ -2,9 +2,17 @@ import type { Metadata } from "next";
 
 import { db } from "@/lib/db";
 import { SahifaSarlavhasi } from "@/components/app-shell";
-import { Nishoncha, Quti } from "@/components/ui";
+import {
+  Jadval,
+  JadvalBosh,
+  JadvalKatak,
+  JadvalQator,
+  JadvalSarlavha,
+  JadvalTana,
+  Nishoncha,
+} from "@/components/ui";
 import { FOYDALANUVCHI_HOLATI, ROL, sanaMatni, telefonMatni, variantlar } from "@/lib/labels";
-import { FoydalanuvchiFormasi, ParolTiklashTugmasi } from "./foydalanuvchi-formasi";
+import { FoydalanuvchiQoshish, ParolTiklashTugmasi } from "./foydalanuvchi-formasi";
 
 export const metadata: Metadata = { title: "Foydalanuvchilar" };
 
@@ -28,46 +36,74 @@ export default async function FoydalanuvchilarSahifasi() {
       <SahifaSarlavhasi
         sarlavha="Foydalanuvchilar"
         izoh="Tizimga kirish huquqini faqat administrator beradi — o'z-o'zidan ro'yxatdan o'tish yo'q."
+        amal={
+          <FoydalanuvchiQoshish rollar={variantlar(ROL)} tashkilotlar={tashkilotlar} />
+        }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-2.5">
+      <Jadval>
+        <JadvalBosh>
+          <JadvalQator className="hover:bg-transparent">
+            <JadvalSarlavha className="w-full">Foydalanuvchi</JadvalSarlavha>
+            <JadvalSarlavha>Tashkilot</JadvalSarlavha>
+            {/*
+              Rol va holat bitta ustunda. Alohida turganda ular jadvalni
+              ekrandan chiqarib yuborardi: "Tashkilot rahbari" va
+              "Tasdiqlanishi kutilmoqda" nishonchalari uzun va satrga
+              bo'linmaydi. Ustma-ust qo'yilganda esa ikkalasi ham bitta
+              tor ustunga sig'adi.
+            */}
+            <JadvalSarlavha>Rol va holat</JadvalSarlavha>
+            <JadvalSarlavha>Oxirgi kirish</JadvalSarlavha>
+            <JadvalSarlavha>
+              <span className="sr-only">Amallar</span>
+            </JadvalSarlavha>
+          </JadvalQator>
+        </JadvalBosh>
+
+        <JadvalTana>
           {foydalanuvchilar.map((f) => (
-            <Quti key={f.id} className="p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-medium text-matn">{f.fullName}</p>
-                  <p className="mt-0.5 text-sm text-matn-ikkilamchi">
-                    {telefonMatni(f.phone)}
-                    {f.position ? ` · ${f.position}` : ""}
-                  </p>
-                  <p className="mt-0.5 text-xs text-matn-uchinchi">
-                    {f.organization?.name ?? "Tashkilotga biriktirilmagan"} · yaratilgan{" "}
-                    {sanaMatni(f.createdAt)}
-                    {f.lastLoginAt ? ` · oxirgi kirish ${sanaMatni(f.lastLoginAt)}` : " · hali kirmagan"}
-                  </p>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1.5">
+            <JadvalQator key={f.id}>
+              <JadvalKatak>
+                <span className="font-medium">{f.fullName}</span>
+                <span className="mt-0.5 block text-xs text-matn-uchinchi">
+                  {telefonMatni(f.phone)}
+                  {f.position ? ` · ${f.position}` : ""}
+                </span>
+              </JadvalKatak>
+
+              <JadvalKatak className="max-w-48">
+                <span className="block truncate">
+                  {f.organization?.name ?? (
+                    <span className="text-matn-uchinchi">Biriktirilmagan</span>
+                  )}
+                </span>
+              </JadvalKatak>
+
+              <JadvalKatak>
+                <div className="flex flex-col items-start gap-1">
                   <Nishoncha>{ROL[f.role]}</Nishoncha>
                   <Nishoncha className={HOLAT_RANGI[f.status]}>
                     {FOYDALANUVCHI_HOLATI[f.status]}
                   </Nishoncha>
                 </div>
-              </div>
-              <div className="mt-3 border-t border-chegara pt-3">
-                <ParolTiklashTugmasi userId={f.id} />
-              </div>
-            </Quti>
-          ))}
-        </div>
+              </JadvalKatak>
 
-        <div>
-          <Quti className="p-5">
-            <h2 className="mb-4 font-medium text-matn">Yangi akkaunt yaratish</h2>
-            <FoydalanuvchiFormasi rollar={variantlar(ROL)} tashkilotlar={tashkilotlar} />
-          </Quti>
-        </div>
-      </div>
+              <JadvalKatak className="whitespace-nowrap text-sm text-matn-ikkilamchi">
+                {f.lastLoginAt ? (
+                  sanaMatni(f.lastLoginAt)
+                ) : (
+                  <span className="text-matn-uchinchi">hali kirmagan</span>
+                )}
+              </JadvalKatak>
+
+              <JadvalKatak className="text-right">
+                <ParolTiklashTugmasi userId={f.id} />
+              </JadvalKatak>
+            </JadvalQator>
+          ))}
+        </JadvalTana>
+      </Jadval>
     </>
   );
 }

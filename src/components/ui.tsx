@@ -50,6 +50,17 @@ const TUGMA_OLCHAMI: Record<TugmaOlchami, string> = {
 export function Tugma({
   korinish = "asosiy",
   olcham = "orta",
+  /*
+    HTML'da `<button>` ning standart turi — `submit`. Ya'ni forma ichidagi
+    oddiy tugmaga `type` berish unutilsa, u jimgina formani yuborib
+    yuboradi. Bunday xato ko'rinmaydi: tugma "ishlaydi", faqat noto'g'ri
+    narsa qiladi.
+
+    Shuning uchun bu yerda standart teskari tomonga o'zgartirilgan. Forma
+    yuboradigan tugmalar `type="submit"` ni ochiq yozadi — yoki, yaxshisi,
+    `Yuborish` komponentini ishlatadi.
+  */
+  type = "button",
   className,
   ...props
 }: React.ComponentProps<"button"> & {
@@ -58,6 +69,7 @@ export function Tugma({
 }) {
   return (
     <button
+      type={type}
       className={cn(
         "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
         "disabled:cursor-not-allowed",
