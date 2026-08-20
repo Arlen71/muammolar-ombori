@@ -497,7 +497,20 @@ export function SehrgarFormasi({
         </>
       )}
 
-      <footer className="flex flex-wrap items-center gap-3 border-t border-chegara pt-5">
+      {/*
+        Tugmalar qatori ekran pastiga yopishib turadi.
+
+        Qadamlar uzun — uchinchi qadamda o'ndan ortiq maydon bor. Tugma
+        faqat sahifa oxirida bo'lsa, rahbar yozib bo'lgach uni topish
+        uchun pastga aylantirishi kerak, va "saqlandimi yoki yo'qmi"
+        degan shubha qoladi. Yopishgan qatorda esa saqlash tugmasi ham,
+        avtosaqlash holati ham doim ko'z oldida turadi.
+
+        `-mx-4` va `px-4` — o'ram sahifa chetlaridan chiqib, butun
+        kenglikni egallasin; aks holda yopishgan panel ostidan kontent
+        chetlaridan ko'rinib qolardi.
+      */}
+      <footer className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-chegara bg-yuza/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
         {qadam > 1 && (
           <Link href={`/rahbar/muammo/${muammo.id}/${qadam - 1}`}>
             <Tugma type="button" korinish="ikkilamchi">
