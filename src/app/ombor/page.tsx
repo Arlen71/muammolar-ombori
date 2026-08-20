@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { db } from "@/lib/db";
 import { SahifaSarlavhasi } from "@/components/app-shell";
-import { MuammoQatori } from "@/components/muammo-qatori";
+import { MuammolarJadvali } from "@/components/muammolar-jadvali";
 import { BoshHolat, Kiritish, Tanlov, Tugma } from "@/components/ui";
 import { HUDUD, SHOSHILINCHLIK, variantlar } from "@/lib/labels";
 import { soatMatni } from "@/lib/scoring";
@@ -200,11 +200,11 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
             {muammolar.length} ta muammo ko'rsatilmoqda
             {muammolar.length === 100 && " (eng yuqoridagi 100 tasi)"}
           </p>
-          <div className="space-y-2.5">
-            {muammolar.map((m) => (
-              <MuammoQatori key={m.id} muammo={m} yol={`/ombor/${m.id}`} />
-            ))}
-          </div>
+          <MuammolarJadvali
+            muammolar={muammolar}
+            yol={(m) => `/ombor/${m.id}`}
+            ustunlar={["tashkilot", "yoqotish", "qollab", "olgan"]}
+          />
         </>
       )}
     </>

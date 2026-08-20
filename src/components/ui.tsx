@@ -352,7 +352,7 @@ export function JadvalSarlavha({
     <th
       scope="col"
       className={cn(
-        "whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-matn-ikkilamchi",
+        "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-matn-ikkilamchi",
         className
       )}
       {...props}

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { talabDasturchi } from "@/lib/auth";
 import { SahifaSarlavhasi } from "@/components/app-shell";
-import { MuammoQatori } from "@/components/muammo-qatori";
+import { MuammolarJadvali } from "@/components/muammolar-jadvali";
 import { BoshHolat } from "@/components/ui";
 import { soatMatni } from "@/lib/scoring";
 
@@ -49,14 +49,12 @@ export default async function MeningMuammolarim() {
       ) : (
         <div className="space-y-8">
           {faol.length > 0 && (
-            <section className="space-y-2.5">
-              {faol.map((t) => (
-                <MuammoQatori
-                  key={t.id}
-                  muammo={t.problem}
-                  yol={`/ombor/${t.problem.id}`}
-                />
-              ))}
+            <section>
+              <MuammolarJadvali
+                muammolar={faol.map((t) => t.problem)}
+                yol={(m) => `/ombor/${m.id}`}
+                ustunlar={["tashkilot", "holat", "yoqotish"]}
+              />
             </section>
           )}
 
@@ -65,14 +63,12 @@ export default async function MeningMuammolarim() {
               <h2 className="mb-3 text-sm font-semibold text-matn-ikkilamchi">
                 Qo'yib yuborilganlar
               </h2>
-              <div className="space-y-2.5 opacity-70">
-                {tugatilgan.map((t) => (
-                  <MuammoQatori
-                    key={t.id}
-                    muammo={t.problem}
-                    yol={`/ombor/${t.problem.id}`}
-                  />
-                ))}
+              <div className="opacity-70">
+                <MuammolarJadvali
+                  muammolar={tugatilgan.map((t) => t.problem)}
+                  yol={(m) => `/ombor/${m.id}`}
+                  ustunlar={["tashkilot", "holat", "yoqotish"]}
+                />
               </div>
             </section>
           )}
