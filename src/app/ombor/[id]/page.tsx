@@ -54,28 +54,44 @@ export default async function OmborMuammosi(props: PageProps<"/ombor/[id]">) {
   const aloqaKorsatilsin = menikimi || foydalanuvchi.role === "ADMIN";
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div>
       <Link href="/ombor" className="mb-4 inline-block text-sm text-matn-ikkilamchi hover:text-matn">
         ← Muammolar ombori
       </Link>
 
-      <Quti className="p-5 sm:p-7">
-        <MuammoKartochkasi
-          muammo={muammo}
-          aloqaKorsatilsin={aloqaKorsatilsin}
-          yuklabOlishMumkin
-        />
-      </Quti>
+      {/*
+        Keng ekranda amallar o'ng ustunda va yopishib turadi.
 
-      <div className="mt-5">
-        <AmalPaneli
-          muammoId={muammo.id}
-          status={muammo.status}
-          menikimi={menikimi}
-          boshqaDasturchi={
-            faolTopshiriq && !menikimi ? faolTopshiriq.developer.fullName : null
-          }
-        />
+        Muammo kartochkasi uzun — dasturchi uni to'liq o'qib chiqadi va
+        aynan o'qish davomida "bu menikimi?" degan qarorga keladi.
+        Tugma sahifa oxirida bo'lsa, qaror qabul qilingan payt bilan
+        tugma o'rtasida butun bir aylantirish masofasi turadi.
+
+        Tor ekranda ustunlar birlashadi va amal kartochka ostiga
+        tushadi — bu yerda yopishtirish mumkin emas, panel ekranning
+        yarmini egallab qo'yardi.
+      */}
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+        <div className="min-w-0">
+          <Quti className="p-5 sm:p-7">
+            <MuammoKartochkasi
+              muammo={muammo}
+              aloqaKorsatilsin={aloqaKorsatilsin}
+              yuklabOlishMumkin
+            />
+          </Quti>
+        </div>
+
+        <div className="xl:sticky xl:top-6">
+          <AmalPaneli
+            muammoId={muammo.id}
+            status={muammo.status}
+            menikimi={menikimi}
+            boshqaDasturchi={
+              faolTopshiriq && !menikimi ? faolTopshiriq.developer.fullName : null
+            }
+          />
+        </div>
       </div>
 
       {muammo.duplicates.length > 0 && (

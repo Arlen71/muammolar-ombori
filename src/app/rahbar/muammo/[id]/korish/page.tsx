@@ -39,8 +39,14 @@ export default async function KorishSahifasi(
   const tahrirlanadi = muammo.status === "DRAFT" || muammo.status === "REJECTED";
   const tayyor = QADAMLAR.every((q) => qadamSxemalari[q].safeParse(muammo).success);
 
+  /*
+    Yon ustun faqat bajariladigan amal bo'lganda ochiladi. Aks holda
+    kartochka keng ekranda o'ng tomonda bo'sh joy qoldirib turardi.
+  */
+  const amalBor = tahrirlanadi || muammo.status === "SOLUTION_OFFERED";
+
   return (
-    <div className="mx-auto max-w-3xl">
+    <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Link href="/rahbar" className="text-sm text-matn-ikkilamchi hover:text-matn">
           ← Mening muammolarim
@@ -68,35 +74,52 @@ export default async function KorishSahifasi(
         </Xabar>
       )}
 
-      <Quti className="p-5 sm:p-7">
-        <MuammoKartochkasi
-          muammo={muammo}
-          // Rahbar o'z tashkiloti muammosining aloqasini ko'rishi tabiiy
-          aloqaKorsatilsin
-          yuklabOlishMumkin
-        />
-      </Quti>
-
-      {tahrirlanadi && (
-        <div className="mt-6">
-          <YuborishFormasi
-            muammoId={muammo.id}
-            tayyor={tayyor}
-            qoralamami={muammo.status === "DRAFT"}
-          />
+      {/*
+        Amal o'ng ustunda va yopishib turadi — dasturchining muammo
+        sahifasidagi kabi. Rahbar kartochkani o'qib chiqadi va aynan
+        o'qish davomida qaror qiladi: yuborsammikan, yoki hal
+        bo'lgandir. Tugma sahifa oxirida bo'lsa, qaror bilan tugma
+        o'rtasida butun aylantirish masofasi turadi.
+      */}
+      <div
+        className={
+          amalBor
+            ? "grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start"
+            : undefined
+        }
+      >
+        <div className="min-w-0">
+          <Quti className="p-5 sm:p-7">
+            <MuammoKartochkasi
+              muammo={muammo}
+              // Rahbar o'z tashkiloti muammosining aloqasini ko'rishi tabiiy
+              aloqaKorsatilsin
+              yuklabOlishMumkin
+            />
+          </Quti>
         </div>
-      )}
 
-      {muammo.status === "SOLUTION_OFFERED" && (
-        <div className="mt-6">
-          <YopishFormasi
-            muammoId={muammo.id}
-            dasturchiIzohi={
-              muammo.history.find((h) => h.toStatus === "SOLUTION_OFFERED")?.comment
-            }
-          />
-        </div>
-      )}
+        {amalBor && (
+          <div className="space-y-5 xl:sticky xl:top-6">
+            {tahrirlanadi && (
+              <YuborishFormasi
+                muammoId={muammo.id}
+                tayyor={tayyor}
+                qoralamami={muammo.status === "DRAFT"}
+              />
+            )}
+
+            {muammo.status === "SOLUTION_OFFERED" && (
+              <YopishFormasi
+                muammoId={muammo.id}
+                dasturchiIzohi={
+                  muammo.history.find((h) => h.toStatus === "SOLUTION_OFFERED")?.comment
+                }
+              />
+            )}
+          </div>
+        )}
+      </div>
 
       {muammo.history.length > 0 && (
         <section className="mt-8">
