@@ -4,10 +4,11 @@ import { db } from "@/lib/db";
 import { SahifaSarlavhasi } from "@/components/app-shell";
 import { MuammolarJadvali } from "@/components/muammolar-jadvali";
 import { BoshHolat, Kiritish, Tanlov, Tugma } from "@/components/ui";
-import { HUDUD, SHOSHILINCHLIK, variantlar } from "@/lib/labels";
+import { TUMANLAR, tumanTogrimi } from "@/lib/hudud";
+import { SHOSHILINCHLIK, variantlar } from "@/lib/labels";
 import { soatMatni } from "@/lib/scoring";
 import type { Prisma } from "@/generated/prisma/client";
-import type { Region, Urgency } from "@/generated/prisma/enums";
+import type { Urgency } from "@/generated/prisma/enums";
 
 export const metadata: Metadata = { title: "Muammolar ombori" };
 
@@ -39,7 +40,16 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
   const q = await props.searchParams;
   const matn = typeof q.q === "string" ? q.q.trim() : "";
   const soha = typeof q.soha === "string" ? q.soha : "";
-  const hudud = typeof q.hudud === "string" ? (q.hudud as Region) : "";
+  /*
+    Filtr viloyat emas, TUMAN bo'yicha. Pilotda barcha tashkilot bitta
+    viloyatda, ya'ni viloyat filtri hech narsani ajratmaydi — u har doim
+    butun bazani qaytaradi. Dasturchi esa "Qarshi shahrida nima bor?"
+    degan savolga javob izlaydi.
+
+    Qiymat ro'yxatdan tekshiriladi: aks holda manzil qatoriga yozilgan
+    ixtiyoriy matn bevosita baza so'roviga tushardi.
+  */
+  const tuman = tumanTogrimi(q.tuman) ? q.tuman : "";
   const shoshilinch = typeof q.shoshilinch === "string" ? (q.shoshilinch as Urgency) : "";
   const faqatOchiq = q.ochiq === "1";
   const saralash: SaralashTuri =
@@ -52,7 +62,7 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
     // Dublikat sifatida birlashtirilganlar ro'yxatda alohida chiqmaydi
     canonicalId: null,
     ...(soha ? { categoryId: soha } : {}),
-    ...(hudud ? { organization: { region: hudud } } : {}),
+    ...(tuman ? { organization: { district: tuman } } : {}),
     ...(shoshilinch ? { urgency: shoshilinch } : {}),
     ...(matn
       ? {
@@ -72,7 +82,7 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
       take: 100,
       include: {
         category: { select: { name: true } },
-        organization: { select: { name: true, region: true } },
+        organization: { select: { name: true, district: true } },
         _count: { select: { supporters: true, attachments: true } },
         assignments: {
           where: { releasedAt: null },
@@ -125,14 +135,14 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
           </div>
 
           <div>
-            <label htmlFor="hudud" className="mb-1 block text-xs font-medium text-matn-ikkilamchi">
-              Hudud
+            <label htmlFor="tuman" className="mb-1 block text-xs font-medium text-matn-ikkilamchi">
+              Tuman
             </label>
-            <Tanlov id="hudud" name="hudud" defaultValue={hudud}>
+            <Tanlov id="tuman" name="tuman" defaultValue={tuman}>
               <option value="">Barchasi</option>
-              {variantlar(HUDUD).map((h) => (
-                <option key={h.value} value={h.value}>
-                  {h.label}
+              {TUMANLAR.map((t) => (
+                <option key={t} value={t}>
+                  {t}
                 </option>
               ))}
             </Tanlov>

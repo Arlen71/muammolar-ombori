@@ -19,7 +19,7 @@ export default async function MeningMuammolarim() {
       problem: {
         include: {
           category: { select: { name: true } },
-          organization: { select: { name: true, region: true } },
+          organization: { select: { name: true, district: true } },
           _count: { select: { supporters: true, attachments: true } },
         },
       },

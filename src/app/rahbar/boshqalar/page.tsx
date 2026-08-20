@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { talabRahbar } from "@/lib/auth";
 import { SahifaSarlavhasi } from "@/components/app-shell";
 import { BoshHolat, Kiritish, Nishoncha, Quti, Tugma } from "@/components/ui";
-import { HUDUD, MUAMMO_HOLATI, MUAMMO_HOLATI_RANGI } from "@/lib/labels";
+import { MUAMMO_HOLATI, MUAMMO_HOLATI_RANGI } from "@/lib/labels";
 import { soatMatni } from "@/lib/scoring";
 import { QollabTugmasi } from "./qollab-tugmasi";
 import type { Prisma } from "@/generated/prisma/client";
@@ -37,7 +37,7 @@ export default async function BoshqalarSahifasi(props: PageProps<"/rahbar/boshqa
     take: 50,
     include: {
       category: { select: { name: true } },
-      organization: { select: { name: true, region: true } },
+      organization: { select: { name: true, district: true } },
       supporters: { select: { organizationId: true } },
       _count: { select: { supporters: true } },
     },
@@ -74,7 +74,8 @@ export default async function BoshqalarSahifasi(props: PageProps<"/rahbar/boshqa
                   <div className="min-w-0 flex-1">
                     <h2 className="font-medium leading-snug text-matn">{m.title}</h2>
                     <p className="mt-1 text-sm text-matn-uchinchi">
-                      {m.organization.name} · {HUDUD[m.organization.region]} · {m.category.name}
+                      {m.organization.name}
+                      {m.organization.district ? ` · ${m.organization.district}` : ""} · {m.category.name}
                     </p>
                   </div>
                   <Nishoncha className={MUAMMO_HOLATI_RANGI[m.status]}>

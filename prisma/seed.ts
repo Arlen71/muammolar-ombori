@@ -7,6 +7,7 @@
 import "dotenv/config";
 
 import { db } from "@/lib/db";
+import { PILOT_HUDUDI } from "@/lib/hudud";
 import { parolXeshla } from "@/lib/password";
 import { oylikYoqotilganSoat, tasirBalli, toliqlikFoizi } from "@/lib/scoring";
 import type {
@@ -605,31 +606,31 @@ async function main() {
   const tashkilotlar = await Promise.all(
     [
       {
-        name: "Chilonzor tumani hokimligi",
+        name: "Qarshi shahar hokimligi",
         type: "KHOKIMIYAT" as const,
-        region: "TASHKENT_CITY" as const,
-        district: "Chilonzor tumani",
+        region: PILOT_HUDUDI,
+        district: "Qarshi shahri",
         stir: "201234567",
       },
       {
-        name: "Samarqand viloyati sog'liqni saqlash boshqarmasi",
+        name: "Qashqadaryo viloyati sog'liqni saqlash boshqarmasi",
         type: "HEALTHCARE" as const,
-        region: "SAMARKAND" as const,
-        district: "Samarqand shahri",
+        region: PILOT_HUDUDI,
+        district: "Qarshi shahri",
         stir: "202345678",
       },
       {
-        name: "Andijon viloyati xalq ta'limi boshqarmasi",
+        name: "Qashqadaryo viloyati xalq ta'limi boshqarmasi",
         type: "EDUCATION" as const,
-        region: "ANDIJAN" as const,
-        district: "Andijon shahri",
+        region: PILOT_HUDUDI,
+        district: "Qarshi shahri",
         stir: "203456789",
       },
       {
-        name: "Buxoro viloyati hokimligi",
+        name: "Shahrisabz tumani hokimligi",
         type: "KHOKIMIYAT" as const,
-        region: "BUKHARA" as const,
-        district: "Buxoro shahri",
+        region: PILOT_HUDUDI,
+        district: "Shahrisabz tumani",
         stir: "204567890",
       },
     ].map((t) => db.organization.create({ data: t }))
@@ -905,7 +906,7 @@ async function main() {
   console.log("\n  Sinov akkauntlari (parol hammasida bir xil):");
   console.log(`  Parol:      ${SINOV_PAROLI}`);
   console.log(`  Admin:      +998 90 111 22 33`);
-  console.log(`  Rahbar:     +998 90 111 22 01  (Chilonzor tumani hokimligi)`);
+  console.log(`  Rahbar:     +998 90 111 22 01  (Qarshi shahar hokimligi)`);
   console.log(`  Dasturchi:  +998 90 111 33 01  (tasdiqlangan)`);
   console.log(`  Dasturchi:  +998 90 111 33 03  (tasdiqlanmagan — kutish ekrani)\n`);
 

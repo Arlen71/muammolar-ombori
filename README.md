@@ -178,6 +178,20 @@ sahifa bor" degani. `/ombor` va `/rahbar` ostida `notFound()`
 chaqiriladi, shuning uchun u yerda skelet yo'q. Buni `npm run e2e`
 tekshiradi.
 
+**Tizim bitta viloyatda ishlaydi.** Pilot hududi `src/lib/hudud.ts` da
+qotirilgan (`PILOT_HUDUDI = "QASHQADARYO"`). Interfeysda viloyat
+tanlanmaydi — tashkilot yaratilganda uni server qo'yadi, chunki pilot
+chegarasi mahsulot qarori, foydalanuvchi tanlovi emas. Ajratish TUMAN
+bo'yicha: bir viloyat ichida odamlar aynan tumanni izlaydi ("Qarshi
+shahrida qanday muammolar bor?"), viloyat filtri esa har doim butun
+bazani qaytarardi.
+
+`Region` enum'i sxemada 14 ta viloyat bilan qolyapti — boshqa viloyatga
+kengaytirish uchun `hudud.ts` dagi ikki qiymatni o'zgartirish kifoya,
+bazaga tegilmaydi. Tumanlar ro'yxati ham shu faylda; ma'muriy bo'linish
+o'zgarganda (masalan Ko'kdala tumani 2018-yilda tashkil etilgan) uni
+rasmiy manba bilan solishtirib turing.
+
 **Ro'yxatlar ikki ko'rinishda.** `MuammolarJadvali` katta ekranda jadval,
 telefonda kartochka chizadi — ikkalasi bitta faylda. Sabab: ustun
 qo'shilganda uni ikki joyda o'zgartirish kerak bo'lsa, vaqt o'tib ular

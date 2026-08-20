@@ -10,7 +10,8 @@ import {
   JadvalSarlavha,
   JadvalTana,
 } from "@/components/ui";
-import { HUDUD, TASHKILOT_TURI, sonMatni, variantlar } from "@/lib/labels";
+import { TUMANLAR } from "@/lib/hudud";
+import { TASHKILOT_TURI, sonMatni, variantlar } from "@/lib/labels";
 import { TashkilotQoshish } from "./tashkilot-formasi";
 
 export const metadata: Metadata = { title: "Tashkilotlar" };
@@ -36,10 +37,7 @@ export default async function TashkilotlarSahifasi() {
         sarlavha="Tashkilotlar"
         izoh={`${tashkilotlar.length} ta tashkilot ro'yxatga olingan`}
         amal={
-          <TashkilotQoshish
-            turlar={variantlar(TASHKILOT_TURI)}
-            hududlar={variantlar(HUDUD)}
-          />
+          <TashkilotQoshish turlar={variantlar(TASHKILOT_TURI)} tumanlar={TUMANLAR} />
         }
       />
 
@@ -48,7 +46,7 @@ export default async function TashkilotlarSahifasi() {
           <JadvalQator className="hover:bg-transparent">
             <JadvalSarlavha className="w-full">Tashkilot</JadvalSarlavha>
             <JadvalSarlavha>Turi</JadvalSarlavha>
-            <JadvalSarlavha>Hudud</JadvalSarlavha>
+            <JadvalSarlavha>Tuman</JadvalSarlavha>
             <JadvalSarlavha className="text-right">Foydalanuvchi</JadvalSarlavha>
             <JadvalSarlavha className="text-right">Muammo</JadvalSarlavha>
           </JadvalQator>
@@ -67,10 +65,7 @@ export default async function TashkilotlarSahifasi() {
               </JadvalKatak>
               <JadvalKatak>{TASHKILOT_TURI[t.type]}</JadvalKatak>
               <JadvalKatak>
-                {HUDUD[t.region]}
-                {t.district && (
-                  <span className="block text-xs text-matn-uchinchi">{t.district}</span>
-                )}
+                {t.district ?? <span className="text-matn-uchinchi">—</span>}
               </JadvalKatak>
               <JadvalKatak className="text-right tabular-nums">
                 {sonMatni(t._count.users)}

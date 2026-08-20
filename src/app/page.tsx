@@ -3,7 +3,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { getJoriyFoydalanuvchi, boshSahifa } from "@/lib/auth";
 import { MavzuTugmasi } from "@/components/mavzu";
-import { Tugma } from "@/components/ui";
+import { Nishoncha, Tugma } from "@/components/ui";
 import { sonMatni } from "@/lib/labels";
 
 /*
@@ -99,7 +99,14 @@ export default async function BoshSahifa() {
 
       <main id="asosiy" className="mx-auto w-full max-w-5xl flex-1 px-4 py-14 sm:py-20">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-semibold tracking-tight text-matn sm:text-4xl">
+          {/*
+            Pilot ko'lami darhol aytiladi. Boshqa viloyat rahbari kirib,
+            o'z tashkilotini qidirib vaqt sarflamasin.
+          */}
+          <Nishoncha className="bg-asosiy-ochiq text-asosiy ring-asosiy-chegara">
+            Qashqadaryo viloyati · pilot bosqichi
+          </Nishoncha>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-matn sm:text-4xl">
             Davlat tashkilotlaridagi real muammolar — bir joyda
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-matn-ikkilamchi">
@@ -165,7 +172,7 @@ export default async function BoshSahifa() {
 
       <footer className="border-t border-chegara bg-yuza">
         <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-matn-uchinchi">
-          Muammolar ombori · Davlat tashkilotlari uchun
+          Muammolar ombori · Qashqadaryo viloyati · Pilot loyiha
         </div>
       </footer>
     </>

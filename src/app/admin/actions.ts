@@ -7,9 +7,10 @@ import { db } from "@/lib/db";
 import { talabRol } from "@/lib/auth";
 import { auditYoz } from "@/lib/audit";
 import { boshlangichParolYarat, parolXeshla } from "@/lib/password";
+import { PILOT_HUDUDI, tumanTogrimi } from "@/lib/hudud";
 import { tasirBalli } from "@/lib/scoring";
 import { telefonSxemasi, zodXatolari, type AmalNatijasi } from "@/lib/validation";
-import { OrgType, Region, Role } from "@/generated/prisma/enums";
+import { OrgType, Role } from "@/generated/prisma/enums";
 
 // ─────────────────────────────────────────────────────────────────────
 //  Muammolarni moderatsiya qilish
@@ -286,11 +287,24 @@ export async function dasturchiniBlokla(
 //  Tashkilot va foydalanuvchi yaratish
 // ─────────────────────────────────────────────────────────────────────
 
+/*
+  Viloyat formadan OLINMAYDI.
+
+  Tizim bitta viloyatda ishlaydi va hudud `PILOT_HUDUDI` dan olinadi.
+  Agar u forma maydoni bo'lganida, so'rovni qo'lda o'zgartirgan odam
+  boshqa viloyatga tashkilot qo'shib qo'yishi mumkin edi — pilot
+  chegarasi esa mahsulot qarori, foydalanuvchi tanlovi emas.
+
+  Tuman endi majburiy va ro'yxatdan tekshiriladi: bir viloyat ichida
+  aynan tuman tashkilotni ajratib turadigan yagona belgi.
+*/
 const tashkilotSxemasi = z.object({
   name: z.string().trim().min(5, "Tashkilot nomini to'liq yozing"),
   type: z.enum(OrgType),
-  region: z.enum(Region),
-  district: z.string().trim().optional(),
+  district: z
+    .string({ error: "Tumanni ro'yxatdan tanlang" })
+    .trim()
+    .refine(tumanTogrimi, "Tumanni ro'yxatdan tanlang"),
   stir: z
     .string()
     .trim()
@@ -308,16 +322,21 @@ export async function tashkilotYarat(
   const natija = tashkilotSxemasi.safeParse({
     name: fd.get("name"),
     type: fd.get("type"),
-    region: fd.get("region"),
-    district: fd.get("district"),
+    /*
+      `?? ""` — tuman tanlanmaganda `<select>` hech narsa yubormaydi va
+      `fd.get` `null` qaytaradi. Bo'sh satrga aylantirmasak, Zod tur
+      xatosini beradi va foydalanuvchi ingliz tilidagi texnik xabarni
+      ("expected string, received null") ko'radi.
+    */
+    district: fd.get("district") ?? "",
     stir: fd.get("stir"),
   });
   if (!natija.success) return { maydonXatolari: zodXatolari(natija.error) };
 
-  const { stir, district, ...qolgan } = natija.data;
+  const { stir, ...qolgan } = natija.data;
   try {
     const tashkilot = await db.organization.create({
-      data: { ...qolgan, district: district || null, stir: stir || null },
+      data: { ...qolgan, region: PILOT_HUDUDI, stir: stir || null },
     });
     await auditYoz({
       actorId: admin.id,

@@ -13,10 +13,10 @@ type Variant = { value: string; label: string };
 /** Sahifa sarlavhasidagi tugma va u ochadigan modal. */
 export function TashkilotQoshish({
   turlar,
-  hududlar,
+  tumanlar,
 }: {
   turlar: Variant[];
-  hududlar: Variant[];
+  tumanlar: readonly string[];
 }) {
   return (
     <ModalOchgich
@@ -32,17 +32,17 @@ export function TashkilotQoshish({
         darhol yozish mumkin. Oyna avtomatik yopilsa, har safar tugmani
         qayta bosishga to'g'ri kelardi.
       */}
-      {() => <TashkilotFormasi turlar={turlar} hududlar={hududlar} />}
+      {() => <TashkilotFormasi turlar={turlar} tumanlar={tumanlar} />}
     </ModalOchgich>
   );
 }
 
 export function TashkilotFormasi({
   turlar,
-  hududlar,
+  tumanlar,
 }: {
   turlar: Variant[];
-  hududlar: Variant[];
+  tumanlar: readonly string[];
 }) {
   const [holat, amal] = useActionState<AmalNatijasi, FormData>(tashkilotYarat, {});
   const x = holat.maydonXatolari;
@@ -53,7 +53,7 @@ export function TashkilotFormasi({
       {holat.muvaffaqiyat && <Xabar turi="muvaffaqiyat">{holat.muvaffaqiyat}</Xabar>}
 
       <Maydon yorliq="Tashkilot nomi" htmlFor="name" majburiy xato={x?.name}>
-        <Kiritish id="name" name="name" placeholder="Chilonzor tumani hokimligi" required />
+        <Kiritish id="name" name="name" placeholder="Qarshi shahar hokimligi" required />
       </Maydon>
 
       <Maydon yorliq="Turi" htmlFor="type" majburiy xato={x?.type}>
@@ -66,18 +66,22 @@ export function TashkilotFormasi({
         </Tanlov>
       </Maydon>
 
-      <Maydon yorliq="Hudud" htmlFor="region" majburiy xato={x?.region}>
-        <Tanlov id="region" name="region" defaultValue="TASHKENT_CITY">
-          {hududlar.map((h) => (
-            <option key={h.value} value={h.value}>
-              {h.label}
+      {/*
+        Viloyat tanlanmaydi — tizim bitta viloyatda ishlaydi va hududni
+        server o'zi qo'yadi. Bu yerda faqat tuman so'raladi, chunki bir
+        viloyat ichida tashkilotni aynan tuman ajratib turadi.
+      */}
+      <Maydon yorliq="Tuman yoki shahar" htmlFor="district" majburiy xato={x?.district}>
+        <Tanlov id="district" name="district" defaultValue="">
+          <option value="" disabled>
+            Tanlang
+          </option>
+          {tumanlar.map((t) => (
+            <option key={t} value={t}>
+              {t}
             </option>
           ))}
         </Tanlov>
-      </Maydon>
-
-      <Maydon yorliq="Tuman yoki shahar" htmlFor="district">
-        <Kiritish id="district" name="district" placeholder="Chilonzor tumani" />
       </Maydon>
 
       <Maydon yorliq="STIR" htmlFor="stir" xato={x?.stir} izoh="9 ta raqam, ixtiyoriy">

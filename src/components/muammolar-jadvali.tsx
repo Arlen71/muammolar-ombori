@@ -10,7 +10,6 @@ import {
   Nishoncha,
 } from "@/components/ui";
 import {
-  HUDUD,
   MUAMMO_HOLATI,
   MUAMMO_HOLATI_RANGI,
   SHOSHILINCHLIK,
@@ -19,7 +18,7 @@ import {
 } from "@/lib/labels";
 import { soatMatni } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
-import type { ProblemStatus, Region, Urgency } from "@/generated/prisma/enums";
+import type { ProblemStatus, Urgency } from "@/generated/prisma/enums";
 
 /**
  * Muammolar ro'yxati.
@@ -47,7 +46,7 @@ export type JadvalMuammosi = {
   monthlyHoursLost: number;
   citizensAffected?: number | null;
   category?: { name: string } | null;
-  organization?: { name: string; region: Region } | null;
+  organization?: { name: string; district: string | null } | null;
   _count?: { supporters?: number; attachments?: number } | null;
   assignments?: { developer: { fullName: string } }[];
 };
@@ -101,16 +100,18 @@ const USTUNLAR: Record<Ustun, UstunTavsifi> = {
   },
   tashkilot: {
     sarlavha: "Tashkilot",
-    // Tashkilot nomlari uzun ("Andijon viloyati sog'liqni saqlash
+    // Tashkilot nomlari uzun ("Qashqadaryo viloyati sog'liqni saqlash
     // boshqarmasi") — cheklanmasa ustun jadvalning yarmini egallab oladi
     kenglik: "max-w-52",
     hujayra: (m) =>
       m.organization ? (
         <>
           <span className="block truncate text-matn">{m.organization.name}</span>
-          <span className="block truncate text-xs text-matn-uchinchi">
-            {HUDUD[m.organization.region]}
-          </span>
+          {m.organization.district && (
+            <span className="block truncate text-xs text-matn-uchinchi">
+              {m.organization.district}
+            </span>
+          )}
         </>
       ) : (
         "—"
@@ -241,7 +242,8 @@ export function MuammolarJadvali({
 
             {m.organization && (
               <p className="mt-1 text-sm text-matn-uchinchi">
-                {m.organization.name} · {HUDUD[m.organization.region]}
+                {m.organization.name}
+                {m.organization.district ? ` · ${m.organization.district}` : ""}
               </p>
             )}
 

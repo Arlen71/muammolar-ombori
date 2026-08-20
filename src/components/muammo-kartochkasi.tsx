@@ -14,7 +14,6 @@ import {
   SHOSHILINCHLIK_RANGI,
   TAKRORLANISH,
   TASHKILOT_TURI,
-  HUDUD,
   VOSITA,
   sanaMatni,
   sonMatni,
@@ -149,9 +148,13 @@ export function MuammoKartochkasi({
         </h1>
 
         <p className="mt-2 text-sm text-matn-ikkilamchi">
-          {muammo.organization.name} · {TASHKILOT_TURI[muammo.organization.type]} ·{" "}
-          {HUDUD[muammo.organization.region]}
-          {muammo.organization.district ? `, ${muammo.organization.district}` : ""}
+          {/*
+            Viloyat ko'rsatilmaydi: pilotda barcha tashkilot bitta
+            viloyatda va u har bir kartochkada takrorlanadigan, hech
+            narsani ajratmaydigan matnga aylanadi. Tuman esa ajratadi.
+          */}
+          {muammo.organization.name} · {TASHKILOT_TURI[muammo.organization.type]}
+          {muammo.organization.district ? ` · ${muammo.organization.district}` : ""}
         </p>
       </header>
 
