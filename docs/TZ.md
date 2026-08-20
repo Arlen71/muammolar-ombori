@@ -333,6 +333,9 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.10 | Klaviatura bilan to'liq boshqarish, fokus halqasi | ✅ |
 | T-8.11 | WCAG AA kontrast darajasi (`npm run contrast` — 38 ta juftlik, ikkala mavzu) | ✅ |
 | T-8.13 | Qorong'i mavzu; rang qiymatlari faqat token orqali | ✅ |
+| T-8.14 | 375 / 768 / 1024 / 1440 kengliklarda sahifa yon tomonga siljimaydi | ✅ |
+| T-8.15 | Sensorli nishonlar 44×44 dan kichik emas (`pointer-coarse`) | ✅ |
+| T-8.16 | Yuklanish (skelet) va xato ekranlari mavjud | ✅ |
 | T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 36 ta hujum stsenariysi) | ✅ |
 
 ---
@@ -460,3 +463,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 |---|---|---|
 | 1.0 | 2026-08-17 | Birinchi versiya. MVP bajarildi: T-1…T-8 bo'yicha ✅ belgilangan barcha talablar |
 | 1.1 | 2026-08-19 | Dizayn tizimi: ikki mavzuli token qatlami, qorong'i mavzu (T-8.13). T-8.11 avtomatik tekshiruvga o'tkazildi va shu jarayonda ikkita haqiqiy kontrast nuqsoni tuzatildi |
+| 1.2 | 2026-08-20 | Interfeys qayta ishlandi: yon panel, jadval ko'rinishlari, modal, yopishgan amal panellari, yuklanish va xato ekranlari (T-8.14…T-8.16). Backend, API va bazaga tegilmadi |

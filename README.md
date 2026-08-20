@@ -155,6 +155,29 @@ ishlatadi. Shu tufayli mavzu almashtirish uchun bironta komponentga tegilmaydi.
 mos kelmasa yiqiladi — mavzu qiymatini o'zgartirib, kontrastni bilmasdan
 buzib qo'yishning oldini oladi.
 
+**`loading.tsx` faqat `/admin` bo'limida.** Bu fayl segmentni oqim
+rejimiga o'tkazadi — javob sarlavhasi skelet bilan birga darhol
+jo'natiladi. Shundan keyin chaqirilgan `notFound()` HTTP statusini
+o'zgartira olmaydi va sahifa 404 o'rniga **200** qaytaradi. Yopiq
+omborda bu jiddiy: ruxsat yo'q resursga 200 javob berish "bunday
+sahifa bor" degani. `/ombor` va `/rahbar` ostida `notFound()`
+chaqiriladi, shuning uchun u yerda skelet yo'q. Buni `npm run e2e`
+tekshiradi.
+
+**Ro'yxatlar ikki ko'rinishda.** `MuammolarJadvali` katta ekranda jadval,
+telefonda kartochka chizadi — ikkalasi bitta faylda. Sabab: ustun
+qo'shilganda uni ikki joyda o'zgartirish kerak bo'lsa, vaqt o'tib ular
+bir-biridan uzoqlashadi. Ustunlarni sahifaning o'zi tanlaydi.
+
+**`/rahbar/boshqalar` ataylab jadval emas.** U yerda rahbar har bir
+muammoning tavsifini o'qib, "bizda ham shumi?" degan qarorga keladi.
+Tavsif matni jadval hujayrasiga sig'maydi.
+
+**Jadval ichida `sr-only` matn ishlatilmaydi.** Bunday element
+`position: absolute` bo'ladi va o'zining oqimdagi joyida qoladi;
+gorizontal siljiydigan jadvalda bu joy ekrandan ancha o'ngda bo'lib,
+butun sahifani yon tomonga siljitib yuboradi.
+
 **Ikki xil chegara tokeni bor.** `chegara` — kartochka konturi va ajratgich,
 bu bezak. `chegara-kuchli` — forma maydonlari; ular fondan kamida 3:1
 ajralishi shart (WCAG 1.4.11), aks holda maydon qayerda boshlanishi
