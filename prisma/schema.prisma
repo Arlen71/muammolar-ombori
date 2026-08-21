@@ -198,6 +198,10 @@ model User {
   role         Role
   status       UserStatus @default(ACTIVE)
 
+  /// Profil rasmining blob omboridagi ichki yo'li (`rasmlar/<uuid>.<kengaytma>`).
+  /// Ochiq manzil EMAS: rasm `/api/rasm/[id]` orqali, sessiya tekshirilgach beriladi.
+  avatarPath String?
+
   /// Sessiyalarni bekor qilish uchun. Qiymat oshsa — barcha eski cookie'lar yaroqsiz bo'ladi.
   sessionVersion Int @default(0)
 
@@ -255,7 +259,7 @@ model Category {
 }
 
 model Problem {
-  id String @id @default(cuid())
+  id      String @id @default(cuid())
   /// Inson o'qiy oladigan raqam: M-2026-0001
   refCode String @unique
 

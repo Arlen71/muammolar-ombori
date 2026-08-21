@@ -2,7 +2,8 @@ import Link from "next/link";
 
 import { db } from "@/lib/db";
 import { SahifaSarlavhasi } from "@/components/app-shell";
-import { Quti } from "@/components/ui";
+import { Oqim, Ustunlar } from "@/components/grafik";
+import { Quti, QutiSarlavha } from "@/components/ui";
 import { MUAMMO_HOLATI, sanaVaqtMatni } from "@/lib/labels";
 import { soatMatni } from "@/lib/scoring";
 
@@ -32,7 +33,13 @@ export default async function AdminBoshSahifa() {
     .filter((h) => ["APPROVED", "TAKEN", "SOLUTION_OFFERED"].includes(h.status))
     .reduce((s, h) => s + (h._sum.monthlyHoursLost ?? 0), 0);
 
-  const [tasdiqKutayotganDasturchilar, tashkilotlar, sonngiAmallar] = await Promise.all([
+  const [
+    tasdiqKutayotganDasturchilar,
+    tashkilotlar,
+    sonngiAmallar,
+    tumanBoyicha,
+    sohaBoyicha,
+  ] = await Promise.all([
     db.user.count({ where: { role: "DEVELOPER", status: "PENDING" } }),
     db.organization.count(),
     db.problemStatusHistory.findMany({
@@ -43,7 +50,58 @@ export default async function AdminBoshSahifa() {
         problem: { select: { id: true, refCode: true, title: true } },
       },
     }),
+    /*
+      Tumanlar bo'yicha taqsimot. `groupBy` bevosita `organization.district`
+      bo'yicha ishlamaydi (u bog'liq jadvalda), shuning uchun tashkilotlar
+      olinadi va guruhlash kodda qilinadi — pilotda tashkilotlar soni
+      o'nlab, ya'ni bu arzon.
+    */
+    db.organization.findMany({
+      select: {
+        district: true,
+        _count: { select: { problems: { where: { status: { not: "DRAFT" } } } } },
+      },
+    }),
+    db.problem.groupBy({
+      by: ["categoryId"],
+      where: { status: { not: "DRAFT" }, canonicalId: null },
+      _count: { _all: true },
+    }),
   ]);
+
+  // Tumanlar bo'yicha yig'indi — bir tumanda bir nechta tashkilot bo'lishi mumkin
+  const tumanlar = new Map<string, number>();
+  for (const t of tumanBoyicha) {
+    if (!t.district || t._count.problems === 0) continue;
+    tumanlar.set(t.district, (tumanlar.get(t.district) ?? 0) + t._count.problems);
+  }
+  const tumanUstunlari = [...tumanlar.entries()]
+    .map(([yorliq, qiymat]) => ({ yorliq, qiymat }))
+    .sort((a, b) => b.qiymat - a.qiymat);
+
+  // Sohalar: turkum nomlarini alohida so'rov bilan olamiz
+  const turkumlar = await db.category.findMany({ select: { id: true, name: true } });
+  const turkumNomi = new Map(turkumlar.map((t) => [t.id, t.name]));
+  const sohaUstunlari = sohaBoyicha
+    .map((s) => ({
+      yorliq: turkumNomi.get(s.categoryId) ?? "Boshqa",
+      qiymat: s._count._all,
+    }))
+    .sort((a, b) => b.qiymat - a.qiymat)
+    .slice(0, 6);
+
+  /*
+    Holatlar oqimi — muammoning zanjir bo'ylab harakati. Bu boshqaruv
+    panelining asosiy savoliga javob beradi: jarayon qayerda tiqilib
+    qolgan? Masalan "Dasturchi oldi" da katta son turib, "Hal qilindi"
+    nol bo'lsa, demak dasturchilar boshlagan ishni tugatmayapti.
+  */
+  const oqim = [
+    { yorliq: "Moderatsiyada", qiymat: soni("SUBMITTED"), rang: "text-ogohlantirish" },
+    { yorliq: "Omborda", qiymat: soni("APPROVED"), rang: "text-malumot" },
+    { yorliq: "Dasturchi oldi", qiymat: soni("TAKEN", "SOLUTION_OFFERED"), rang: "text-jarayon" },
+    { yorliq: "Hal qilindi", qiymat: halQilingan, rang: "text-muvaffaqiyat" },
+  ];
 
   const ishlar = [
     {
@@ -99,6 +157,41 @@ export default async function AdminBoshSahifa() {
           </div>
         ))}
       </div>
+
+      <Quti className="mb-6">
+        <QutiSarlavha
+          sarlavha="Muammolar qayerda turibdi"
+          izoh="Zanjir bo'ylab taqsimot — jarayon qayerda to'xtaganini ko'rsatadi."
+          className="mb-4"
+        />
+        <Oqim bosqichlar={oqim} />
+      </Quti>
+
+      {(tumanUstunlari.length > 0 || sohaUstunlari.length > 0) && (
+        <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          {tumanUstunlari.length > 0 && (
+            <Quti>
+              <QutiSarlavha
+                sarlavha="Tumanlar bo'yicha"
+                izoh="Qaysi tumandan ko'proq muammo kelyapti"
+                className="mb-4"
+              />
+              <Ustunlar malumot={tumanUstunlari} />
+            </Quti>
+          )}
+
+          {sohaUstunlari.length > 0 && (
+            <Quti>
+              <QutiSarlavha
+                sarlavha="Sohalar bo'yicha"
+                izoh="Eng ko'p uchraydigan oltita soha"
+                className="mb-4"
+              />
+              <Ustunlar malumot={sohaUstunlari} />
+            </Quti>
+          )}
+        </div>
+      )}
 
       <section>
         <h2 className="mb-3 text-sm font-semibold text-matn-ikkilamchi">So'nggi harakatlar</h2>

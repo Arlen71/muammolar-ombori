@@ -72,7 +72,7 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm run build` | Ishlab chiqarish uchun yig'ish |
 | `npm test` | Hisob-kitob mantiqi testlari |
 | `npm run e2e` | Rollar va ruxsatlar tekshiruvi (dev server ochiq bo'lsin) |
-| `npm run security` | Xavfsizlik tekshiruvi — 36 ta hujum stsenariysi |
+| `npm run security` | Xavfsizlik tekshiruvi — 41 ta hujum stsenariysi |
 | `npm run contrast` | Rang kontrasti — ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
@@ -160,6 +160,25 @@ o'qiy oladi. Bazada ochiq manzil emas, ichki yo'l saqlanadi. Foydalanuvchi
 faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat tekshiriladi.
 Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi bergan nom
 hech qachon yo'l sifatida ishlatilmaydi.
+
+**Profil rasmlari biriktirmalardan boshqacha himoyalangan.** Har qanday
+kirgan foydalanuvchi hamkasbining rasmini ko'ra oladi (`/api/rasm/[id]`) —
+dasturchi muammoni olgach mas'ul shaxsga qo'ng'iroq qiladi va kim bilan
+gaplashayotganini ko'rish aloqani osonlashtiradi. Biriktirmalar esa
+tashkilot bo'yicha cheklangan. Ikkalasi ham `private` blobda va
+sessiyasiz 401 qaytaradi.
+
+Profilda foydalanuvchi faqat ism, lavozim, pochta va rasmni o'zgartiradi.
+Telefon (login), rol va tashkilot administrator qo'lida: bu maydonlar
+`profilniYangila` sxemasida umuman yo'q, ya'ni so'rovni qo'lda
+o'zgartirgan odam ham ularga yeta olmaydi.
+
+**Diagrammalar kutubxonasiz.** `grafik.tsx` — oddiy HTML va CSS, server
+komponenti. Brauzerga bir bayt JavaScript ketmaydi; recharts yoki
+chart.js ~50–150 KB qo'shardi va client komponentiga majbur qilardi.
+Gorizontal ustunlar va oqim uchun `div` va `width: %` yetarli. Har bir
+diagrammada raqam ustunning yonida matn bo'lib turadi — ma'no faqat
+uzunlik bilan berilmaydi (WCAG 1.4.1).
 
 **Vizual til Qashqadaryodan olingan.** Brend rangi — lojuvard
 (`#2447b8`), Shahrisabzdagi Oqsaroy koshinlaridan; fon naqshi

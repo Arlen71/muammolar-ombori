@@ -244,6 +244,45 @@ async function main() {
       );
     }
 
+    // ── 1b. Profil rasmlari ──
+    /*
+      Avatar marshruti biriktirmalardan ATAYLAB kengroq: har qanday kirgan
+      foydalanuvchi hamkasbining rasmini ko'ra oladi. Ammo "kirgan" sharti
+      qat'iy — tashqaridan hech kim yeta olmasligi kerak, aks holda yopiq
+      tizimdagi odamlarning yuzi va ismi internetga chiqib ketardi.
+    */
+    console.log("\n1b. Profil rasmlari");
+    {
+      const R = (id: string) => `/api/rasm/${id}`;
+
+      tekshir(
+        "avatar avtorizatsiyasiz berilmaydi",
+        (await ol(R(rahbar.id))).status === 401,
+        "",
+        "jiddiy"
+      );
+      tekshir(
+        "mavjud bo'lmagan foydalanuvchi avatari 200 qaytarmaydi",
+        (await ol(R("yoq-bunday-id"), adminC)).status !== 200
+      );
+      tekshir(
+        "avatar yo'lidagi ../ server xatosiga olib kelmaydi",
+        (await ol(R("..%2F..%2Fetc%2Fpasswd"), adminC)).status !== 500
+      );
+      const rasmSarlavhasi = await sarlavhalar(R(rahbar.id), adminC);
+      tekshir(
+        "avatar javobi nosniff bilan beriladi",
+        // Rasm yuklanmagan bo'lsa 404 — sarlavha faqat 200 da tekshiriladi
+        rasmSarlavhasi.status !== 200 ||
+          rasmSarlavhasi.h.get("x-content-type-options") === "nosniff"
+      );
+      tekshir(
+        "avatar keshi private (oraliq proksilarda saqlanmaydi)",
+        rasmSarlavhasi.status !== 200 ||
+          (rasmSarlavhasi.h.get("cache-control") ?? "").includes("private")
+      );
+    }
+
     // ── 2. Fayl ombori tashqaridan ──
     console.log("\n2. Fayl ombori");
     {

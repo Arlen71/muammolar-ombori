@@ -338,7 +338,10 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.16 | Yuklanish (skelet) va xato ekranlari mavjud | ✅ |
 | T-8.17 | Pilot bitta viloyatda: hudud serverda qotirilgan, ajratish tuman bo'yicha | ✅ |
 | T-8.18 | Vizual identifikatsiya: Oqsaroy lojuvardi va naqshi, uch rolli tipografiya | ✅ |
-| T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 36 ta hujum stsenariysi) | ✅ |
+| T-8.19 | Foydalanuvchi profili: rasm, ism, lavozim, pochta — o'zi boshqaradi | ✅ |
+| T-8.20 | Administrator qaysi tashkilot muammo yuborgan/yubormaganini ko'radi | ✅ |
+| T-8.21 | Boshqaruv panelida diagrammalar: holatlar oqimi, tuman va soha taqsimoti | ✅ |
+| T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 41 ta hujum stsenariysi) | ✅ |
 
 ---
 
@@ -468,3 +471,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | 1.2 | 2026-08-20 | Interfeys qayta ishlandi: yon panel, jadval ko'rinishlari, modal, yopishgan amal panellari, yuklanish va xato ekranlari (T-8.14…T-8.16). Backend, API va bazaga tegilmadi |
 | 1.3 | 2026-08-20 | Pilot Qashqadaryo viloyatiga moslashtirildi (T-8.17): viloyat tanlash olib tashlandi, o'rniga 16 ta tuman/shahar ro'yxati. Sinov ma'lumoti Qashqadaryo tashkilotlariga almashtirildi |
 | 1.4 | 2026-08-20 | Vizual identifikatsiya (T-8.18): Oqsaroy koshinlaridan olingan lojuvard palitra va sakkiz qirrali yulduz naqshi, uch rolli tipografiya, o'lchovli harakat |
+| 1.5 | 2026-08-21 | Foydalanuvchi profili va rasm (T-8.19), tashkilotlar qamrovi nazorati (T-8.20), boshqaruv panelida diagrammalar (T-8.21). Sxemaga `User.avatarPath` qo'shildi |

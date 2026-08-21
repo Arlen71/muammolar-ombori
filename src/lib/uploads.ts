@@ -125,8 +125,14 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
  * Bazadagi yozuv buzilgan yoki qo'lda o'zgartirilgan bo'lsa ham, ombordan
  * faqat o'zimiz yozgan naqshdagi fayllar so'raladi.
  */
+/*
+  Ikkita papka: `biriktirmalar/` — muammoga ilova qilingan hujjatlar,
+  `rasmlar/` — profil rasmlari. Ikkalasida ham nom tizim yaratgan UUID:
+  foydalanuvchi bergan matn hech qachon yo'lga tushmaydi, ya'ni
+  `../` bilan ombordan chiqib ketish imkoni yo'q.
+*/
 function yolIshonchlimi(qiymat: string): boolean {
-  return /^biriktirmalar\/[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(qiymat);
+  return /^(biriktirmalar|rasmlar)\/[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(qiymat);
 }
 
 /**
@@ -152,4 +158,72 @@ export async function faylniOchir(saqlanadiganNom: string): Promise<void> {
   await del(saqlanadiganNom).catch(() => {
     // Fayl allaqachon o'chirilgan bo'lsa muammo emas
   });
+}
+
+
+// ─────────────────────────────────────────────────────────────────────
+//  Profil rasmi
+// ─────────────────────────────────────────────────────────────────────
+
+/** Profil rasmi uchun ruxsat etilgan turlar — faqat rasm. */
+const RASM_TURLARI: Record<string, string[]> = {
+  ".png": ["image/png"],
+  ".jpg": ["image/jpeg"],
+  ".jpeg": ["image/jpeg"],
+  ".webp": ["image/webp"],
+};
+
+export const RASM_KENGAYTMALARI = Object.keys(RASM_TURLARI);
+
+/**
+ * Profil rasmi uchun hajm chegarasi — 2 MB.
+ *
+ * Hujjat chegarasidan (10 MB) ancha kichik: avatar ekranda 40–96 piksel
+ * ko'rsatiladi va bundan kattasi hech qanday sifat qo'shmaydi, faqat
+ * ombor va trafikni yeydi.
+ */
+export const RASM_MAKSIMAL_HAJMI = 2 * 1024 * 1024;
+
+/**
+ * Profil rasmini saqlaydi.
+ *
+ * Alohida funksiya, `faylniSaqla` emas: turlar ro'yxati tor (faqat rasm),
+ * hajm chegarasi kichik va papka boshqa. Bitta funksiyaga ikkala vazifani
+ * yuklasak, hujjat uchun ruxsat etilgan `.docx` avatar sifatida ham
+ * o'tib ketardi.
+ */
+export async function rasmniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi> {
+  if (fayl.size === 0) return { xato: "Fayl bo'sh." };
+  if (fayl.size > RASM_MAKSIMAL_HAJMI) {
+    return { xato: `Rasm ${hajmMatni(RASM_MAKSIMAL_HAJMI)} dan katta bo'lmasligi kerak.` };
+  }
+
+  const keng = kengaytma(fayl.name);
+  const ruxsat = RASM_TURLARI[keng];
+  if (!ruxsat) {
+    return { xato: `Faqat ${RASM_KENGAYTMALARI.join(", ")} turidagi rasm qabul qilinadi.` };
+  }
+
+  /*
+    Kengaytma bilan MIME turi mos kelishi tekshiriladi. Aks holda
+    `.png` deb nomlangan boshqa turdagi fayl o'tib ketardi — brauzer
+    esa uni MIME bo'yicha talqin qiladi.
+  */
+  const mime = fayl.type || ruxsat[0];
+  if (!ruxsat.includes(mime)) {
+    return { xato: "Fayl turi kengaytmasiga mos kelmadi." };
+  }
+
+  const natija = await put(`rasmlar/${crypto.randomUUID()}${keng}`, fayl, {
+    access: "private",
+    contentType: mime,
+    addRandomSuffix: false,
+  });
+
+  return {
+    fileName: tozaNom(fayl.name),
+    storedName: natija.pathname,
+    mimeType: mime,
+    size: fayl.size,
+  };
 }

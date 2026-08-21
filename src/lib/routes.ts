@@ -20,6 +20,8 @@ export const BOLIM_RUXSATI: { prefiks: string; rollar: Role[] }[] = [
   { prefiks: "/rahbar", rollar: ["LEADER"] },
   // Admin omborni nazorat uchun ko'ra oladi
   { prefiks: "/ombor", rollar: ["DEVELOPER", "ADMIN"] },
+  // Profil har uch rolda ochiladi — har kim faqat o'zinikini ko'radi
+  { prefiks: "/profil", rollar: ["ADMIN", "LEADER", "DEVELOPER"] },
 ];
 
 /** Rolga qarab bosh sahifa manzili. */

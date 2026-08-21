@@ -20,6 +20,9 @@ export type JoriyFoydalanuvchi = {
   status: UserStatus;
   organizationId: string | null;
   organizationName: string | null;
+  /** Profil rasmi yuklanganmi. Yo'lning o'zi kerak emas — rasm
+      `/api/rasm/[id]` orqali olinadi, bu yerda faqat bor-yo'qligi. */
+  rasmBormi: boolean;
 };
 
 /**
@@ -49,6 +52,7 @@ export const getJoriyFoydalanuvchi = cache(
         role: true,
         status: true,
         sessionVersion: true,
+        avatarPath: true,
         organizationId: true,
         organization: { select: { name: true } },
       },
@@ -68,6 +72,7 @@ export const getJoriyFoydalanuvchi = cache(
       status: foydalanuvchi.status,
       organizationId: foydalanuvchi.organizationId,
       organizationName: foydalanuvchi.organization?.name ?? null,
+      rasmBormi: Boolean(foydalanuvchi.avatarPath),
     };
   }
 );

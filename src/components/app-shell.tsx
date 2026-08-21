@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import { chiqishAmali } from "@/app/kirish/actions";
+import { Avatar } from "@/components/avatar";
 import { MavzuTugmasi } from "@/components/mavzu";
 import { YonPanel, type Havola } from "@/components/yon-panel";
 import { ROL } from "@/lib/labels";
@@ -27,15 +30,33 @@ export function AppShell({
 }) {
   const poyloq = (
     <div className="space-y-1">
-      <div className="flex items-center gap-2 px-2 py-1">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium leading-tight text-matn">
-            {foydalanuvchi.fullName}
-          </p>
-          <p className="truncate text-xs leading-tight text-matn-uchinchi">
-            {foydalanuvchi.organizationName ?? ROL[foydalanuvchi.role]}
-          </p>
-        </div>
+      {/*
+        Foydalanuvchi bloki — havola. Profilga o'tishning eng tabiiy joyi
+        aynan shu: odam o'z ismini bosadi. Menyuga alohida "Profil" bandi
+        qo'shilsa, u har bir rolning ro'yxatiga takrorlanib kirardi va
+        bo'limlar bilan bir qatorda turib, ular bilan teng ahamiyatli
+        ko'rinardi.
+      */}
+      <div className="flex items-center gap-2">
+        <Link
+          href="/profil"
+          className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 transition-colors hover:bg-yuza-2"
+        >
+          <Avatar
+            ism={foydalanuvchi.fullName}
+            foydalanuvchiId={foydalanuvchi.id}
+            rasmBormi={foydalanuvchi.rasmBormi}
+            olcham="kichik"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium leading-tight text-matn">
+              {foydalanuvchi.fullName}
+            </span>
+            <span className="block truncate text-xs leading-tight text-matn-uchinchi">
+              {foydalanuvchi.organizationName ?? ROL[foydalanuvchi.role]}
+            </span>
+          </span>
+        </Link>
         <MavzuTugmasi className="shrink-0" />
       </div>
 
