@@ -37,12 +37,22 @@
   --u-matn-2: #475569;
   --u-matn-3: #626f86;
 
-  /* ── Brend ── */
-  --u-asosiy: #1d4ed8;
-  --u-asosiy-quyuq: #1e40af;
-  --u-asosiy-yuza: #eff6ff;
-  --u-asosiy-chegara: #bfdbfe;
+  /*
+    ── Brend: lojuvard ──
+
+    Rang Shahrisabzdagi Oqsaroy koshinlaridan olingan — Qashqadaryoning
+    eng tanilgan me'moriy merosi. Standart kutubxona ko'kidan biroz
+    quyuqroq va binafshaga moyilroq; oq matn ustida 7.9:1 beradi.
+  */
+  --u-asosiy: #2447b8;
+  --u-asosiy-quyuq: #1c3696;
+  --u-asosiy-yuza: #eef2fe;
+  --u-asosiy-chegara: #c7d4f8;
   --u-asosiy-matn: #ffffff; /* asosiy fon ustidagi matn */
+
+  /* Firuza — koshinning ikkinchi rangi. FAQAT bezakda (naqsh chiziqlari);
+     matn sifatida ishlatilmaydi, shuning uchun kontrast talabi yo'q. */
+  --u-firuza: #0e7490;
 
   /* ── Holatlar: matn / yuza / chegara uchligi ── */
   --u-muvaffaqiyat: #047857;
@@ -89,11 +99,13 @@
   --u-matn-2: #a3b0c2;
   --u-matn-3: #7d8ba0;
 
-  --u-asosiy: #60a5fa;
-  --u-asosiy-quyuq: #93c5fd;
-  --u-asosiy-yuza: #172554;
-  --u-asosiy-chegara: #1e3a8a;
+  --u-asosiy: #93a9ff;
+  --u-asosiy-quyuq: #b3c2ff;
+  --u-asosiy-yuza: #1a2352;
+  --u-asosiy-chegara: #2d3d8f;
   --u-asosiy-matn: #0b1120;
+
+  --u-firuza: #5eead4;
 
   --u-muvaffaqiyat: #6ee7b7;
   --u-muvaffaqiyat-yuza: #052e21;
@@ -158,11 +170,17 @@
   --color-jarayon-yuza: var(--u-jarayon-yuza);
   --color-jarayon-chegara: var(--u-jarayon-chegara);
 
+  --color-firuza: var(--u-firuza);
+
   --shadow-1: var(--u-soya-1);
   --shadow-2: var(--u-soya-2);
   --shadow-3: var(--u-soya-3);
 
   --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Sarlavha va yirik raqamlar uchun — `font-display` sinfini beradi */
+  --font-display: var(--font-schibsted), var(--font-inter), system-ui, sans-serif;
+  /* Muammo kodlari uchun — `font-mono` sinfini beradi */
+  --font-mono: var(--font-jbmono), ui-monospace, "SF Mono", monospace;
 
   /*
     Zich (dashboard) shkala. Boshqaruv panelida ekranga ko'proq ma'lumot
@@ -254,6 +272,73 @@
       transform: translateX(-100%);
     }
   }
+
+  /*
+    ── Kirib kelish (stagger) ──
+
+    Sahifa ochilganda kartochka va qatorlar birin-ketin ko'tarilib
+    chiqadi. Tartib raqami inline uslub orqali beriladi:
+
+      style={{ "--jonlanish-tartib": i }}
+
+    Har bir keyingi element 55 ms kechikadi. Kechikish elementga emas,
+    animatsiyaga tegishli — kontent darhol DOMda, qidiruv va ekran
+    o'quvchiga ta'sir qilmaydi. `both` boshlang'ich holatni kechikish
+    davomida ham ushlab turadi (aks holda element bir lahza ko'rinib,
+    keyin yo'qolib qayta chiqardi).
+  */
+  .jonlanish {
+    animation: kirib-kelish 0.45s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation-delay: calc(var(--jonlanish-tartib, 0) * 55ms);
+  }
+
+  @keyframes kirib-kelish {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  /*
+    ── Ko'tarilish ──
+
+    Bosiladigan kartochkalar uchun: sichqoncha kelganda 2px ko'tariladi
+    va soyasi chuqurlashadi. Faqat transform va box-shadow — ikkalasi
+    kompozitor qatlamida, ya'ni qayta joylashuv (reflow) bo'lmaydi.
+  */
+  .kotarilish {
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .kotarilish:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--u-soya-2);
+  }
+
+  /*
+    ── Mavzu almashinuvi ──
+
+    Tugma bosilganda `mavzu.tsx` html'ga vaqtincha shu sinfni qo'yadi:
+    ranglar sakrab emas, 300 ms da oqib o'tadi. Doimiy qo'yib bo'lmaydi —
+    har bir hover ham sekinlashib qolardi.
+
+    Pastdagi prefers-reduced-motion bloki keyinroq kelgani uchun undan
+    ustun turadi: harakat kamaytirilganda bu o'tish ham o'chadi.
+  */
+  html.mavzu-otish,
+  html.mavzu-otish *,
+  html.mavzu-otish *::before,
+  html.mavzu-otish *::after {
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease,
+      fill 0.3s ease,
+      stroke 0.3s ease !important;
+  }
 }
 
 @layer utilities {
@@ -271,15 +356,31 @@
   }
 }
 
-/* Harakatni kamaytirishni so'raganlar uchun animatsiyalarni o'chiramiz */
+/*
+  Harakatni kamaytirishni so'raganlar uchun animatsiyalarni o'chiramiz.
+
+  `animation-delay` ni nolga tushirish ALOHIDA muhim. Pog'onali kirishda
+  (`.jonlanish`) har bir element navbatiga qarab 55 ms kutadi va
+  `animation-fill-mode: both` shu kutish davomida boshlang'ich holatni —
+  ya'ni `opacity: 0` ni — ushlab turadi. Faqat davomiylikni nolga
+  tushirsak, kechikish o'z joyida qoladi va harakatni o'chirgan
+  foydalanuvchi kontentni yarim soniyagacha umuman ko'rmaydi.
+*/
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Ko'tarilish ham to'xtaydi — kartochka sichqoncha ostida sakramaydi */
+  .kotarilish:hover {
+    transform: none;
   }
 }
 

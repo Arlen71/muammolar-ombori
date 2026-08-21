@@ -1,11 +1,39 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
 
+/*
+  Uch shrift — uch vazifa:
+
+    Inter              matn va forma elementlari. Zich interfeysda eng
+                       o'qilishli variant, tabular raqamlari jadvalda
+                       ustma-ust tushadi.
+    Schibsted Grotesk  sarlavhalar va yirik raqamlar. Skandinaviya
+                       jamoat matbuoti uchun chizilgan — rasmiy, lekin
+                       zamonaviy ohang beradi va sahifaga o'z yuzini
+                       qo'shadi.
+    JetBrains Mono     muammo kodlari (M-2026-0005) va texnik qiymatlar.
+                       Nol va O harfi ajralib turadi — kod aynan kodday
+                       ko'rinadi.
+
+  Hammasi latin-ext bilan: o'zbek lotin yozuvidagi belgilar uchun shart.
+*/
 const inter = Inter({
   variable: "--font-inter",
-  // latin-ext o'zbek lotin yozuvidagi belgilar uchun kerak
   subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+const schibsted = Schibsted_Grotesk({
+  variable: "--font-schibsted",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+const jbMono = JetBrains_Mono({
+  variable: "--font-jbmono",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -65,7 +93,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       Belgi faqat SHU elementning atributlariga ta'sir qiladi, ichkariga
       o'tmaydi — ya'ni haqiqiy nomuvofiqliklar baribir ko'rinadi.
     */
-    <html lang="uz" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html
+      lang="uz"
+      className={`${inter.variable} ${schibsted.variable} ${jbMono.variable} h-full`}
+      suppressHydrationWarning
+    >
       <body className="min-h-full flex flex-col antialiased">
         <script dangerouslySetInnerHTML={{ __html: MAVZU_SKRIPTI }} />
         <a

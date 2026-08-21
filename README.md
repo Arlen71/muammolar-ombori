@@ -161,6 +161,25 @@ faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat tekshiriladi.
 Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi bergan nom
 hech qachon yo'l sifatida ishlatilmaydi.
 
+**Vizual til Qashqadaryodan olingan.** Brend rangi — lojuvard
+(`#2447b8`), Shahrisabzdagi Oqsaroy koshinlaridan; fon naqshi
+(`naqsh.tsx`) o'sha koshinlarning sakkiz qirrali yulduz motivi.
+Shriftlar uch rolda: Inter (matn), Schibsted Grotesk (sarlavha va yirik
+raqamlar), JetBrains Mono (muammo kodlari — nol va O ajralib turadi).
+
+**Harakat faqat birinchi taassurot joyida.** Pog'onali kirish
+(`.jonlanish`) va sanaladigan raqamlar (`Sanoq`) — ochiq sahifa bilan
+kirish ekranida. Ish ekranlarida (ombor, rahbar, admin) ular yo'q:
+xodim bu sahifalarni kuniga o'nlab marta ochadi va har filtrda
+qatorlarning qaytadan pog'onalanishi ishga xalaqit beradi. U yerda
+faqat javob harakati qoladi — kartochka ko'tarilishi (`.kotarilish`),
+tugma bosilishi, mavzu o'tishi.
+
+`prefers-reduced-motion` da `animation-delay` ham nolga tushiriladi,
+faqat davomiylik emas: aks holda `animation-fill-mode: both` boshlang'ich
+`opacity: 0` ni kechikish davomida ushlab turadi va harakatni o'chirgan
+foydalanuvchi kontentni yarim soniyagacha ko'rmay qoladi.
+
 **Ranglar komponentda yozilmaydi.** `globals.css` ikki qatlamli: xom hex
 qiymatlar faqat `:root` (yorug') va `.dark` (qorong'i) bloklarida, komponentlar
 esa faqat semantik tokenlarni (`bg-yuza`, `text-matn`, `ring-xato-chegara`)

@@ -74,10 +74,10 @@ export default async function AdminBoshSahifa() {
                 <Link
                   key={i.yol}
                   href={i.yol}
-                  className="flex items-center justify-between rounded-xl border border-ogohlantirish-chegara bg-ogohlantirish-yuza px-5 py-4 transition-colors hover:bg-ogohlantirish-yuza"
+                  className="kotarilish flex items-center justify-between rounded-2xl border border-ogohlantirish-chegara bg-ogohlantirish-yuza px-5 py-4"
                 >
                   <span className="text-sm font-medium text-ogohlantirish">{i.matn}</span>
-                  <span className="text-2xl font-semibold tabular-nums text-ogohlantirish">
+                  <span className="font-display text-2xl font-bold tabular-nums text-ogohlantirish">
                     {i.soni}
                   </span>
                 </Link>
@@ -93,9 +93,9 @@ export default async function AdminBoshSahifa() {
           { yorliq: "Tashkilotlar", qiymat: String(tashkilotlar) },
           { yorliq: "Oyiga yo'qotish", qiymat: soatMatni(jamiSoat) },
         ].map((k) => (
-          <div key={k.yorliq} className="rounded-xl border border-chegara bg-yuza px-4 py-3">
+          <div key={k.yorliq} className="rounded-2xl border border-chegara bg-yuza px-4 py-3">
             <p className="text-xs text-matn-ikkilamchi">{k.yorliq}</p>
-            <p className="mt-0.5 text-xl font-semibold text-matn">{k.qiymat}</p>
+            <p className="mt-0.5 font-display text-xl font-bold text-matn">{k.qiymat}</p>
           </div>
         ))}
       </div>

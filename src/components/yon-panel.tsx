@@ -72,10 +72,18 @@ function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }
             aria-current={faol ? "page" : undefined}
             className={cn(
               // 44px balandlik — sensorli ekranda eng kam nishon o'lchami
-              "flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "relative flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              /*
+                Chapdagi ustuncha — faol bo'limning belgisi. U yo'qolib
+                paydo bo'lmaydi, balandligi o'sib chiqadi: yon panel
+                sahifalar orasida saqlanib qolgani uchun belgi eski
+                banddan yangisiga "ko'chib o'tayotgandek" seziladi.
+              */
+              "before:absolute before:left-0 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2",
+              "before:rounded-full before:bg-asosiy before:transition-transform before:duration-200 before:content-['']",
               faol
-                ? "bg-asosiy-ochiq text-asosiy"
-                : "text-matn-ikkilamchi hover:bg-yuza-2 hover:text-matn"
+                ? "bg-asosiy-ochiq text-asosiy before:scale-y-100"
+                : "text-matn-ikkilamchi before:scale-y-0 hover:bg-yuza-2 hover:text-matn"
             )}
           >
             {Belgi && <Belgi size={18} className="shrink-0" aria-hidden="true" />}
@@ -103,7 +111,7 @@ function PanelIchi({
         <Link
           href="/"
           onClick={yop}
-          className="flex min-h-11 min-w-0 items-center truncate font-semibold tracking-tight text-matn"
+          className="flex min-h-11 min-w-0 items-center truncate font-display font-bold tracking-tight text-matn"
         >
           Muammolar ombori
         </Link>
@@ -182,7 +190,7 @@ export function YonPanel({
         {/* `min-h-11` — barmoq bilan bosiladigan nishon 44px dan past bo'lmasin */}
         <Link
           href="/"
-          className="flex min-h-11 min-w-0 items-center truncate font-semibold tracking-tight text-matn"
+          className="flex min-h-11 min-w-0 items-center truncate font-display font-bold tracking-tight text-matn"
         >
           Muammolar ombori
         </Link>

@@ -140,10 +140,10 @@ export function MuammoKartochkasi({
             {SHOSHILINCHLIK[muammo.urgency]}
           </Nishoncha>
           <Nishoncha>{muammo.category.name}</Nishoncha>
-          <span className="text-sm text-matn-uchinchi">{muammo.refCode}</span>
+          <span className="font-mono text-sm text-matn-uchinchi">{muammo.refCode}</span>
         </div>
 
-        <h1 className="text-2xl font-semibold leading-snug tracking-tight text-matn">
+        <h1 className="font-display text-2xl font-bold leading-snug tracking-tight text-matn">
           {muammo.title || "Sarlavha kiritilmagan"}
         </h1>
 

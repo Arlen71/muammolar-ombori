@@ -122,7 +122,7 @@ export function SahifaSarlavhasi({
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-matn">{sarlavha}</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-matn">{sarlavha}</h1>
         {izoh && <p className="mt-1 text-sm text-matn-ikkilamchi">{izoh}</p>}
       </div>
       {amal && <div className="shrink-0">{amal}</div>}

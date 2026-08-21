@@ -200,7 +200,7 @@ export function MuammolarJadvali({
                   >
                     {m.title || "Nomsiz muammo"}
                   </Link>
-                  <span className="mt-0.5 block text-xs text-matn-uchinchi">
+                  <span className="mt-0.5 block font-mono text-xs text-matn-uchinchi">
                     {m.refCode}
                     {m._count?.attachments ? ` · ${m._count.attachments} ta fayl` : ""}
                   </span>
@@ -229,7 +229,7 @@ export function MuammolarJadvali({
           <Link
             key={m.id}
             href={yol(m)}
-            className="block rounded-xl border border-chegara bg-yuza p-4 shadow-1 transition-colors hover:border-asosiy"
+            className="kotarilish block rounded-2xl border border-chegara bg-yuza p-4 shadow-1 hover:border-asosiy"
           >
             <div className="flex items-start justify-between gap-3">
               <h3 className="min-w-0 flex-1 font-medium leading-snug text-matn">

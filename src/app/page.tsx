@@ -1,10 +1,12 @@
+import * as React from "react";
 import Link from "next/link";
 
 import { db } from "@/lib/db";
 import { getJoriyFoydalanuvchi, boshSahifa } from "@/lib/auth";
 import { MavzuTugmasi } from "@/components/mavzu";
+import { Naqsh } from "@/components/naqsh";
+import { Sanoq } from "@/components/sanoq";
 import { Nishoncha, Tugma } from "@/components/ui";
-import { sonMatni } from "@/lib/labels";
 
 /*
   Sahifa har so'rovda qaytadan render qilinadi.
@@ -79,7 +81,7 @@ export default async function BoshSahifa() {
     <>
       <header className="border-b border-chegara bg-yuza">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <span className="font-semibold tracking-tight text-matn">Muammolar ombori</span>
+          <span className="font-display font-bold tracking-tight text-matn">Muammolar ombori</span>
           <div className="ml-auto flex items-center gap-2">
           <MavzuTugmasi />
           {foydalanuvchi ? (
@@ -97,8 +99,19 @@ export default async function BoshSahifa() {
         </div>
       </header>
 
-      <main id="asosiy" className="mx-auto w-full max-w-5xl flex-1 px-4 py-14 sm:py-20">
-        <div className="max-w-2xl">
+      {/*
+        Hero fonida Oqsaroy koshinlarining sakkiz qirrali yulduz naqshi.
+        Juda past shaffoflikda — sezilsin, lekin matnni bosmasin. Pastga
+        qarab so'nadi (`mask-image`), shunda naqsh sahifada keskin
+        uzilmaydi.
+      */}
+      <div className="relative isolate overflow-hidden">
+        <Naqsh
+          className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-asosiy/[0.07] [mask-image:linear-gradient(to_bottom,black,transparent)] dark:text-firuza/[0.08]"
+        />
+
+        <main id="asosiy" className="mx-auto w-full max-w-5xl flex-1 px-4 py-14 sm:py-20">
+        <div className="jonlanish max-w-2xl">
           {/*
             Pilot ko'lami darhol aytiladi. Boshqa viloyat rahbari kirib,
             o'z tashkilotini qidirib vaqt sarflamasin.
@@ -106,7 +119,7 @@ export default async function BoshSahifa() {
           <Nishoncha className="bg-asosiy-ochiq text-asosiy ring-asosiy-chegara">
             Qashqadaryo viloyati · pilot bosqichi
           </Nishoncha>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-matn sm:text-4xl">
+          <h1 className="mt-3 font-display text-4xl font-bold leading-[1.1] tracking-tight text-matn sm:text-5xl">
             Davlat tashkilotlaridagi real muammolar — bir joyda
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-matn-ikkilamchi">
@@ -117,14 +130,24 @@ export default async function BoshSahifa() {
         </div>
 
         <dl className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {raqamlar.map((r) => (
+          {raqamlar.map((r, i) => (
             <div
               key={r.yorliq}
-              className="rounded-xl border border-chegara bg-yuza px-5 py-6"
+              className="jonlanish rounded-2xl border border-chegara bg-yuza px-5 py-6"
+              style={{ "--jonlanish-tartib": i + 1 } as React.CSSProperties}
             >
-              <dt className="text-sm text-matn-ikkilamchi">{r.yorliq}</dt>
-              <dd className="mt-1 text-3xl font-semibold tabular-nums text-matn">
-                {sonMatni(r.qiymat)}
+              {/*
+                `min-h-10` — ikki qator uchun joy. Yorliqlar har xil
+                uzunlikda ("davlat tashkiloti" bir qator, "oyiga
+                yo'qotilayotgan soat" ikki qator) va joy oldindan
+                ajratilmasa, raqamlar turli balandlikda qolib ketadi.
+                Qator esa aynan raqamlarni solishtirish uchun turibdi.
+              */}
+              <dt className="flex min-h-10 items-start text-sm leading-snug text-matn-ikkilamchi">
+                {r.yorliq}
+              </dt>
+              <dd className="mt-1 font-display text-4xl font-bold tracking-tight text-matn">
+                <Sanoq qiymat={r.qiymat} />
               </dd>
             </div>
           ))}
@@ -149,7 +172,7 @@ export default async function BoshSahifa() {
             },
           ].map((q) => (
             <div key={q.raqam}>
-              <span className="inline-flex size-8 items-center justify-center rounded-full bg-asosiy-ochiq text-sm font-semibold text-asosiy">
+              <span className="inline-flex size-9 items-center justify-center rounded-full bg-asosiy-ochiq font-display text-sm font-bold text-asosiy ring-1 ring-inset ring-asosiy-chegara">
                 {q.raqam}
               </span>
               <h2 className="mt-3 font-medium text-matn">{q.sarlavha}</h2>
@@ -160,7 +183,7 @@ export default async function BoshSahifa() {
           ))}
         </section>
 
-        <div className="mt-16 rounded-xl border border-chegara bg-yuza p-6 sm:p-8">
+        <div className="mt-16 rounded-2xl border border-chegara bg-yuza p-6 sm:p-8">
           <h2 className="font-medium text-matn">Ombor yopiq</h2>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-matn-ikkilamchi">
             Muammolar davlat tashkilotlarining ichki ish jarayonlariga tegishli,
@@ -168,7 +191,8 @@ export default async function BoshSahifa() {
             ko'rinadi. Tizimga kirish huquqini olish uchun administratorga murojaat qiling.
           </p>
         </div>
-      </main>
+        </main>
+      </div>
 
       <footer className="border-t border-chegara bg-yuza">
         <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-matn-uchinchi">

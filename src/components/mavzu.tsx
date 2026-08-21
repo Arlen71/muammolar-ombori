@@ -27,8 +27,19 @@ export const MAVZU_KALITI = "muammolar-ombori:mavzu";
 
 export function MavzuTugmasi({ className }: { className?: string }) {
   function almashtir() {
-    const qorongi = !document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", qorongi);
+    const el = document.documentElement;
+
+    /*
+      Almashish oldidan vaqtinchalik o'tish sinfi qo'yiladi — ranglar
+      sakrab emas, 300 ms da oqib o'tadi (qoida `globals.css` da).
+      Sinf doimiy qolsa har bir hover ham sekinlashardi, shuning uchun
+      o'tish tugagach olib tashlanadi.
+    */
+    el.classList.add("mavzu-otish");
+    window.setTimeout(() => el.classList.remove("mavzu-otish"), 350);
+
+    const qorongi = !el.classList.contains("dark");
+    el.classList.toggle("dark", qorongi);
     try {
       localStorage.setItem(MAVZU_KALITI, qorongi ? "qorongi" : "yorug");
     } catch {

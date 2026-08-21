@@ -32,7 +32,8 @@ type TugmaOlchami = "kichik" | "orta" | "katta";
 const TUGMA_KORINISHI: Record<TugmaKorinishi, string> = {
   asosiy:
     "bg-asosiy text-asosiy-matn hover:bg-asosiy-quyuq " +
-    "disabled:bg-yuza-3 disabled:text-matn-uchinchi",
+    "hover:shadow-[0_4px_14px_-4px_var(--u-asosiy)] " +
+    "disabled:bg-yuza-3 disabled:text-matn-uchinchi disabled:shadow-none",
   ikkilamchi:
     "bg-yuza text-matn ring-1 ring-inset ring-chegara hover:bg-yuza-2 " +
     "disabled:text-matn-uchinchi",
@@ -80,8 +81,14 @@ export function Tugma({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors",
-        "disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center rounded-lg font-medium",
+        /*
+          `transition` (hammasi) — rang bilan birga transform ham o'tsin.
+          `active:scale-[0.98]` — bosilganda tugma barmoq ostida bir
+          lahza "cho'kadi": harakat javob qaytarilganini his qildiradi.
+        */
+        "transition duration-150 active:scale-[0.98]",
+        "disabled:cursor-not-allowed disabled:active:scale-100",
         TUGMA_KORINISHI[korinish],
         TUGMA_OLCHAMI[olcham],
         className
@@ -198,7 +205,7 @@ export function Nishoncha({
 export function Quti({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("rounded-xl border border-chegara bg-yuza p-5 shadow-1", className)}
+      className={cn("rounded-2xl border border-chegara bg-yuza p-5 shadow-1", className)}
       {...props}
     >
       {children}
@@ -285,6 +292,7 @@ export function KPIKartochka({
   belgi,
   havola,
   className,
+  style,
 }: {
   yorliq: string;
   qiymat: React.ReactNode;
@@ -294,13 +302,16 @@ export function KPIKartochka({
   /** Kartochka o'ng burchagidagi havola yoki tugma */
   havola?: React.ReactNode;
   className?: string;
+  /** Pog'onali kirish tartibi uchun: `{ "--jonlanish-tartib": i }` */
+  style?: React.CSSProperties;
 }) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-chegara bg-yuza px-5 py-4 shadow-1",
+        "rounded-2xl border border-chegara bg-yuza px-5 py-4 shadow-1",
         className
       )}
+      style={style}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
@@ -309,7 +320,7 @@ export function KPIKartochka({
         </div>
         {havola}
       </div>
-      <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-matn">
+      <p className="mt-1 font-display text-3xl font-semibold tracking-tight tabular-nums text-matn">
         {qiymat}
       </p>
       {izoh && <p className="mt-1 text-xs text-matn-uchinchi">{izoh}</p>}
@@ -332,7 +343,7 @@ export function Jadval({
   ...props
 }: React.ComponentProps<"table">) {
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-chegara bg-yuza shadow-1">
+    <div className="w-full overflow-x-auto rounded-2xl border border-chegara bg-yuza shadow-1">
       <table className={cn("w-full min-w-[40rem] border-collapse text-sm", className)} {...props}>
         {children}
       </table>
@@ -411,7 +422,7 @@ export function Skelet({ className }: { className?: string }) {
 /** Jadval yuklanayotganda ko'rsatiladigan qatorlar. */
 export function SkeletJadval({ qatorlar = 5 }: { qatorlar?: number }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-chegara bg-yuza shadow-1">
+    <div className="overflow-hidden rounded-2xl border border-chegara bg-yuza shadow-1">
       <div className="border-b border-chegara bg-yuza-2 px-4 py-3">
         <Skelet className="h-4 w-40" />
       </div>
@@ -443,7 +454,7 @@ export function BoshHolat({
   amal?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-dashed border-chegara bg-yuza px-6 py-14 text-center">
+    <div className="rounded-2xl border border-dashed border-chegara bg-yuza px-6 py-14 text-center">
       <p className="text-base font-medium text-matn">{sarlavha}</p>
       {izoh && <p className="mx-auto mt-1.5 max-w-md text-sm text-matn-ikkilamchi">{izoh}</p>}
       {amal && <div className="mt-5 flex justify-center">{amal}</div>}
