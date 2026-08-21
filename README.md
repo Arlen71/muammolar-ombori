@@ -161,6 +161,28 @@ faylni `/api/fayl/[id]` orqali oladi, u yerda avval ruxsat tekshiriladi.
 Saqlanadigan yo'l har doim tizim yaratgan UUID — foydalanuvchi bergan nom
 hech qachon yo'l sifatida ishlatilmaydi.
 
+**Fayllar brauzerdan omborga BEVOSITA yuklanadi.** Vercel serverless
+funksiyasiga 4.5 MB dan katta so'rov tanasi umuman kirmaydi — bu
+platforma cheklovi, `next.config.ts` dan sozlab bo'lmaydi (o'lchangan:
+4 MB o'tadi, 4.4 MB da 413 `FUNCTION_PAYLOAD_TOO_LARGE`). Ilgari fayl
+server action orqali ketardi va kodda 10 MB deb yozilgani holda amalda
+~4.4 MB dan kattasi tushunarsiz "Kutilmagan xatolik" ekrani bilan
+yiqilardi.
+
+Endi `/api/yuklash` faqat qisqa muddatli token beradi, fayl baytlari
+esa serverdan o'tmaydi. Token cheklangan: chaqiruvchining O'Z papkasiga
+(`rasmlar/<foydalanuvchiId>/`, `biriktirmalar/<muammoId>/`), faqat
+ruxsat etilgan turlarga va belgilangan hajmgacha. Yo'lni mijoz taklif
+qiladi, lekin uni ikki joy tekshiradi — token berishda va bazaga
+biriktirishda.
+
+Chegaralar `uploads-client.ts` da, bitta manbada: brauzer ham, server
+ham o'sha yerdan o'qiydi.
+
+**Avatar manziliga versiya qo'shiladi** (`?v=…`). Manzil
+`/api/rasm/<id>` hech qachon o'zgarmaydi, rasm esa o'zgaradi — versiyasiz
+brauzer eski nusxani bir soat keshda ushlab turardi.
+
 **Profil rasmlari biriktirmalardan boshqacha himoyalangan.** Har qanday
 kirgan foydalanuvchi hamkasbining rasmini ko'ra oladi (`/api/rasm/[id]`) —
 dasturchi muammoni olgach mas'ul shaxsga qo'ng'iroq qiladi va kim bilan

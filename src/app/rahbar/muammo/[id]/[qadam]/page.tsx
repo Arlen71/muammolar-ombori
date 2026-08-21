@@ -144,6 +144,7 @@ export default async function SehrgarSahifasi(
               }))}
               ruxsatEtilgan={RUXSAT_ETILGAN_KENGAYTMALAR}
               maksimalHajmMatni={hajmMatni(maksimalHajm())}
+              maksimalHajm={maksimalHajm()}
             />
           ) : (
             <Xabar turi="ogohlantirish" sarlavha="Fayl biriktirish hozircha ishlamaydi">

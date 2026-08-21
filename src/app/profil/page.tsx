@@ -42,7 +42,7 @@ export default async function ProfilSahifasi() {
         telefon={joriy.phone}
         tashkilot={joriy.organizationName}
         rol={ROL[joriy.role]}
-        rasmBormi={joriy.rasmBormi}
+        rasmVersiyasi={joriy.rasmVersiyasi}
       />
     </>
   );

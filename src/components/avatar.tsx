@@ -49,14 +49,17 @@ const OLCHAMLAR = {
 export function Avatar({
   ism,
   foydalanuvchiId,
-  rasmBormi,
+  rasmVersiyasi,
   olcham = "orta",
   className,
 }: {
   ism: string;
   foydalanuvchiId: string;
-  /** Bazada `avatarPath` bormi. Bo'lmasa so'rov ham yuborilmaydi. */
-  rasmBormi: boolean;
+  /**
+   * Rasm versiyasi; `null` bo'lsa rasm yo'q va so'rov yuborilmaydi.
+   * Manzilga qo'shiladi — rasm almashganda brauzer keshi ham almashadi.
+   */
+  rasmVersiyasi: string | null;
   olcham?: keyof typeof OLCHAMLAR;
   className?: string;
 }) {
@@ -67,7 +70,7 @@ export function Avatar({
     className
   );
 
-  if (!rasmBormi) {
+  if (!rasmVersiyasi) {
     return (
       <span className={cn(asos, RANGLAR[rangIndeksi(ism)])} aria-hidden="true">
         {boshHarflar(ism)}
@@ -86,7 +89,7 @@ export function Avatar({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/api/rasm/${foydalanuvchiId}`}
+      src={`/api/rasm/${foydalanuvchiId}?v=${rasmVersiyasi}`}
       alt=""
       loading="lazy"
       decoding="async"

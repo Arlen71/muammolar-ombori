@@ -20,9 +20,16 @@ export type JoriyFoydalanuvchi = {
   status: UserStatus;
   organizationId: string | null;
   organizationName: string | null;
-  /** Profil rasmi yuklanganmi. Yo'lning o'zi kerak emas — rasm
-      `/api/rasm/[id]` orqali olinadi, bu yerda faqat bor-yo'qligi. */
-  rasmBormi: boolean;
+  /**
+   * Profil rasmining versiyasi — rasm bo'lmasa `null`.
+   *
+   * Bor-yo'qligini bildiruvchi `boolean` yetarli emas edi: avatar manzili
+   * (`/api/rasm/<id>`) hech qachon o'zgarmaydi, rasm esa o'zgaradi.
+   * Brauzer eski nusxani keshda ushlab, foydalanuvchi yangi rasmini bir
+   * soat ko'rmasdi. Versiya manzilga qo'shiladi va rasm almashganda
+   * manzil ham almashadi.
+   */
+  rasmVersiyasi: string | null;
 };
 
 /**
@@ -72,7 +79,9 @@ export const getJoriyFoydalanuvchi = cache(
       status: foydalanuvchi.status,
       organizationId: foydalanuvchi.organizationId,
       organizationName: foydalanuvchi.organization?.name ?? null,
-      rasmBormi: Boolean(foydalanuvchi.avatarPath),
+      // Yo'lning oxirgi 8 belgisi — har yuklashda yangi UUID, ya'ni
+      // versiya ham yangi. To'liq yo'lni bermaymiz: u ichki ma'lumot.
+      rasmVersiyasi: foydalanuvchi.avatarPath?.slice(-12, -4) ?? null,
     };
   }
 );

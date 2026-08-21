@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { talabRahbar } from "@/lib/auth";
 import { auditYoz } from "@/lib/audit";
-import { faylniOchir as diskdanOchir, faylniSaqla } from "@/lib/uploads";
+import { faylniOchir as diskdanOchir } from "@/lib/uploads";
 import { oylikYoqotilganSoat, tasirBalli, toliqlikFoizi } from "@/lib/scoring";
 import {
   QADAM_NOMLARI,
@@ -221,49 +221,66 @@ export async function avtoSaqla(
 //  Fayllar
 // ─────────────────────────────────────────────────────────────────────
 
-export async function fayllarniYukla(
-  _oldingi: AmalNatijasi,
-  fd: FormData
+/** Mijoz omborga yuklab bo'lgan fayl haqidagi ma'lumot. */
+export type YuklanganFayl = {
+  yol: string;
+  nomi: string;
+  hajm: number;
+  turi: string;
+};
+
+/**
+ * Omborga yuklangan fayllarni muammoga biriktiradi.
+ *
+ * Fayl baytlari bu yerga KELMAYDI — brauzer ularni `/api/yuklash`
+ * tokeni bilan omborga bevosita yuborgan. Sabab: Vercel serverless
+ * funksiyasiga 4.5 MB dan katta tana o'tmaydi (o'lchangan: 4 MB
+ * o'tadi, 4.4 MB da 413). Ilgari kodda 10 MB deb yozilgani holda
+ * amalda undan katta Excel fayli umuman biriktirilmasdi — TZ esa
+ * aynan real Excel faylini eng qimmatli ma'lumot deb ataydi.
+ *
+ * Yo'l mijozdan kelgani uchun ishonchsiz: prefiks shu muammoga mos
+ * kelishi tekshiriladi. Token berishda ham xuddi shu tekshiruv bor.
+ */
+export async function fayllarniBiriktir(
+  muammoId: string,
+  fayllar: YuklanganFayl[]
 ): Promise<AmalNatijasi> {
-  const muammoId = String(fd.get("muammoId") ?? "");
   const { rahbar, muammo } = await rahbarMuammosi(muammoId);
   if (!TAHRIRLANADIGAN.includes(muammo.status as (typeof TAHRIRLANADIGAN)[number])) {
     return { xato: "Yuborilgan muammoga fayl qo'shib bo'lmaydi." };
   }
-
-  const fayllar = fd.getAll("fayllar").filter((f): f is File => f instanceof File && f.size > 0);
   if (fayllar.length === 0) return { xato: "Fayl tanlanmadi." };
   if (muammo._count.attachments + fayllar.length > 10) {
     return { xato: "Bitta muammoga ko'pi bilan 10 ta fayl biriktirish mumkin." };
   }
 
-  const xatolar: string[] = [];
-  let yuklandi = 0;
-
-  for (const fayl of fayllar) {
-    const natija = await faylniSaqla(fayl);
-    if ("xato" in natija) {
-      xatolar.push(`${fayl.name}: ${natija.xato}`);
-      continue;
-    }
-    await db.problemAttachment.create({ data: { problemId: muammoId, ...natija } });
-    yuklandi++;
+  const kutilganPrefiks = `biriktirmalar/${muammoId}/`;
+  if (fayllar.some((f) => !f.yol.startsWith(kutilganPrefiks))) {
+    return { xato: "Fayl yo'li noto'g'ri." };
   }
 
-  if (yuklandi > 0) {
-    await hisoblarniYangila(muammoId);
-    await auditYoz({
-      actorId: rahbar.id,
-      action: "muammo.fayl_yuklandi",
-      entity: "Problem",
-      entityId: muammoId,
-      meta: { soni: yuklandi },
-    });
-    revalidatePath(`/rahbar/muammo/${muammoId}`, "layout");
-  }
+  await db.problemAttachment.createMany({
+    data: fayllar.map((f) => ({
+      problemId: muammoId,
+      fileName: f.nomi,
+      storedName: f.yol,
+      mimeType: f.turi,
+      size: f.hajm,
+    })),
+  });
 
-  if (xatolar.length > 0) return { xato: xatolar.join("; ") };
-  return { muvaffaqiyat: `${yuklandi} ta fayl biriktirildi.` };
+  await hisoblarniYangila(muammoId);
+  await auditYoz({
+    actorId: rahbar.id,
+    action: "muammo.fayl_yuklandi",
+    entity: "Problem",
+    entityId: muammoId,
+    meta: { soni: fayllar.length },
+  });
+  revalidatePath(`/rahbar/muammo/${muammoId}`, "layout");
+
+  return { muvaffaqiyat: `${fayllar.length} ta fayl biriktirildi.` };
 }
 
 export async function biriktirmaniOchir(biriktirmaId: string) {

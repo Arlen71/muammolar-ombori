@@ -2,7 +2,7 @@ import "server-only";
 
 import { del, get, put } from "@vercel/blob";
 
-import { hajmMatni } from "@/lib/uploads-client";
+import { hajmMatni, RASM_MAKSIMAL_HAJMI } from "@/lib/uploads-client";
 
 /**
  * Biriktirilgan fayllarni saqlash — Vercel Blob orqali.
@@ -21,7 +21,7 @@ import { hajmMatni } from "@/lib/uploads-client";
  * ham fayl ochilmaydi — chunki yo'lning o'zi hech narsa bermaydi.
  */
 
-export { hajmMatni };
+export { hajmMatni, RASM_MAKSIMAL_HAJMI };
 
 /** Ruxsat etilgan turlar: kengaytma → MIME. */
 const RUXSAT_ETILGAN: Record<string, string[]> = {
@@ -126,13 +126,35 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
  * faqat o'zimiz yozgan naqshdagi fayllar so'raladi.
  */
 /*
-  Ikkita papka: `biriktirmalar/` — muammoga ilova qilingan hujjatlar,
-  `rasmlar/` — profil rasmlari. Ikkalasida ham nom tizim yaratgan UUID:
-  foydalanuvchi bergan matn hech qachon yo'lga tushmaydi, ya'ni
-  `../` bilan ombordan chiqib ketish imkoni yo'q.
+  Ombordagi yo'l shakli:
+
+    rasmlar/<foydalanuvchiId>/<uuid>.<kengaytma>
+    biriktirmalar/<muammoId>/<uuid>.<kengaytma>
+
+  Egasining id'si yo'lga kiritilgan — bu tasodifiy emas. Fayl brauzerdan
+  TO'G'RIDAN-TO'G'RI omborga yuklanadi (sabab: Vercel serverless
+  funksiyasiga 4.5 MB dan katta tana o'tmaydi). Ya'ni yo'lni mijoz
+  taklif qiladi, server esa uni tasdiqlaydi: token faqat chaqiruvchining
+  o'z papkasiga beriladi, biriktirish amali esa prefiksni qaytadan
+  tekshiradi. Papkasiz bo'lsa, foydalanuvchi o'zganing fayliga yo'l
+  ko'rsata olardi.
+
+  Nom har doim tizim yaratgan UUID — foydalanuvchi bergan matn hech
+  qachon yo'lga tushmaydi.
+
+  Eski (papkasiz) yo'llar ham qabul qilinadi: ular shu o'zgarishdan
+  oldin yuklangan va bazada saqlanib qolgan.
 */
+const YOL_QOLIPI =
+  /^(biriktirmalar|rasmlar)\/(?:[a-z0-9]{20,32}\/)?[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i;
+
 function yolIshonchlimi(qiymat: string): boolean {
-  return /^(biriktirmalar|rasmlar)\/[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i.test(qiymat);
+  return YOL_QOLIPI.test(qiymat);
+}
+
+/** Yo'l shu egaga tegishlimi (`rasmlar/<egaId>/…`). */
+export function yolEgasiniTekshir(yol: string, egaId: string): boolean {
+  return yolIshonchlimi(yol) && yol.split("/")[1] === egaId;
 }
 
 /**
@@ -165,24 +187,15 @@ export async function faylniOchir(saqlanadiganNom: string): Promise<void> {
 //  Profil rasmi
 // ─────────────────────────────────────────────────────────────────────
 
-/** Profil rasmi uchun ruxsat etilgan turlar — faqat rasm. */
-const RASM_TURLARI: Record<string, string[]> = {
+/** Kengaytma → ruxsat etilgan MIME (profil rasmi uchun). */
+const RASM_KENGAYTMA_MIME: Record<string, string[]> = {
   ".png": ["image/png"],
   ".jpg": ["image/jpeg"],
   ".jpeg": ["image/jpeg"],
   ".webp": ["image/webp"],
 };
 
-export const RASM_KENGAYTMALARI = Object.keys(RASM_TURLARI);
-
-/**
- * Profil rasmi uchun hajm chegarasi — 2 MB.
- *
- * Hujjat chegarasidan (10 MB) ancha kichik: avatar ekranda 40–96 piksel
- * ko'rsatiladi va bundan kattasi hech qanday sifat qo'shmaydi, faqat
- * ombor va trafikni yeydi.
- */
-export const RASM_MAKSIMAL_HAJMI = 2 * 1024 * 1024;
+export const RASM_KENGAYTMALARI = Object.keys(RASM_KENGAYTMA_MIME);
 
 /**
  * Profil rasmini saqlaydi.
@@ -199,7 +212,7 @@ export async function rasmniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
   }
 
   const keng = kengaytma(fayl.name);
-  const ruxsat = RASM_TURLARI[keng];
+  const ruxsat = RASM_KENGAYTMA_MIME[keng];
   if (!ruxsat) {
     return { xato: `Faqat ${RASM_KENGAYTMALARI.join(", ")} turidagi rasm qabul qilinadi.` };
   }

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { talabKirish } from "@/lib/auth";
 import { auditYoz } from "@/lib/audit";
-import { faylniOchir, omborUlanganmi, rasmniSaqla } from "@/lib/uploads";
+import { faylniOchir, yolEgasiniTekshir } from "@/lib/uploads";
 import { zodXatolari, type AmalNatijasi } from "@/lib/validation";
 
 /*
@@ -86,23 +86,25 @@ export async function profilniYangila(
   return { muvaffaqiyat: "Profil saqlandi." };
 }
 
-export async function rasmniYukla(
-  _oldingi: AmalNatijasi,
-  fd: FormData
-): Promise<AmalNatijasi> {
+/**
+ * Yuklangan rasmni profilga biriktiradi.
+ *
+ * Fayl baytlari bu yerga KELMAYDI — brauzer ularni omborga bevosita
+ * yuborgan (`/api/yuklash` tokeni bilan), bu amal esa faqat yo'lni
+ * qabul qiladi. Sabab: Vercel serverless funksiyasiga 4.5 MB dan katta
+ * tana o'tmaydi, ya'ni 10 MB li rasmni server orqali o'tkazib bo'lmaydi.
+ *
+ * Yo'l mijozdan kelgani uchun u ISHONCHSIZ deb qaraladi: prefiks
+ * chaqiruvchining o'z papkasiga mos kelishi tekshiriladi. Token berishda
+ * ham xuddi shu tekshiruv bor — ikkitasi bir-birini dublikat qiladi va
+ * bittasi o'tkazib yuborilsa, ikkinchisi ushlab qoladi.
+ */
+export async function rasmniBiriktir(yol: string): Promise<AmalNatijasi> {
   const foydalanuvchi = await talabKirish();
 
-  if (!(await omborUlanganmi())) {
-    return { xato: "Fayl ombori sozlanmagan — administratorga murojaat qiling." };
+  if (!yolEgasiniTekshir(yol, foydalanuvchi.id)) {
+    return { xato: "Rasm yo'li noto'g'ri." };
   }
-
-  const fayl = fd.get("rasm");
-  if (!(fayl instanceof File) || fayl.size === 0) {
-    return { xato: "Rasm tanlanmadi." };
-  }
-
-  const saqlangan = await rasmniSaqla(fayl);
-  if ("xato" in saqlangan) return { xato: saqlangan.xato };
 
   /*
     Eski rasm o'chiriladi — aks holda har yangilashda omborda bir dona
@@ -120,10 +122,10 @@ export async function rasmniYukla(
 
   await db.user.update({
     where: { id: foydalanuvchi.id },
-    data: { avatarPath: saqlangan.storedName },
+    data: { avatarPath: yol },
   });
 
-  if (eskiYol) await faylniOchir(eskiYol);
+  if (eskiYol && eskiYol !== yol) await faylniOchir(eskiYol);
 
   await auditYoz({
     actorId: foydalanuvchi.id,

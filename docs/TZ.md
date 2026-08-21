@@ -341,6 +341,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.19 | Foydalanuvchi profili: rasm, ism, lavozim, pochta — o'zi boshqaradi | ✅ |
 | T-8.20 | Administrator qaysi tashkilot muammo yuborgan/yubormaganini ko'radi | ✅ |
 | T-8.21 | Boshqaruv panelida diagrammalar: holatlar oqimi, tuman va soha taqsimoti | ✅ |
+| T-8.22 | Fayllar brauzerdan omborga bevosita yuklanadi (10 MB gacha) | ✅ |
 | T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 41 ta hujum stsenariysi) | ✅ |
 
 ---
@@ -472,3 +473,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | 1.3 | 2026-08-20 | Pilot Qashqadaryo viloyatiga moslashtirildi (T-8.17): viloyat tanlash olib tashlandi, o'rniga 16 ta tuman/shahar ro'yxati. Sinov ma'lumoti Qashqadaryo tashkilotlariga almashtirildi |
 | 1.4 | 2026-08-20 | Vizual identifikatsiya (T-8.18): Oqsaroy koshinlaridan olingan lojuvard palitra va sakkiz qirrali yulduz naqshi, uch rolli tipografiya, o'lchovli harakat |
 | 1.5 | 2026-08-21 | Foydalanuvchi profili va rasm (T-8.19), tashkilotlar qamrovi nazorati (T-8.20), boshqaruv panelida diagrammalar (T-8.21). Sxemaga `User.avatarPath` qo'shildi |
+| 1.6 | 2026-08-21 | Fayl yuklash tuzatildi (T-8.22): Vercel'ning 4.5 MB cheklovi sababli fayllar endi brauzerdan omborga bevosita ketadi. Rasm chegarasi 2 → 10 MB |

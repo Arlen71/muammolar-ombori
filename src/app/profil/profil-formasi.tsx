@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
-import { profilniYangila, rasmniOchir, rasmniYukla } from "./actions";
+import { profilniYangila, rasmniBiriktir, rasmniOchir } from "./actions";
 import { Avatar } from "@/components/avatar";
 import { Kiritish, Maydon, Quti, QutiSarlavha, Tugma, Xabar } from "@/components/ui";
 import { Yuborish } from "@/components/yuborish";
 import { telefonMatni } from "@/lib/labels";
+import { RASM_MAKSIMAL_HAJMI, RASM_TURLARI } from "@/lib/uploads-client";
+import { faylniYukla } from "@/lib/yuklovchi";
 import type { AmalNatijasi } from "@/lib/validation";
 
 /**
@@ -20,23 +22,64 @@ import type { AmalNatijasi } from "@/lib/validation";
 function RasmBloki({
   ism,
   foydalanuvchiId,
-  rasmBormi,
+  rasmVersiyasi,
 }: {
   ism: string;
   foydalanuvchiId: string;
-  rasmBormi: boolean;
+  rasmVersiyasi: string | null;
 }) {
-  const [holat, amal] = useActionState<AmalNatijasi, FormData>(rasmniYukla, {});
+  const [holat, holatniYoz] = useState<AmalNatijasi>({});
+  const [foiz, foizniYoz] = useState<number | null>(null);
   const [ochirHolati, ochirAmali] = useActionState<AmalNatijasi, FormData>(
     async () => rasmniOchir(),
     {}
   );
 
+  /*
+    Yuklash server action orqali EMAS: fayl brauzerdan omborga bevosita
+    ketadi. Vercel serverless funksiyasiga 4.5 MB dan katta tana o'tmaydi
+    va 10 MB li telefon rasmi shu chegarada yiqilardi — foydalanuvchi esa
+    sababi ko'rinmaydigan "Kutilmagan xatolik" ekranini olardi.
+
+    Shu sababli bu yerda `useActionState` emas, oddiy holat: jarayon
+    foizi kerak, va uni server action bermaydi.
+  */
+  async function tanlandi(hodisa: React.ChangeEvent<HTMLInputElement>) {
+    const fayl = hodisa.target.files?.[0];
+    if (!fayl) return;
+
+    holatniYoz({});
+    foizniYoz(0);
+
+    const natija = await faylniYukla({
+      fayl,
+      papka: `rasmlar/${foydalanuvchiId}`,
+      yuklama: { turi: "rasm" },
+      maksimalHajm: RASM_MAKSIMAL_HAJMI,
+      ruxsatEtilganTurlar: [...RASM_TURLARI],
+      jarayon: foizniYoz,
+    });
+
+    foizniYoz(null);
+    // Kirish maydonini tozalaymiz — aks holda bir xil faylni qayta
+    // tanlaganda `change` hodisasi umuman ishlamaydi
+    hodisa.target.value = "";
+
+    if (!natija.ok) {
+      holatniYoz({ xato: natija.xato });
+      return;
+    }
+
+    holatniYoz(await rasmniBiriktir(natija.yol));
+  }
+
+  const yuklanmoqda = foiz !== null;
+
   return (
     <Quti className="space-y-4">
       <QutiSarlavha
         sarlavha="Profil rasmi"
-        izoh="Hamkasblar sizni ro'yxatlarda shu rasm bilan taniydi. PNG, JPG yoki WEBP, 2 MB gacha."
+        izoh="Hamkasblar sizni ro'yxatlarda shu rasm bilan taniydi. PNG, JPG yoki WEBP, 10 MB gacha."
       />
 
       {holat.xato && <Xabar turi="xato">{holat.xato}</Xabar>}
@@ -49,26 +92,40 @@ function RasmBloki({
         <Avatar
           ism={ism}
           foydalanuvchiId={foydalanuvchiId}
-          rasmBormi={rasmBormi}
+          rasmVersiyasi={rasmVersiyasi}
           olcham="katta"
         />
 
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-          <form action={amal} className="flex flex-wrap items-center gap-2">
-            <input
-              type="file"
-              name="rasm"
-              accept="image/png,image/jpeg,image/webp"
-              required
-              aria-label="Rasm tanlash"
-              className="max-w-full text-sm text-matn-ikkilamchi file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-yuza-2 file:px-3 file:py-2 file:text-sm file:font-medium file:text-matn hover:file:bg-yuza-3"
-            />
-            <Yuborish kutish="Yuklanmoqda…" korinish="ikkilamchi" olcham="kichik">
-              Yuklash
-            </Yuborish>
-          </form>
+        <div className="min-w-0 flex-1 space-y-2">
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            disabled={yuklanmoqda}
+            onChange={tanlandi}
+            aria-label="Rasm tanlash"
+            className="max-w-full text-sm text-matn-ikkilamchi file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-yuza-2 file:px-3 file:py-2 file:text-sm file:font-medium file:text-matn hover:file:bg-yuza-3 disabled:opacity-60"
+          />
 
-          {rasmBormi && (
+          {/*
+            Jarayon chizig'i. 10 MB li fayl sekin internetda bir necha
+            soniya ketadi va bu vaqtda ekranda hech narsa o'zgarmasa,
+            foydalanuvchi tugmani qayta bosadi.
+          */}
+          {yuklanmoqda && (
+            <div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-yuza-2">
+                <div
+                  className="h-full rounded-full bg-asosiy transition-[width] duration-200"
+                  style={{ width: `${foiz}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-matn-ikkilamchi" role="status">
+                Yuklanmoqda… {foiz}%
+              </p>
+            </div>
+          )}
+
+          {rasmVersiyasi && !yuklanmoqda && (
             <form action={ochirAmali}>
               <Yuborish kutish="O'chirilmoqda…" korinish="shaffof" olcham="kichik">
                 Rasmni o'chirish
@@ -89,7 +146,7 @@ export function ProfilFormasi({
   telefon,
   tashkilot,
   rol,
-  rasmBormi,
+  rasmVersiyasi,
 }: {
   foydalanuvchiId: string;
   ism: string;
@@ -98,7 +155,7 @@ export function ProfilFormasi({
   telefon: string;
   tashkilot: string | null;
   rol: string;
-  rasmBormi: boolean;
+  rasmVersiyasi: string | null;
 }) {
   const [holat, amal] = useActionState<AmalNatijasi, FormData>(profilniYangila, {});
   const x = holat.maydonXatolari;
@@ -106,7 +163,11 @@ export function ProfilFormasi({
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
       <div className="space-y-5">
-        <RasmBloki ism={ism} foydalanuvchiId={foydalanuvchiId} rasmBormi={rasmBormi} />
+        <RasmBloki
+          ism={ism}
+          foydalanuvchiId={foydalanuvchiId}
+          rasmVersiyasi={rasmVersiyasi}
+        />
 
         <Quti>
           <QutiSarlavha

@@ -45,7 +45,7 @@ export function AppShell({
           <Avatar
             ism={foydalanuvchi.fullName}
             foydalanuvchiId={foydalanuvchi.id}
-            rasmBormi={foydalanuvchi.rasmBormi}
+            rasmVersiyasi={foydalanuvchi.rasmVersiyasi}
             olcham="kichik"
           />
           <span className="min-w-0 flex-1">
