@@ -342,7 +342,10 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.20 | Administrator qaysi tashkilot muammo yuborgan/yubormaganini ko'radi | ✅ |
 | T-8.21 | Boshqaruv panelida diagrammalar: holatlar oqimi, tuman va soha taqsimoti | ✅ |
 | T-8.22 | Fayllar brauzerdan omborga bevosita yuklanadi (10 MB gacha) | ✅ |
-| T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 41 ta hujum stsenariysi) | ✅ |
+| T-8.23 | Moderatsiya olib tashlandi: muammo darhol omborga tushadi | ✅ |
+| T-8.24 | Rahbar ↔ dasturchi suhbati, fayl almashinuvi bilan | ✅ |
+| T-8.25 | Suhbat yopiq: begona dasturchi ko'ra olmaydi (404) | ✅ |
+| T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 52 ta hujum stsenariysi) | ✅ |
 
 ---
 
@@ -474,3 +477,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | 1.4 | 2026-08-20 | Vizual identifikatsiya (T-8.18): Oqsaroy koshinlaridan olingan lojuvard palitra va sakkiz qirrali yulduz naqshi, uch rolli tipografiya, o'lchovli harakat |
 | 1.5 | 2026-08-21 | Foydalanuvchi profili va rasm (T-8.19), tashkilotlar qamrovi nazorati (T-8.20), boshqaruv panelida diagrammalar (T-8.21). Sxemaga `User.avatarPath` qo'shildi |
 | 1.6 | 2026-08-21 | Fayl yuklash tuzatildi (T-8.22): Vercel'ning 4.5 MB cheklovi sababli fayllar endi brauzerdan omborga bevosita ketadi. Rasm chegarasi 2 → 10 MB |
+| 1.7 | 2026-09-01 | Moderatsiya olib tashlandi (T-8.23) va rahbar ↔ dasturchi suhbati qo'shildi (T-8.24, T-8.25). Sxemaga `Suhbat`, `SuhbatXabari`, `SuhbatFayli` jadvallari qo'shildi |

@@ -217,6 +217,10 @@ model User {
   notifications    Notification[]
   auditLogs        AuditLog[]
 
+  suhbatlar          Suhbat[]       @relation("SuhbatDasturchi")
+  boshlaganSuhbatlar Suhbat[]       @relation("SuhbatBoshlovchi")
+  suhbatXabarlari    SuhbatXabari[]
+
   lastLoginAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -331,6 +335,7 @@ model Problem {
   attachments ProblemAttachment[]
   history     ProblemStatusHistory[]
   assignments ProblemAssignment[]
+  suhbatlar   Suhbat[]
 
   submittedAt DateTime?
   approvedAt  DateTime?
@@ -455,4 +460,91 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  Suhbat
+// ─────────────────────────────────────────────────────────────────────
+
+/// Bitta muammo yuzasidan bitta dasturchi bilan olib boriladigan yozishma.
+///
+/// Har (muammo × dasturchi) juftligi uchun alohida — dasturchilar
+/// bir-birining yozishmasini ko'rmaydi. Rahbar tomonidan tashkilotning
+/// ISTALGAN rahbari javob bera oladi: tizimning qolgan qismi ham shunday
+/// ishlaydi (rahbar o'z tashkilotining hamma muammosini ko'radi) va
+/// muallif ta'tilda bo'lsa yozishma to'xtab qolmaydi.
+model Suhbat {
+  id String @id @default(cuid())
+
+  problemId String
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  /// Yozishmaning dasturchi tomoni — aniq bitta odam
+  developerId String
+  developer   User   @relation("SuhbatDasturchi", fields: [developerId], references: [id])
+
+  /// Yozishmani kim boshlagani — statistikada "dasturchi so'radi" va
+  /// "rahbar o'zi yozdi" ni ajratish uchun
+  boshlovchiId String
+  boshlovchi   User   @relation("SuhbatBoshlovchi", fields: [boshlovchiId], references: [id])
+
+  /**
+   * O'qilmagan xabarlarni sanash uchun ikkita vaqt belgisi.
+   * Har bir xabarga `readAt` qo'yish ham mumkin edi, lekin u suhbat
+   * ochilganda N ta qatorni yangilashni talab qiladi. Ikkita maydon esa
+   * bitta yangilanish: "shu vaqtdan keyingi, men yozmagan xabarlar
+   * o'qilmagan".
+   */
+  rahbarOqidi    DateTime?
+  dasturchiOqidi DateTime?
+
+  /// Ro'yxatni saralash uchun — har xabarda yangilanadi
+  oxirgiXabarAt DateTime @default(now())
+
+  xabarlar SuhbatXabari[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Bitta dasturchi bitta muammo bo'yicha faqat bitta suhbat yuritadi
+  @@unique([problemId, developerId])
+  @@index([problemId])
+  @@index([developerId, oxirgiXabarAt(sort: Desc)])
+}
+
+model SuhbatXabari {
+  id String @id @default(cuid())
+
+  suhbatId String
+  suhbat   Suhbat @relation(fields: [suhbatId], references: [id], onDelete: Cascade)
+
+  yuboruvchiId String
+  yuboruvchi   User   @relation(fields: [yuboruvchiId], references: [id])
+
+  /// Faqat fayl yuborilgan bo'lsa bo'sh bo'lishi mumkin
+  matn String?
+
+  fayllar SuhbatFayli[]
+
+  createdAt DateTime @default(now())
+
+  @@index([suhbatId, createdAt])
+}
+
+model SuhbatFayli {
+  id String @id @default(cuid())
+
+  xabarId String
+  xabar   SuhbatXabari @relation(fields: [xabarId], references: [id], onDelete: Cascade)
+
+  /// Foydalanuvchi ko'radigan nom
+  fileName   String
+  /// Ombordagi ichki yo'l — tashqi kiritishdan mustaqil
+  storedName String @unique
+  mimeType   String
+  size       Int
+
+  createdAt DateTime @default(now())
+
+  @@index([xabarId])
 }

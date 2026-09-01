@@ -16,79 +16,62 @@ import { OrgType, Role } from "@/generated/prisma/enums";
 //  Muammolarni moderatsiya qilish
 // ─────────────────────────────────────────────────────────────────────
 
-export async function muammoniTasdiqla(
+/**
+ * Muammoni arxivga oladi.
+ *
+ * Moderatsiya OLIB TASHLANGAN: muammo yuborilishi bilan omborga
+ * tushadi, administrator tasdig'i kutilmaydi. Sabab — kartochkadagi
+ * kamchilikni endi dasturchi suhbat orqali to'g'ridan-to'g'ri
+ * so'raydi, bu moderatorning taxmin qilishidan aniqroq.
+ *
+ * Ammo nazorat butunlay yo'qolmaydi: nomaqbul yoki takroriy yozuvni
+ * administrator keyin arxivga oladi. Bu "oldindan to'sish" emas,
+ * "keyin tuzatish" modeli — oqim to'xtamaydi, lekin javobgarlik
+ * qoladi.
+ *
+ * Arxivlangan muammo ombordan chiqadi, lekin O'CHIRILMAYDI: tarixi,
+ * yozishmalari va fayllari joyida qoladi.
+ */
+const arxivSxemasi = z.object({
+  muammoId: z.string().min(1),
+  sabab: z
+    .string()
+    .trim()
+    .min(10, "Sababni yozing — u rahbarga ko'rinadi")
+    .max(500, "Sabab juda uzun"),
+});
+
+export async function muammoniArxivla(
   _oldingi: AmalNatijasi,
   fd: FormData
 ): Promise<AmalNatijasi> {
-  const muammoId = String(fd.get("muammoId") ?? "");
   const admin = await talabRol("ADMIN");
+
+  const natija = arxivSxemasi.safeParse({
+    muammoId: fd.get("muammoId") ?? "",
+    sabab: fd.get("sabab") ?? "",
+  });
+  if (!natija.success) return { maydonXatolari: zodXatolari(natija.error) };
+
+  const { muammoId, sabab } = natija.data;
 
   const muammo = await db.problem.findUnique({
     where: { id: muammoId },
     select: { status: true },
   });
   if (!muammo) return { xato: "Muammo topilmadi." };
-  if (muammo.status !== "SUBMITTED") return { xato: "Bu muammo moderatsiya navbatida emas." };
+  if (muammo.status === "ARCHIVED") return { xato: "Bu muammo allaqachon arxivda." };
 
   await db.$transaction([
     db.problem.update({
       where: { id: muammoId },
-      data: { status: "APPROVED", approvedAt: new Date(), moderationNote: null },
+      data: { status: "ARCHIVED", moderationNote: sabab },
     }),
     db.problemStatusHistory.create({
       data: {
         problemId: muammoId,
-        fromStatus: "SUBMITTED",
-        toStatus: "APPROVED",
-        actorId: admin.id,
-        comment: "Moderatsiyadan o'tdi, omborga qo'shildi",
-      },
-    }),
-  ]);
-
-  await auditYoz({
-    actorId: admin.id,
-    action: "muammo.tasdiqlandi",
-    entity: "Problem",
-    entityId: muammoId,
-  });
-
-  revalidatePath("/admin/moderatsiya");
-  revalidatePath("/ombor");
-  return { muvaffaqiyat: "Muammo omborga qo'shildi." };
-}
-
-export async function muammoniRadEt(
-  _oldingi: AmalNatijasi,
-  fd: FormData
-): Promise<AmalNatijasi> {
-  const muammoId = String(fd.get("muammoId") ?? "");
-  const sabab = String(fd.get("sabab") ?? "").trim();
-  if (sabab.length < 15) {
-    return {
-      xato: "Rad etish sababini aniq yozing — rahbar nimani tuzatishi kerakligini bilishi shart.",
-    };
-  }
-
-  const admin = await talabRol("ADMIN");
-  const muammo = await db.problem.findUnique({
-    where: { id: muammoId },
-    select: { status: true },
-  });
-  if (!muammo || muammo.status !== "SUBMITTED") {
-    return { xato: "Bu muammo moderatsiya navbatida emas." };
-  }
-
-  await db.$transaction([
-    db.problem.update({
-      where: { id: muammoId },
-      data: { status: "REJECTED", moderationNote: sabab },
-    }),
-    db.problemStatusHistory.create({
-      data: {
-        problemId: muammoId,
-        fromStatus: "SUBMITTED",
-        toStatus: "REJECTED",
+        fromStatus: muammo.status,
+        toStatus: "ARCHIVED",
         actorId: admin.id,
         comment: sabab,
       },
@@ -97,14 +80,58 @@ export async function muammoniRadEt(
 
   await auditYoz({
     actorId: admin.id,
-    action: "muammo.rad_etildi",
+    action: "muammo.arxivlandi",
     entity: "Problem",
     entityId: muammoId,
     meta: { sabab },
   });
 
   revalidatePath("/admin/moderatsiya");
-  return { muvaffaqiyat: "Muammo rahbarga qaytarildi." };
+  revalidatePath("/ombor");
+  return { muvaffaqiyat: "Muammo arxivga olindi." };
+}
+
+/** Arxivdan qaytaradi — xato bilan arxivlangan bo'lsa. */
+export async function muammoniTiklash(
+  _oldingi: AmalNatijasi,
+  fd: FormData
+): Promise<AmalNatijasi> {
+  const admin = await talabRol("ADMIN");
+  const muammoId = String(fd.get("muammoId") ?? "");
+
+  const muammo = await db.problem.findUnique({
+    where: { id: muammoId },
+    select: { status: true },
+  });
+  if (!muammo) return { xato: "Muammo topilmadi." };
+  if (muammo.status !== "ARCHIVED") return { xato: "Bu muammo arxivda emas." };
+
+  await db.$transaction([
+    db.problem.update({
+      where: { id: muammoId },
+      data: { status: "APPROVED", moderationNote: null },
+    }),
+    db.problemStatusHistory.create({
+      data: {
+        problemId: muammoId,
+        fromStatus: "ARCHIVED",
+        toStatus: "APPROVED",
+        actorId: admin.id,
+        comment: "Arxivdan qaytarildi",
+      },
+    }),
+  ]);
+
+  await auditYoz({
+    actorId: admin.id,
+    action: "muammo.tiklandi",
+    entity: "Problem",
+    entityId: muammoId,
+  });
+
+  revalidatePath("/admin/moderatsiya");
+  revalidatePath("/ombor");
+  return { muvaffaqiyat: "Muammo omborga qaytarildi." };
 }
 
 // ─────────────────────────────────────────────────────────────────────

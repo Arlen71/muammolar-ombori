@@ -11,6 +11,7 @@ import {
   Handshake,
   LayoutList,
   Menu,
+  MessageSquare,
   ShieldCheck,
   Users,
   X,
@@ -21,7 +22,13 @@ import { useOyna } from "@/components/oyna";
 import { cn } from "@/lib/utils";
 
 /** Menyu havolasi. `belgi` — ikonka nomi, komponent emas: u serverdan keladi. */
-export type Havola = { yol: string; matn: string; belgi?: BelgiNomi };
+export type Havola = {
+  yol: string;
+  matn: string;
+  belgi?: BelgiNomi;
+  /** O'ng tomonda ko'rinadigan son — o'qilmagan xabarlar kabi */
+  soni?: number;
+};
 
 export type BelgiNomi =
   | "boshqaruv"
@@ -32,7 +39,8 @@ export type BelgiNomi =
   | "dasturchilar"
   | "tashkilotlar"
   | "foydalanuvchilar"
-  | "qollab";
+  | "qollab"
+  | "suhbat";
 
 /*
   Ikonka komponentini serverdan client'ga prop sifatida uzatib bo'lmaydi —
@@ -49,6 +57,7 @@ const BELGILAR: Record<BelgiNomi, LucideIcon> = {
   tashkilotlar: Building2,
   foydalanuvchilar: Users,
   qollab: Handshake,
+  suhbat: MessageSquare,
 };
 
 function faolmi(joriy: string, yol: string): boolean {
@@ -88,6 +97,16 @@ function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }
           >
             {Belgi && <Belgi size={18} className="shrink-0" aria-hidden="true" />}
             <span className="min-w-0 flex-1">{h.matn}</span>
+            {/*
+              O'qilmagan xabarlar soni. Nol bo'lsa umuman chizilmaydi —
+              "0" raqami e'tiborni tortadi, lekin hech narsa aytmaydi.
+            */}
+            {h.soni ? (
+              <span className="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-asosiy px-1.5 text-xs font-semibold text-asosiy-matn">
+                {h.soni > 99 ? "99+" : h.soni}
+                <span className="faqat-oquvchi"> ta o'qilmagan xabar</span>
+              </span>
+            ) : null}
           </Link>
         );
       })}

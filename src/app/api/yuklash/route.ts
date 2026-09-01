@@ -2,6 +2,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 
 import { db } from "@/lib/db";
 import { getJoriyFoydalanuvchi } from "@/lib/auth";
+import { suhbatRoli, yozaOladimi } from "@/lib/suhbat";
 import { maksimalHajm } from "@/lib/uploads";
 import {
   HUJJAT_TURLARI,
@@ -39,7 +40,8 @@ import {
 /** Mijoz nima yuklayotganini aytadi — token shunga qarab cheklanadi. */
 type Yuklama =
   | { turi: "rasm" }
-  | { turi: "biriktirma"; muammoId: string };
+  | { turi: "biriktirma"; muammoId: string }
+  | { turi: "suhbat"; suhbatId: string };
 
 /** Muammoga fayl biriktirish mumkin bo'lgan holatlar. */
 const TAHRIRLANADIGAN = ["DRAFT", "REJECTED"];
@@ -103,6 +105,35 @@ export async function POST(soro: Request): Promise<Response> {
           };
         }
 
+        if (yuklama.turi === "suhbat") {
+          /*
+            Suhbat fayli — faqat yozish huquqi bor qatnashchi yuklaydi.
+            Ruxsat mantig'i `suhbat.ts` da bir joyda: bu yerda ham,
+            xabar yuborish amalida ham o'sha funksiya ishlatiladi.
+          */
+          const suhbat = await db.suhbat.findUnique({
+            where: { id: yuklama.suhbatId },
+            select: {
+              developerId: true,
+              problem: { select: { organizationId: true } },
+            },
+          });
+          if (!suhbat) throw new Error("Suhbat topilmadi");
+
+          if (!yozaOladimi(suhbatRoli(foydalanuvchi, suhbat))) {
+            throw new Error("Bu suhbatga fayl yuborish huquqingiz yo'q");
+          }
+          if (!pathname.startsWith(`suhbat/${yuklama.suhbatId}/`)) {
+            throw new Error("Yo'l noto'g'ri");
+          }
+
+          return {
+            allowedContentTypes: [...HUJJAT_TURLARI],
+            maximumSizeInBytes: maksimalHajm(),
+            addRandomSuffix: false,
+          };
+        }
+
         throw new Error("Yuklama turi noma'lum");
       },
 
@@ -110,7 +141,8 @@ export async function POST(soro: Request): Promise<Response> {
         Yuklash tugagach Vercel shu manzilga webhook yuboradi. Lekin u
         faqat ochiq domenda ishlaydi — localhost'ga yetib kelmaydi.
         Shu sababli bazaga yozish bu yerda EMAS, mijoz chaqiradigan
-        alohida amalda qilinadi (`rasmniBiriktir`, `fayllarniBiriktir`).
+        alohida amalda qilinadi (`rasmniBiriktir`, `fayllarniBiriktir`,
+        `xabarYubor`).
         Ular yo'l prefiksini qaytadan tekshiradi.
       */
       onUploadCompleted: async () => {},

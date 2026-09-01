@@ -129,3 +129,19 @@ export async function talabDasturchi(): Promise<JoriyFoydalanuvchi> {
   if (f.role === "DEVELOPER" && f.status !== "ACTIVE") redirect(KUTISH_SAHIFASI);
   return f;
 }
+
+/**
+ * Har uch rolga ochiq bo'lim, lekin TASDIQLANGAN foydalanuvchi uchun.
+ *
+ * `/profil` va `/suhbat` kabi bo'limlar rolga bog'liq emas, shuning
+ * uchun `talabRol` mos kelmaydi. Ammo tasdiqlanmagan dasturchi ularga
+ * ham kirmasligi kerak: u hali tizimning to'la a'zosi emas va
+ * boshqa hamma joyda kutish ekraniga yo'naltiriladi. Bu funksiyasiz
+ * har bir yangi umumiy bo'lim shu tekshiruvni qaytadan yozishni
+ * talab qilardi — biri esa albatta unutilardi.
+ */
+export async function talabTasdiqlangan(): Promise<JoriyFoydalanuvchi> {
+  const f = await talabKirish();
+  if (f.role === "DEVELOPER" && f.status !== "ACTIVE") redirect(KUTISH_SAHIFASI);
+  return f;
+}

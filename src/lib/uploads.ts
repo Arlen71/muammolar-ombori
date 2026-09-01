@@ -130,6 +130,7 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
 
     rasmlar/<foydalanuvchiId>/<uuid>.<kengaytma>
     biriktirmalar/<muammoId>/<uuid>.<kengaytma>
+    suhbat/<suhbatId>/<uuid>.<kengaytma>
 
   Egasining id'si yo'lga kiritilgan — bu tasodifiy emas. Fayl brauzerdan
   TO'G'RIDAN-TO'G'RI omborga yuklanadi (sabab: Vercel serverless
@@ -146,7 +147,7 @@ export async function faylniSaqla(fayl: File): Promise<FaylNatijasi | FaylXatosi
   oldin yuklangan va bazada saqlanib qolgan.
 */
 const YOL_QOLIPI =
-  /^(biriktirmalar|rasmlar)\/(?:[a-z0-9]{20,32}\/)?[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i;
+  /^(biriktirmalar|rasmlar|suhbat)\/(?:[a-z0-9]{20,32}\/)?[a-f0-9-]{36}\.[a-z0-9]{2,5}$/i;
 
 function yolIshonchlimi(qiymat: string): boolean {
   return YOL_QOLIPI.test(qiymat);

@@ -26,7 +26,6 @@ export default async function AdminBoshSahifa() {
       .filter((h) => holatlar.includes(h.status))
       .reduce((s, h) => s + h._count._all, 0);
 
-  const moderatsiyada = soni("SUBMITTED");
   const omborda = soni("APPROVED", "TAKEN", "SOLUTION_OFFERED");
   const halQilingan = soni("RESOLVED");
   const jamiSoat = holatlarBoyicha
@@ -39,6 +38,7 @@ export default async function AdminBoshSahifa() {
     sonngiAmallar,
     tumanBoyicha,
     sohaBoyicha,
+    toliqmaganlar,
   ] = await Promise.all([
     db.user.count({ where: { role: "DEVELOPER", status: "PENDING" } }),
     db.organization.count(),
@@ -66,6 +66,12 @@ export default async function AdminBoshSahifa() {
       by: ["categoryId"],
       where: { status: { not: "DRAFT" }, canonicalId: null },
       _count: { _all: true },
+    }),
+    db.problem.count({
+      where: {
+        status: { in: ["APPROVED", "TAKEN", "SOLUTION_OFFERED"] },
+        completeness: { lt: 60 },
+      },
     }),
   ]);
 
@@ -97,17 +103,25 @@ export default async function AdminBoshSahifa() {
     nol bo'lsa, demak dasturchilar boshlagan ishni tugatmayapti.
   */
   const oqim = [
-    { yorliq: "Moderatsiyada", qiymat: soni("SUBMITTED"), rang: "text-ogohlantirish" },
     { yorliq: "Omborda", qiymat: soni("APPROVED"), rang: "text-malumot" },
     { yorliq: "Dasturchi oldi", qiymat: soni("TAKEN", "SOLUTION_OFFERED"), rang: "text-jarayon" },
     { yorliq: "Hal qilindi", qiymat: halQilingan, rang: "text-muvaffaqiyat" },
   ];
 
+  /*
+    Diqqat talab qiladigan ishlar.
+
+    Moderatsiya navbati o'rniga — TO'LIQLIGI PAST kartochkalar. Muammo
+    endi tasdiqsiz omborga tushadi, ya'ni sifatni tekshiradigan darvoza
+    yo'q. Yarim to'ldirilgan kartochka esa dasturchi uchun foydasiz va
+    u shunchaki omborda yotib qoladi. Administrator bunday yozuvlarni
+    ko'rib, rahbarga eslatishi mumkin.
+  */
   const ishlar = [
     {
       yol: "/admin/moderatsiya",
-      matn: "Moderatsiya kutayotgan muammo",
-      soni: moderatsiyada,
+      matn: "To'liqligi 60% dan past muammo",
+      soni: toliqmaganlar,
     },
     {
       yol: "/admin/dasturchilar",

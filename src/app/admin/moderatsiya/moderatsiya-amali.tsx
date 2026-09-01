@@ -2,72 +2,105 @@
 
 import { useActionState, useState } from "react";
 
-import { muammoniRadEt, muammoniTasdiqla } from "../actions";
+import { muammoniArxivla, muammoniTiklash } from "../actions";
 import { KattaMatn, Tugma, Xabar } from "@/components/ui";
 import { Yuborish } from "@/components/yuborish";
 import type { AmalNatijasi } from "@/lib/validation";
 
-export function ModeratsiyaAmali({ muammoId }: { muammoId: string }) {
-  const [tasdiqHolati, tasdiqAmali] = useActionState<AmalNatijasi, FormData>(
-    muammoniTasdiqla,
+/**
+ * Administratorning muammo ustidagi amali.
+ *
+ * Moderatsiya olib tashlangach bu yerda "tasdiqlash" yo'q — muammo
+ * allaqachon omborda. Qoladigan amal bitta: nomaqbul yoki takroriy
+ * yozuvni arxivga olish, va kerak bo'lsa qaytarish.
+ */
+export function ModeratsiyaAmali({
+  muammoId,
+  arxivdami,
+}: {
+  muammoId: string;
+  arxivdami: boolean;
+}) {
+  const [arxivHolati, arxivAmali] = useActionState<AmalNatijasi, FormData>(
+    muammoniArxivla,
     {}
   );
-  const [radHolati, radAmali] = useActionState<AmalNatijasi, FormData>(muammoniRadEt, {});
-  const [radKorinsin, setRadKorinsin] = useState(false);
+  const [tiklashHolati, tiklashAmali] = useActionState<AmalNatijasi, FormData>(
+    muammoniTiklash,
+    {}
+  );
+  const [formaKorinsin, setFormaKorinsin] = useState(false);
 
-  if (tasdiqHolati.muvaffaqiyat) {
-    return <Xabar turi="muvaffaqiyat">{tasdiqHolati.muvaffaqiyat}</Xabar>;
+  if (arxivdami) {
+    return (
+      <div className="space-y-2">
+        {tiklashHolati.xato && <Xabar turi="xato">{tiklashHolati.xato}</Xabar>}
+        <form action={tiklashAmali}>
+          <input type="hidden" name="muammoId" value={muammoId} />
+          <Yuborish kutish="Qaytarilmoqda…" korinish="ikkilamchi" olcham="kichik">
+            Arxivdan qaytarish
+          </Yuborish>
+        </form>
+      </div>
+    );
   }
-  if (radHolati.muvaffaqiyat) {
-    return <Xabar turi="malumot">{radHolati.muvaffaqiyat}</Xabar>;
+
+  if (!formaKorinsin) {
+    return (
+      <div className="space-y-2">
+        {arxivHolati.muvaffaqiyat && (
+          <Xabar turi="muvaffaqiyat">{arxivHolati.muvaffaqiyat}</Xabar>
+        )}
+        <Tugma
+          type="button"
+          korinish="ikkilamchi"
+          olcham="kichik"
+          onClick={() => setFormaKorinsin(true)}
+        >
+          Arxivga olish
+        </Tugma>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-3">
-      {tasdiqHolati.xato && <Xabar turi="xato">{tasdiqHolati.xato}</Xabar>}
-      {radHolati.xato && <Xabar turi="xato">{radHolati.xato}</Xabar>}
+    <form action={arxivAmali} className="space-y-2">
+      <input type="hidden" name="muammoId" value={muammoId} />
 
-      {radKorinsin ? (
-        <form action={radAmali} className="space-y-2">
-          <input type="hidden" name="muammoId" value={muammoId} />
-          <KattaMatn
-            name="sabab"
-            rows={2}
-            required
-            placeholder="Nima yetishmayapti? Rahbar nimani tuzatishi kerak?"
-          />
-          <div className="flex gap-2">
-            <Yuborish kutish="Yuborilmoqda…" korinish="xavfli" olcham="kichik">
-              Rad etib qaytarish
-            </Yuborish>
-            <Tugma
-              type="button"
-              korinish="shaffof"
-              olcham="kichik"
-              onClick={() => setRadKorinsin(false)}
-            >
-              Bekor qilish
-            </Tugma>
-          </div>
-        </form>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          <form action={tasdiqAmali}>
-            <input type="hidden" name="muammoId" value={muammoId} />
-            <Yuborish kutish="Tasdiqlanmoqda…" olcham="kichik">
-              Tasdiqlash va omborga qo'shish
-            </Yuborish>
-          </form>
-          <Tugma
-            type="button"
-            korinish="ikkilamchi"
-            olcham="kichik"
-            onClick={() => setRadKorinsin(true)}
-          >
-            Rahbarga qaytarish
-          </Tugma>
-        </div>
+      {arxivHolati.xato && <Xabar turi="xato">{arxivHolati.xato}</Xabar>}
+
+      {/*
+        Sabab majburiy va u rahbarga ko'rinadi. Sababsiz arxivlash
+        rahbar uchun tushunarsiz bo'lardi: muammosi ombordan yo'qolgan,
+        nega — noma'lum.
+      */}
+      <KattaMatn
+        name="sabab"
+        rows={2}
+        required
+        placeholder="Nega arxivga olinmoqda? Bu izoh rahbarga ko'rinadi."
+        aria-label="Arxivlash sababi"
+        aria-invalid={Boolean(arxivHolati.maydonXatolari?.sabab)}
+      />
+      {arxivHolati.maydonXatolari?.sabab && (
+        <p className="text-sm font-medium text-xato" role="alert">
+          {arxivHolati.maydonXatolari.sabab}
+        </p>
       )}
-    </div>
+
+      <div className="flex gap-2">
+        <Yuborish kutish="Arxivlanmoqda…" korinish="xavfli" olcham="kichik">
+          Arxivga olish
+        </Yuborish>
+        <Tugma
+          type="button"
+          korinish="shaffof"
+          olcham="kichik"
+          onClick={() => setFormaKorinsin(false)}
+        >
+          Bekor qilish
+        </Tugma>
+      </div>
+    </form>
   );
 }

@@ -163,6 +163,7 @@ async function main() {
     tekshir("/ombor kirishga yo'naltiradi", yonaltiradi(await ol("/ombor"), "/kirish"));
     tekshir("/rahbar kirishga yo'naltiradi", yonaltiradi(await ol("/rahbar"), "/kirish"));
     tekshir("/admin kirishga yo'naltiradi", yonaltiradi(await ol("/admin"), "/kirish"));
+    tekshir("/suhbat kirishga yo'naltiradi", yonaltiradi(await ol("/suhbat"), "/kirish"));
 
     if (m.faylId) {
       const j = await ol(`/api/fayl/${m.faylId}`);
@@ -173,6 +174,7 @@ async function main() {
   console.log("\nTashkilot rahbari:");
   {
     tekshir("/rahbar ochiladi", (await ol("/rahbar", m.rahbarC)).status === 200);
+    tekshir("rahbar suhbatlar ro'yxatini ochadi", (await ol("/suhbat", m.rahbarC)).status === 200);
     tekshir(
       "/rahbar/boshqalar ochiladi",
       (await ol("/rahbar/boshqalar", m.rahbarC)).status === 200
@@ -193,6 +195,10 @@ async function main() {
   console.log("\nTasdiqlanmagan dasturchi:");
   {
     tekshir(
+      "tasdiqlanmagan dasturchi suhbatlarga kira olmaydi",
+      (await ol("/suhbat", m.kutayotganC)).status !== 200
+    );
+    tekshir(
       "/ombor kutish sahifasiga yo'naltiradi",
       yonaltiradi(await ol("/ombor", m.kutayotganC), "/kutilmoqda"),
       "tasdiqlanmagan dasturchi omborga kirib qoldi"
@@ -204,6 +210,7 @@ async function main() {
   {
     tekshir("/ombor ochiladi", (await ol("/ombor", m.dasturchiC)).status === 200);
     tekshir("/ombor/mening ochiladi", (await ol("/ombor/mening", m.dasturchiC)).status === 200);
+    tekshir("dasturchi suhbatlar ro'yxatini ochadi", (await ol("/suhbat", m.dasturchiC)).status === 200);
     tekshir("/admin ga kira olmaydi", yonaltiradi(await ol("/admin", m.dasturchiC), "/ombor"));
     tekshir("/rahbar ga kira olmaydi", yonaltiradi(await ol("/rahbar", m.dasturchiC), "/ombor"));
 
@@ -255,6 +262,7 @@ async function main() {
       tekshir(`${yol} ochiladi`, j.status === 200, `status ${j.status}`);
     }
     tekshir("admin omborni ham ko'radi", (await ol("/ombor", m.adminC)).status === 200);
+    tekshir("admin suhbatlarni kuzatadi", (await ol("/suhbat", m.adminC)).status === 200);
   }
 
   console.log("\nBekor qilingan sessiya:");

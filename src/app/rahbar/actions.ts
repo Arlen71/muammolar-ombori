@@ -328,18 +328,39 @@ export async function muammoniYubor(
     };
   }
 
+  /*
+    Muammo TO'G'RIDAN-TO'G'RI omborga tushadi — administrator tasdig'i
+    kutilmaydi.
+
+    Ilgari zanjir `SUBMITTED → (admin) → APPROVED` edi. Amalda bu ikki
+    narsani buzardi: rahbar yuborgach kutib qolardi, dasturchi esa
+    muammoni umuman ko'rmasdi. Kartochkadagi kamchilikni endi dasturchi
+    suhbat orqali to'g'ridan-to'g'ri so'raydi — bu moderatorning taxmin
+    qilishidan aniqroq.
+
+    `APPROVED` holati saqlanib qoldi (ombor, filtrlar va statistika
+    o'shanga tayanadi), faqat unga o'tish endi yuborish paytida bo'ladi.
+    Administratorda keyin aralashish huquqi qoladi: nomaqbul yozuvni
+    arxivga oladi.
+  */
+  const hozir = new Date();
   await db.$transaction([
     db.problem.update({
       where: { id: muammoId },
-      data: { status: "SUBMITTED", submittedAt: new Date(), moderationNote: null },
+      data: {
+        status: "APPROVED",
+        submittedAt: hozir,
+        approvedAt: hozir,
+        moderationNote: null,
+      },
     }),
     db.problemStatusHistory.create({
       data: {
         problemId: muammoId,
         fromStatus: muammo.status,
-        toStatus: "SUBMITTED",
+        toStatus: "APPROVED",
         actorId: rahbar.id,
-        comment: "Muammo moderatsiyaga yuborildi",
+        comment: "Muammo omborga yuborildi",
       },
     }),
   ]);

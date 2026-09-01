@@ -89,6 +89,17 @@ async function main() {
     db.user.findFirstOrThrow({ where: { role: "DEVELOPER", status: "PENDING" } }),
   ]);
 
+  /*
+    Suhbat qatnashchisi BO'LMAGAN, lekin tasdiqlangan dasturchi.
+    Eng muhim tekshiruv shu odam ustida: u yozishmani ko'ra
+    olmasligi kerak. `id: { not: dasturchi.id }` bo'lmasa, so'rov
+    qatnashchining o'zini qaytarardi va tekshiruv jimgina
+    o'tkazib yuborilardi.
+  */
+  const begonaDasturchi = await db.user.findFirst({
+    where: { role: "DEVELOPER", status: "ACTIVE", id: { not: dasturchi.id } },
+  });
+
   const begonaRahbar = await db.user.findFirst({
     where: { role: "LEADER", organizationId: { not: rahbar.organizationId } },
   });
@@ -168,6 +179,45 @@ async function main() {
 
   const adminC = await cookie(admin);
   const rahbarC = await cookie(rahbar);
+  /*
+    Suhbat fikstirasi.
+
+    Yozishma YOPIQ bo'lishi kerak: unda tashkilotning ichki jarayoni
+    muhokama qilinadi va boshqa dasturchiga ko'rinmasligi shart. Buni
+    qo'lda tekshirish oson unutiladi, shuning uchun avtomatik.
+
+    Ombordagi haqiqiy muammo olinadi — suhbat faqat shundaylar bo'yicha
+    ochiladi.
+  */
+  const ochiqMuammo = await db.problem.findFirstOrThrow({
+    where: { status: "APPROVED", canonicalId: null },
+    select: { id: true },
+  });
+
+  const sinovSuhbati = await db.suhbat.create({
+    data: {
+      problemId: ochiqMuammo.id,
+      developerId: dasturchi.id,
+      boshlovchiId: dasturchi.id,
+      xabarlar: {
+        create: {
+          yuboruvchiId: dasturchi.id,
+          matn: "XAVFSIZLIK-SINOVI-MAXFIY-MATN",
+          fayllar: {
+            create: {
+              fileName: "suhbat-maxfiy.csv",
+              storedName: `suhbat/${crypto.randomUUID()}.csv`,
+              mimeType: "text/csv",
+              size: 24,
+            },
+          },
+        },
+      },
+    },
+    include: { xabarlar: { include: { fayllar: true } } },
+  });
+  const suhbatFayli = sinovSuhbati.xabarlar[0].fayllar[0];
+
   const dasturchiC = await cookie(dasturchi);
   const kutayotganC = await cookie(kutayotgan);
   const begonaC = begonaRahbar ? await cookie(begonaRahbar) : null;
@@ -280,6 +330,108 @@ async function main() {
         "avatar keshi private (oraliq proksilarda saqlanmaydi)",
         rasmSarlavhasi.status !== 200 ||
           (rasmSarlavhasi.h.get("cache-control") ?? "").includes("private")
+      );
+    }
+
+    // ── 1c. Suhbat maxfiyligi ──
+    /*
+      Suhbat har (muammo × dasturchi) juftligi uchun alohida va YOPIQ.
+      Bu mahsulot va'dasi: rahbar ichki jarayonini bir dasturchiga
+      aytganda, u boshqasiga tarqalmasligi kerak.
+    */
+    console.log("\n1c. Suhbat maxfiyligi");
+    {
+      const S = `/suhbat/${sinovSuhbati.id}`;
+      const SF = `/api/suhbat-fayl/${suhbatFayli.id}`;
+
+      tekshir(
+        "suhbat avtorizatsiyasiz ochilmaydi",
+        kirishgaYonaltiradi(await ol(S)),
+        "",
+        "jiddiy"
+      );
+      tekshir(
+        "suhbat fayli avtorizatsiyasiz berilmaydi",
+        (await ol(SF)).status === 401,
+        "",
+        "jiddiy"
+      );
+
+      const qatnashuvchi = await ol(S, dasturchiC);
+      tekshir(
+        "qatnashuvchi dasturchi suhbatni ko'radi",
+        qatnashuvchi.status === 200 &&
+          qatnashuvchi.matn.includes("XAVFSIZLIK-SINOVI-MAXFIY-MATN"),
+        `status ${qatnashuvchi.status}`
+      );
+
+      const rahbarKordi = await ol(S, rahbarC);
+      tekshir(
+        "tashkilot rahbari suhbatni ko'radi",
+        rahbarKordi.status === 200 &&
+          rahbarKordi.matn.includes("XAVFSIZLIK-SINOVI-MAXFIY-MATN"),
+        `status ${rahbarKordi.status}`
+      );
+
+      if (!begonaDasturchi) {
+        tekshir(
+          "BEGONA dasturchi suhbatni ko'ra olmaydi",
+          false,
+          "bazada ikkinchi tasdiqlangan dasturchi yo'q — tekshirib bo'lmadi",
+          "jiddiy"
+        );
+      } else {
+        const begonaDC = await cookie(begonaDasturchi);
+        const begona = await ol(S, begonaDC);
+        /*
+          403 emas, 404 kutiladi: 403 "bunday suhbat bor, lekin sizga
+          ko'rinmaydi" degani — bu ham ma'lumot.
+        */
+        tekshir(
+          "BEGONA dasturchi suhbatni ko'ra olmaydi",
+          begona.status === 404 && !begona.matn.includes("XAVFSIZLIK-SINOVI-MAXFIY-MATN"),
+          `status ${begona.status}`,
+          "jiddiy"
+        );
+        tekshir(
+          "BEGONA dasturchi suhbat faylini ololmaydi",
+          [403, 404].includes((await ol(SF, begonaDC)).status),
+          "",
+          "jiddiy"
+        );
+        const begonaRoyxat = await ol("/suhbat", begonaDC);
+        tekshir(
+          "begona dasturchining ro'yxatida bu suhbat yo'q",
+          !begonaRoyxat.matn.includes("XAVFSIZLIK-SINOVI-MAXFIY-MATN"),
+          "",
+          "jiddiy"
+        );
+      }
+
+      if (begonaC) {
+        const begonaR = await ol(S, begonaC);
+        tekshir(
+          "boshqa tashkilot rahbari suhbatni ko'ra olmaydi",
+          begonaR.status === 404,
+          `status ${begonaR.status}`,
+          "jiddiy"
+        );
+      }
+
+      const adminKordi = await ol(S, adminC);
+      tekshir(
+        "administrator kuzatuvchi sifatida o'qiy oladi",
+        adminKordi.status === 200,
+        `status ${adminKordi.status}`
+      );
+      tekshir(
+        "administratorga yozish maydoni ko'rsatilmaydi",
+        !adminKordi.matn.includes("Savolingizni yozing")
+      );
+
+      tekshir(
+        "mavjud bo'lmagan suhbat 404 beradi",
+        (await ol("/suhbat/yoq-bunday-id", dasturchiC)).status === 404
       );
     }
 
@@ -440,6 +592,7 @@ async function main() {
   } finally {
     // Sinov ma'lumotini albatta tozalaymiz
     await db.problem.delete({ where: { id: qoralama.id } }).catch(() => {});
+    await db.suhbat.delete({ where: { id: sinovSuhbati.id } }).catch(() => {});
     if (haqiqiyYol && process.env.BLOB_READ_WRITE_TOKEN) {
       const { del } = await import("@vercel/blob");
       await del(haqiqiyYol).catch(() => {});

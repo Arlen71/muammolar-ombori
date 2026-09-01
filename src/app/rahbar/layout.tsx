@@ -1,16 +1,16 @@
 import { talabRahbar } from "@/lib/auth";
 import { AppShell } from "@/components/app-shell";
+import { rolMenyusi } from "@/lib/menyu";
+import { jamiOqilmagan } from "@/lib/suhbat";
 
 export default async function RahbarLayout({ children }: LayoutProps<"/rahbar">) {
   const rahbar = await talabRahbar();
+  const oqilmagan = await jamiOqilmagan(rahbar);
 
   return (
     <AppShell
       foydalanuvchi={rahbar}
-      havolalar={[
-        { yol: "/rahbar", matn: "Mening muammolarim", belgi: "royxat" },
-        { yol: "/rahbar/boshqalar", matn: "Boshqa tashkilotlarda", belgi: "qollab" },
-      ]}
+      havolalar={rolMenyusi("LEADER", oqilmagan)}
     >
       {children}
     </AppShell>

@@ -4,14 +4,12 @@ import { rolMenyusi } from "@/lib/menyu";
 import { jamiOqilmagan } from "@/lib/suhbat";
 
 /**
- * Profil sahifasining qobig'i.
+ * Suhbat bo'limining qobig'i.
  *
- * Boshqa bo'limlardan farqi: profil har uch rolda ochiladi, ya'ni yon
- * paneldagi menyu foydalanuvchining roliga qarab tanlanadi. Aks holda
- * dasturchi profilga kirganda administrator menyusini ko'rib qolardi.
+ * Profil bilan bir xil: suhbat har uch rolda ochiladi, shuning uchun
+ * yon paneldagi menyu foydalanuvchining roliga qarab tanlanadi.
  */
-
-export default async function ProfilLayout({ children }: LayoutProps<"/profil">) {
+export default async function SuhbatLayout({ children }: LayoutProps<"/suhbat">) {
   const foydalanuvchi = await talabTasdiqlangan();
   const oqilmagan = await jamiOqilmagan(foydalanuvchi);
 

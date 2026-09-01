@@ -71,8 +71,8 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm run dev` | Ishlab chiqish serveri |
 | `npm run build` | Ishlab chiqarish uchun yig'ish |
 | `npm test` | Hisob-kitob mantiqi testlari |
-| `npm run e2e` | Rollar va ruxsatlar tekshiruvi (dev server ochiq bo'lsin) |
-| `npm run security` | Xavfsizlik tekshiruvi — 41 ta hujum stsenariysi |
+| `npm run e2e` | Rollar va ruxsatlar — 36 ta tekshiruv (dev server ochiq bo'lsin) |
+| `npm run security` | Xavfsizlik tekshiruvi — 52 ta hujum stsenariysi |
 | `npm run contrast` | Rang kontrasti — ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
@@ -118,14 +118,15 @@ hujjat va kod hech qachon bir-biridan uzoqlashmaydi.
 ## Asosiy oqim
 
 ```
-Rahbar sehrgarni to'ldiradi  →  Moderatsiya  →  Ombor
-                                                  ↓
-Rahbar muammoni yopadi  ←  Yechim taqdim etildi  ←  Dasturchi oladi
-                                                     (telefon orqali bog'lanadi)
+Rahbar sehrgarni to'ldiradi  →  Ombor (darhol)
+                                   ↓
+Rahbar muammoni yopadi  ←  Yechim  ←  Dasturchi oladi
+                                       ↑
+                              Suhbat: dasturchi ↔ rahbar
 ```
 
-Holatlar: `DRAFT → SUBMITTED → APPROVED → TAKEN → SOLUTION_OFFERED → RESOLVED`
-(qo'shimcha: `REJECTED`, `ARCHIVED`).
+Holatlar: `DRAFT → APPROVED → TAKEN → SOLUTION_OFFERED → RESOLVED`
+(qo'shimcha: `ARCHIVED`; `SUBMITTED` va `REJECTED` eski yozuvlarda qoladi).
 
 Siklni **rahbar** yopadi, dasturchi emas — aks holda muammo "hal qilindi" deb
 belgilanib, tashkilotda aslida hech narsa o'zgarmagan bo'lishi mumkin edi.
@@ -270,6 +271,31 @@ butun sahifani yon tomonga siljitib yuboradi.
 bu bezak. `chegara-kuchli` — forma maydonlari; ular fondan kamida 3:1
 ajralishi shart (WCAG 1.4.11), aks holda maydon qayerda boshlanishi
 ko'rinmaydi.
+
+**Moderatsiya yo'q — muammo darhol omborga tushadi.** Ilgari zanjir
+`SUBMITTED → (admin) → APPROVED` edi va u ikki narsani buzardi: rahbar
+yuborgach kutib qolardi, dasturchi esa muammoni umuman ko'rmasdi.
+Kartochkadagi kamchilikni endi dasturchi **suhbat orqali** rahbardan
+to'g'ridan-to'g'ri so'raydi — bu moderatorning taxmin qilishidan aniqroq.
+
+Nazorat butunlay yo'qolmadi: administrator nomaqbul yoki takroriy
+yozuvni **keyin** arxivga oladi (sabab bilan, u rahbarga ko'rinadi).
+Bu "oldindan to'sish" emas, "keyin tuzatish" modeli.
+
+`APPROVED` holati saqlanib qoldi — ombor, filtrlar va statistika
+o'shanga tayanadi. Faqat unga o'tish endi yuborish paytida bo'ladi.
+
+**Suhbat har (muammo × dasturchi) juftligi uchun alohida va yopiq.**
+Dasturchi boshqasining yozishmasini ko'rmaydi. Rahbar tomonidan
+tashkilotning istalgan rahbari javob beradi — muallif ta'tilda bo'lsa
+yozishma to'xtab qolmasligi kerak. Administrator **o'qiydi, yozmaydi**:
+bu rasmiy ish yozishmasi va nizo chiqqanda platforma egasi ko'ra
+olishi kerak, lekin u suhbatning tarafi emas.
+
+Ruxsat mantig'i `src/lib/suhbat.ts` da, bitta joyda — sahifa, fayl
+marshruti va yuklash tokeni o'sha funksiyani chaqiradi. Begona
+foydalanuvchiga **404** qaytariladi, 403 emas: 403 "bunday suhbat bor"
+degani bo'lardi. Buni `npm run security` tekshiradi.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.

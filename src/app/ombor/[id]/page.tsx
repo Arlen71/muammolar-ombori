@@ -9,6 +9,7 @@ import { MuammoQatori } from "@/components/muammo-qatori";
 import { Quti } from "@/components/ui";
 import { MUAMMO_HOLATI, sanaVaqtMatni } from "@/lib/labels";
 import { AmalPaneli } from "./amal-paneli";
+import { SavolTugmasi } from "./savol-tugmasi";
 
 export const metadata: Metadata = { title: "Muammo" };
 
@@ -82,7 +83,7 @@ export default async function OmborMuammosi(props: PageProps<"/ombor/[id]">) {
           </Quti>
         </div>
 
-        <div className="xl:sticky xl:top-6">
+        <div className="space-y-4 xl:sticky xl:top-6">
           <AmalPaneli
             muammoId={muammo.id}
             status={muammo.status}
@@ -91,6 +92,13 @@ export default async function OmborMuammosi(props: PageProps<"/ombor/[id]">) {
               faolTopshiriq && !menikimi ? faolTopshiriq.developer.fullName : null
             }
           />
+
+          {/*
+            Savol berish muammoni olishdan MUSTAQIL. Dasturchi kartochkani
+            o'qib, tushunarsiz joyni ko'rsa — darhol so'raydi. Administrator
+            uchun ko'rsatilmaydi: u suhbatni kuzatadi, boshlamaydi.
+          */}
+          {foydalanuvchi.role === "DEVELOPER" && <SavolTugmasi muammoId={muammo.id} />}
         </div>
       </div>
 

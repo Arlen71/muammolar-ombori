@@ -22,6 +22,12 @@ export const BOLIM_RUXSATI: { prefiks: string; rollar: Role[] }[] = [
   { prefiks: "/ombor", rollar: ["DEVELOPER", "ADMIN"] },
   // Profil har uch rolda ochiladi — har kim faqat o'zinikini ko'radi
   { prefiks: "/profil", rollar: ["ADMIN", "LEADER", "DEVELOPER"] },
+  /*
+    Suhbat ham har uch rolda. Qaysi yozishmani kim ko'rishi bu yerda
+    emas, `src/lib/suhbat.ts` da hal qilinadi: proxy bazaga murojaat
+    qila olmaydi, qatnashchilikni esa faqat bazadan bilish mumkin.
+  */
+  { prefiks: "/suhbat", rollar: ["ADMIN", "LEADER", "DEVELOPER"] },
 ];
 
 /** Rolga qarab bosh sahifa manzili. */
