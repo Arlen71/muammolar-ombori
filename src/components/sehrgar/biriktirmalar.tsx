@@ -105,7 +105,7 @@ export function Biriktirmalar({
   }
 
   return (
-    <section className="rounded-xl border border-chegara bg-yuza p-5">
+    <section className="p-5 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
       <h2 className="font-medium text-matn">Namuna fayllarni biriktiring</h2>
       <p className="mt-1 text-sm leading-relaxed text-matn-ikkilamchi">
         Hozir ishlatayotgan Excel jadvalingiz, qog'oz blanka rasmi yoki jurnal

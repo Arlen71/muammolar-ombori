@@ -40,30 +40,31 @@ export function AppShell({
       <div className="flex items-center gap-2">
         <Link
           href="/profil"
-          className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 transition-colors hover:bg-yuza-2"
+          className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 transition-colors hover:bg-panel-hover"
         >
           <Avatar
             ism={foydalanuvchi.fullName}
             foydalanuvchiId={foydalanuvchi.id}
             rasmVersiyasi={foydalanuvchi.rasmVersiyasi}
             olcham="kichik"
+            className="ring-2 ring-panel-chegara"
           />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-medium leading-tight text-matn">
+            <span className="block truncate text-sm font-semibold leading-tight text-panel-matn">
               {foydalanuvchi.fullName}
             </span>
-            <span className="block truncate text-xs leading-tight text-matn-uchinchi">
+            <span className="block truncate text-xs leading-tight text-panel-matn">
               {foydalanuvchi.organizationName ?? ROL[foydalanuvchi.role]}
             </span>
           </span>
         </Link>
-        <MavzuTugmasi className="shrink-0" />
+        <MavzuTugmasi className="shrink-0 text-panel-matn hover:bg-panel-hover hover:text-panel-matn" />
       </div>
 
       <form action={chiqishAmali}>
         <button
           type="submit"
-          className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
+          className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm font-medium text-panel-matn transition-colors hover:bg-panel-hover"
         >
           Chiqish
         </button>

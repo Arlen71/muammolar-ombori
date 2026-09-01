@@ -146,7 +146,7 @@ export default async function AdminBoshSahifa() {
                 <Link
                   key={i.yol}
                   href={i.yol}
-                  className="kotarilish flex items-center justify-between rounded-2xl border border-ogohlantirish-chegara bg-ogohlantirish-yuza px-5 py-4"
+                  className="kotarilish flex items-center justify-between rounded-quti border border-ogohlantirish-chegara bg-ogohlantirish-yuza px-5 py-4"
                 >
                   <span className="text-sm font-medium text-ogohlantirish">{i.matn}</span>
                   <span className="font-display text-2xl font-bold tabular-nums text-ogohlantirish">
@@ -165,7 +165,7 @@ export default async function AdminBoshSahifa() {
           { yorliq: "Tashkilotlar", qiymat: String(tashkilotlar) },
           { yorliq: "Oyiga yo'qotish", qiymat: soatMatni(jamiSoat) },
         ].map((k) => (
-          <div key={k.yorliq} className="rounded-2xl border border-chegara bg-yuza px-4 py-3">
+          <div key={k.yorliq} className="px-4 py-3 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
             <p className="text-xs text-matn-ikkilamchi">{k.yorliq}</p>
             <p className="mt-0.5 font-display text-xl font-bold text-matn">{k.qiymat}</p>
           </div>

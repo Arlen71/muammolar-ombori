@@ -99,41 +99,45 @@ export default async function BoshSahifa() {
         </div>
       </header>
 
-      {/*
-        Hero fonida Oqsaroy koshinlarining sakkiz qirrali yulduz naqshi.
-        Juda past shaffoflikda — sezilsin, lekin matnni bosmasin. Pastga
-        qarab so'nadi (`mask-image`), shunda naqsh sahifada keskin
-        uzilmaydi.
-      */}
-      <div className="relative isolate overflow-hidden">
-        <Naqsh
-          className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-asosiy/[0.07] [mask-image:linear-gradient(to_bottom,black,transparent)] dark:text-firuza/[0.08]"
-        />
+      <main id="asosiy" className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:py-8">
+        {/*
+          Gradientli panel — my.gov.uz bosh sahifasining o'zagi: ko'kdan
+          yashilga o'tuvchi qiya to'rtburchak, ichida oq sarlavha.
+          Yashil o'ng yuqori burchakda qoladi, matn esa chapda — ya'ni
+          oq harflar doim to'q ko'k ustida turadi va kontrast pasaymaydi.
 
-        <main id="asosiy" className="mx-auto w-full max-w-5xl flex-1 px-4 py-14 sm:py-20">
-        <div className="jonlanish max-w-2xl">
-          {/*
-            Pilot ko'lami darhol aytiladi. Boshqa viloyat rahbari kirib,
-            o'z tashkilotini qidirib vaqt sarflamasin.
-          */}
-          <Nishoncha className="bg-asosiy-ochiq text-asosiy ring-asosiy-chegara">
-            Qashqadaryo viloyati · pilot bosqichi
-          </Nishoncha>
-          <h1 className="mt-3 font-display text-4xl font-bold leading-[1.1] tracking-tight text-matn sm:text-5xl">
-            Davlat tashkilotlaridagi real muammolar — bir joyda
-          </h1>
-          <p className="mt-4 text-lg leading-relaxed text-matn-ikkilamchi">
-            Tashkilot rahbarlari kundalik ishdagi muammolarini tizimga kiritadi.
-            Tasdiqlangan dasturchilar shu ombordan real ehtiyojni ko'radi va
-            yechim taklif qiladi.
-          </p>
+          Ichidagi naqsh — Oqsaroy koshinlarining sakkiz qirrali yulduzi.
+          my.gov.uz o'sha joyda illyustratsiya qo'yadi; bizda uning
+          o'rnini Qashqadaryoning me'moriy belgisi egallaydi va panelni
+          tekis rangdan chiqaradi.
+        */}
+        <div className="jonlanish relative isolate overflow-hidden rounded-quti gradient-brend px-6 py-12 sm:px-10 sm:py-16">
+          <Naqsh className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/[0.09]" />
+
+          <div className="max-w-2xl lg:w-[68%] lg:max-w-none">
+            {/*
+              Pilot ko'lami darhol aytiladi. Boshqa viloyat rahbari kirib,
+              o'z tashkilotini qidirib vaqt sarflamasin.
+            */}
+            <Nishoncha className="bg-yuza text-asosiy ring-transparent">
+              Qashqadaryo viloyati · pilot bosqichi
+            </Nishoncha>
+            <h1 className="mt-3 font-display text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl">
+              Davlat tashkilotlaridagi real muammolar — bir joyda
+            </h1>
+            <p className="mt-4 text-lg leading-relaxed text-white">
+              Tashkilot rahbarlari kundalik ishdagi muammolarini tizimga kiritadi.
+              Tasdiqlangan dasturchilar shu ombordan real ehtiyojni ko'radi va
+              yechim taklif qiladi.
+            </p>
+          </div>
         </div>
 
         <dl className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {raqamlar.map((r, i) => (
             <div
               key={r.yorliq}
-              className="jonlanish rounded-2xl border border-chegara bg-yuza px-5 py-6"
+              className="jonlanish rounded-quti bg-yuza px-5 py-6 ring-1 ring-inset ring-quti-chegara"
               style={{ "--jonlanish-tartib": i + 1 } as React.CSSProperties}
             >
               {/*
@@ -163,7 +167,7 @@ export default async function BoshSahifa() {
             {
               raqam: "2",
               sarlavha: "Muammo omborga tushadi",
-              matn: "Administrator tekshiradi. Bir xil muammolar birlashtiriladi — shunda qaysi muammo nechta tashkilotda uchrashi ko'rinadi.",
+              matn: "Tasdiq kutilmaydi — muammo yuborilishi bilan omborda ko'rinadi. Bir xil muammolar birlashtiriladi va qaysi muammo nechta tashkilotda uchrashi ko'rinadi.",
             },
             {
               raqam: "3",
@@ -183,7 +187,7 @@ export default async function BoshSahifa() {
           ))}
         </section>
 
-        <div className="mt-16 rounded-2xl border border-chegara bg-yuza p-6 sm:p-8">
+        <div className="mt-16 rounded-quti gradient-yumshoq p-6 sm:p-8">
           <h2 className="font-medium text-matn">Ombor yopiq</h2>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-matn-ikkilamchi">
             Muammolar davlat tashkilotlarining ichki ish jarayonlariga tegishli,
@@ -191,8 +195,7 @@ export default async function BoshSahifa() {
             ko'rinadi. Tizimga kirish huquqini olish uchun administratorga murojaat qiling.
           </p>
         </div>
-        </main>
-      </div>
+      </main>
 
       <footer className="border-t border-chegara bg-yuza">
         <div className="mx-auto max-w-5xl px-4 py-6 text-sm text-matn-uchinchi">

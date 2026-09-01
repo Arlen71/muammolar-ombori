@@ -1,31 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Schibsted_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
 /*
-  Uch shrift — uch vazifa:
+  Ikki shrift — ikki vazifa:
 
-    Inter              matn va forma elementlari. Zich interfeysda eng
-                       o'qilishli variant, tabular raqamlari jadvalda
-                       ustma-ust tushadi.
-    Schibsted Grotesk  sarlavhalar va yirik raqamlar. Skandinaviya
-                       jamoat matbuoti uchun chizilgan — rasmiy, lekin
-                       zamonaviy ohang beradi va sahifaga o'z yuzini
-                       qo'shadi.
-    JetBrains Mono     muammo kodlari (M-2026-0005) va texnik qiymatlar.
-                       Nol va O harfi ajralib turadi — kod aynan kodday
-                       ko'rinadi.
+    Montserrat     matn ham, sarlavha ham. my.gov.uz butun portal bo'ylab
+                   shu shriftni ishlatadi va aynan shrift eng kuchli
+                   tanish belgisi: foydalanuvchi rangni nomlay olmaydi,
+                   lekin "o'sha saytning harfi" ekanini bir qarashda
+                   sezadi. Geometrik grotesk — davlat sayti uchun
+                   yetarlicha rasmiy, zich jadvalda esa qalinlik farqi
+                   (400/500/600/700) ierarxiyani ushlab turadi.
+    JetBrains Mono muammo kodlari (M-2026-0005) va texnik qiymatlar.
+                   Nol va O harfi ajralib turadi — kod aynan kodday
+                   ko'rinadi.
 
-  Hammasi latin-ext bilan: o'zbek lotin yozuvidagi belgilar uchun shart.
+  Ikkalasi ham latin-ext bilan: o'zbek lotin yozuvidagi belgilar uchun shart.
 */
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin", "latin-ext"],
-  display: "swap",
-});
-
-const schibsted = Schibsted_Grotesk({
-  variable: "--font-schibsted",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -53,8 +47,8 @@ export const viewport: Viewport = {
   // Brauzer paneli sahifa foniga qo'shilib ketsin — mobil qurilmada
   // ranglar bir-biriga urishib turmasligi uchun
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f8fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1120" },
+    { media: "(prefers-color-scheme: light)", color: "#f2f4f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d1520" },
   ],
 };
 
@@ -95,7 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     */
     <html
       lang="uz"
-      className={`${inter.variable} ${schibsted.variable} ${jbMono.variable} h-full`}
+      className={`${montserrat.variable} ${jbMono.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col antialiased">

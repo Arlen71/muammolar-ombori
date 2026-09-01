@@ -451,7 +451,7 @@ export function SehrgarFormasi({
             />
           </Maydon>
 
-          <div className="rounded-xl border border-chegara bg-yuza p-5">
+          <div className="p-5 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
             <h2 className="font-medium text-matn">Dasturchi kim bilan bog'lansin?</h2>
             <p className="mt-1 text-sm text-matn-ikkilamchi">
               Yechim telefon orqali taqdim etiladi. Bu ma'lumot faqat tasdiqlangan

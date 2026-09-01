@@ -105,7 +105,7 @@ export default async function SuhbatSahifasi(props: PageProps<"/suhbat/[id]">) {
 
       <div className="space-y-3">
         {suhbat.xabarlar.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-chegara bg-yuza px-5 py-10 text-center text-sm text-matn-ikkilamchi">
+          <p className="rounded-quti border border-dashed border-chegara bg-yuza px-5 py-10 text-center text-sm text-matn-ikkilamchi">
             Hali xabar yo&apos;q. Birinchi savolni yozing.
           </p>
         )}

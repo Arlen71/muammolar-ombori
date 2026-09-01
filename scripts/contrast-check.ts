@@ -60,7 +60,36 @@ const JUFTLAR: Juft[] = [
   { oldi: "matn-3", orqa: "asos", kam: 4.5, izoh: "meta matn sahifada" },
 
   { oldi: "asosiy", orqa: "yuza", kam: 4.5, izoh: "havola" },
+  { oldi: "asosiy", orqa: "asos", kam: 4.5, izoh: "havola sahifa fonida" },
   { oldi: "asosiy-matn", orqa: "asosiy", kam: 4.5, izoh: "to'ldirilgan tugma matni" },
+
+  /*
+    Jadvalning navbatdagi qatori ochiq ko'k (`asosiy-yuza`). Matn u yerda
+    ham o'qilishi kerak — meta ustunlar aynan shu fonga tushadi.
+  */
+  { oldi: "matn", orqa: "asosiy-yuza", kam: 4.5, izoh: "jadval zebra qatori" },
+  { oldi: "matn-2", orqa: "asosiy-yuza", kam: 4.5, izoh: "zebra qatordagi ikkilamchi matn" },
+  { oldi: "matn-3", orqa: "asosiy-yuza", kam: 4.5, izoh: "zebra qatordagi meta matn" },
+  { oldi: "asosiy", orqa: "asosiy-yuza", kam: 4.5, izoh: "zebra qatordagi havola" },
+
+  /*
+    Yon panel — o'z fonlari bilan alohida dunyo. Barcha bandlar oq:
+    xiralashtirilgan oq ko'k panelda 4.5:1 dan tushib ketadi, shuning
+    uchun faol band matn rangi bilan emas, fon bilan ajratiladi.
+  */
+  { oldi: "panel-matn", orqa: "panel", kam: 4.5, izoh: "yon panel bandi" },
+  { oldi: "panel-matn", orqa: "panel-hover", kam: 4.5, izoh: "yon panel bandi (sichqoncha ostida)" },
+  { oldi: "panel-matn", orqa: "panel-faol", kam: 4.5, izoh: "yon paneldagi faol bo'lim" },
+  { oldi: "panel-faol", orqa: "panel-belgi", kam: 4.5, izoh: "o'qilmagan xabarlar nishonchasi" },
+  { oldi: "panel-belgi", orqa: "panel-faol", kam: 3, izoh: "faol bo'lim belgisi" },
+  /*
+    `panel-chegara` (ajratgich va avatar halqasi) ataylab ro'yxatda yo'q.
+    WCAG 1.4.11 interfeys elementlari va ma'no tashuvchi grafikaga
+    tegishli; menyu bilan poyloq orasidagi chiziq esa hech qanday
+    ma'lumot bermaydi — guruhlash bo'shliq bilan ham ko'rinadi. Uni
+    3:1 gacha yorqinlashtirish paneldagi yagona kuchli chiziqni
+    yasab, e'tiborni menyudan tortib olardi.
+  */
 
   { oldi: "muvaffaqiyat", orqa: "muvaffaqiyat-yuza", kam: 4.5, izoh: "muvaffaqiyat nishonchasi" },
   { oldi: "ogohlantirish", orqa: "ogohlantirish-yuza", kam: 4.5, izoh: "ogohlantirish nishonchasi" },

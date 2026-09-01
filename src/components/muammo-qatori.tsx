@@ -39,7 +39,7 @@ export function MuammoQatori({
   return (
     <Link
       href={yol}
-      className="block rounded-xl border border-chegara bg-yuza p-4 transition-colors hover:border-asosiy/50 hover:bg-asosiy-ochiq/30"
+      className="block p-4 transition-colors rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara hover:bg-asosiy-ochiq hover:ring-asosiy/50"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">

@@ -29,7 +29,7 @@ export default async function KirishSahifasi(props: PageProps<"/kirish">) {
         qurilganini birinchi ekrandayoq aytadi. Markazdan chetga qarab
         so'nadi, shunda forma ustida naqsh bo'lmaydi.
       */}
-      <Naqsh className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-asosiy/[0.06] [mask-image:radial-gradient(ellipse_at_center,transparent_35%,black)] dark:text-firuza/[0.07]" />
+      <Naqsh className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-asosiy/[0.06] [mask-image:radial-gradient(ellipse_at_center,transparent_35%,black)] dark:text-yashil/[0.07]" />
 
       {/* Mavzu tugmasi burchakda — kirishdan oldin ham tanlash mumkin bo'lsin */}
       <div className="absolute right-3 top-3">
@@ -48,7 +48,7 @@ export default async function KirishSahifasi(props: PageProps<"/kirish">) {
           </p>
         </div>
 
-        <div className="rounded-xl border border-chegara bg-yuza p-6 shadow-sm sm:p-8">
+        <div className="p-6 sm:p-8 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
           <h1 className="mb-6 text-lg font-semibold text-matn">Tizimga kirish</h1>
           <KirishFormasi keyingi={keyingi} />
         </div>

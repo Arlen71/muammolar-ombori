@@ -106,7 +106,7 @@ export default async function OmborSahifasi(props: PageProps<"/ombor">) {
         izoh={`${jami._count} ta muammo · birgalikda oyiga ${soatMatni(jami._sum.monthlyHoursLost ?? 0)} yo'qotilmoqda`}
       />
 
-      <form method="get" className="mb-6 rounded-xl border border-chegara bg-yuza p-4">
+      <form method="get" className="mb-6 p-4 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <label htmlFor="q" className="mb-1 block text-xs font-medium text-matn-ikkilamchi">

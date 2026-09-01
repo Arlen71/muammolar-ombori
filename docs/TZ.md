@@ -337,7 +337,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.15 | Sensorli nishonlar 44×44 dan kichik emas (`pointer-coarse`) | ✅ |
 | T-8.16 | Yuklanish (skelet) va xato ekranlari mavjud | ✅ |
 | T-8.17 | Pilot bitta viloyatda: hudud serverda qotirilgan, ajratish tuman bo'yicha | ✅ |
-| T-8.18 | Vizual identifikatsiya: Oqsaroy lojuvardi va naqshi, uch rolli tipografiya | ✅ |
+| T-8.18 | Vizual identifikatsiya: Oqsaroy naqshi va o'lchovli harakat | ✅ |
 | T-8.19 | Foydalanuvchi profili: rasm, ism, lavozim, pochta — o'zi boshqaradi | ✅ |
 | T-8.20 | Administrator qaysi tashkilot muammo yuborgan/yubormaganini ko'radi | ✅ |
 | T-8.21 | Boshqaruv panelida diagrammalar: holatlar oqimi, tuman va soha taqsimoti | ✅ |
@@ -345,6 +345,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.23 | Moderatsiya olib tashlandi: muammo darhol omborga tushadi | ✅ |
 | T-8.24 | Rahbar ↔ dasturchi suhbati, fayl almashinuvi bilan | ✅ |
 | T-8.25 | Suhbat yopiq: begona dasturchi ko'ra olmaydi (404) | ✅ |
+| T-8.26 | Interfeys my.gov.uz portalining dizayn tiliga moslandi | ✅ |
 | T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 52 ta hujum stsenariysi) | ✅ |
 
 ---
@@ -478,3 +479,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | 1.5 | 2026-08-21 | Foydalanuvchi profili va rasm (T-8.19), tashkilotlar qamrovi nazorati (T-8.20), boshqaruv panelida diagrammalar (T-8.21). Sxemaga `User.avatarPath` qo'shildi |
 | 1.6 | 2026-08-21 | Fayl yuklash tuzatildi (T-8.22): Vercel'ning 4.5 MB cheklovi sababli fayllar endi brauzerdan omborga bevosita ketadi. Rasm chegarasi 2 → 10 MB |
 | 1.7 | 2026-09-01 | Moderatsiya olib tashlandi (T-8.23) va rahbar ↔ dasturchi suhbati qo'shildi (T-8.24, T-8.25). Sxemaga `Suhbat`, `SuhbatXabari`, `SuhbatFayli` jadvallari qo'shildi |
+| 1.8 | 2026-09-01 | Interfeys my.gov.uz dizayn tiliga moslandi (T-8.26): `#0068e0` palitra, Montserrat, ko'k yon panel, 14 px radius, ko'k→yashil gradient. Gradient ustidagi matn uchun kontrast qatlami qo'shildi |

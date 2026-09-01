@@ -229,7 +229,7 @@ export function MuammolarJadvali({
           <Link
             key={m.id}
             href={yol(m)}
-            className="kotarilish block rounded-2xl border border-chegara bg-yuza p-4 shadow-1 hover:border-asosiy"
+            className="kotarilish block p-4 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara hover:ring-asosiy"
           >
             <div className="flex items-start justify-between gap-3">
               <h3 className="min-w-0 flex-1 font-medium leading-snug text-matn">

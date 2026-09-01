@@ -60,17 +60,35 @@ const BELGILAR: Record<BelgiNomi, LucideIcon> = {
   suhbat: MessageSquare,
 };
 
-function faolmi(joriy: string, yol: string): boolean {
+function mos(joriy: string, yol: string): boolean {
   return joriy === yol || (yol !== "/" && joriy.startsWith(`${yol}/`));
+}
+
+/**
+ * Qaysi band faol — eng uzun mos keladigani.
+ *
+ * Oddiy prefiks tekshiruvi yetmaydi: `/admin/foydalanuvchilar` sahifasida
+ * `/admin` ham mos keladi va ikkala band bir vaqtda faol ko'rinadi.
+ * Ilgari faol holat ozgina ko'kish fon edi va bu kamchilik ko'zga
+ * tashlanmasdi; endi u to'q ko'k blok — ikkitasi yonma-yon turganda
+ * foydalanuvchi qayerdaligini tushunmay qoladi.
+ */
+function faolYol(joriy: string, havolalar: Havola[]): string | null {
+  let eng: string | null = null;
+  for (const h of havolalar) {
+    if (mos(joriy, h.yol) && (eng === null || h.yol.length > eng.length)) eng = h.yol;
+  }
+  return eng;
 }
 
 function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }) {
   const joriy = usePathname();
+  const faolBand = faolYol(joriy, havolalar);
 
   return (
     <nav className="flex flex-col gap-0.5" aria-label="Asosiy menyu">
       {havolalar.map((h) => {
-        const faol = faolmi(joriy, h.yol);
+        const faol = h.yol === faolBand;
         const Belgi = h.belgi ? BELGILAR[h.belgi] : null;
 
         return (
@@ -81,7 +99,15 @@ function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }
             aria-current={faol ? "page" : undefined}
             className={cn(
               // 44px balandlik — sensorli ekranda eng kam nishon o'lchami
-              "relative flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "relative flex min-h-11 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+              /*
+                Barcha bandlar OQ. Ko'k panel ustida xiralashtirilgan oq
+                4.5:1 dan tushib ketadi, shuning uchun faol band matn
+                rangi bilan emas — quyuqroq fon, qalinroq harf va yashil
+                belgi bilan ajratiladi. Yashil my.gov.uz menyusidagi
+                urg'u rangi.
+              */
+              "text-panel-matn",
               /*
                 Chapdagi ustuncha — faol bo'limning belgisi. U yo'qolib
                 paydo bo'lmaydi, balandligi o'sib chiqadi: yon panel
@@ -89,10 +115,10 @@ function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }
                 banddan yangisiga "ko'chib o'tayotgandek" seziladi.
               */
               "before:absolute before:left-0 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2",
-              "before:rounded-full before:bg-asosiy before:transition-transform before:duration-200 before:content-['']",
+              "before:rounded-full before:bg-panel-belgi before:transition-transform before:duration-200 before:content-['']",
               faol
-                ? "bg-asosiy-ochiq text-asosiy before:scale-y-100"
-                : "text-matn-ikkilamchi before:scale-y-0 hover:bg-yuza-2 hover:text-matn"
+                ? "bg-panel-faol font-semibold before:scale-y-100"
+                : "font-medium before:scale-y-0 hover:bg-panel-hover"
             )}
           >
             {Belgi && <Belgi size={18} className="shrink-0" aria-hidden="true" />}
@@ -102,7 +128,7 @@ function Havolalar({ havolalar, yop }: { havolalar: Havola[]; yop?: () => void }
               "0" raqami e'tiborni tortadi, lekin hech narsa aytmaydi.
             */}
             {h.soni ? (
-              <span className="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-asosiy px-1.5 text-xs font-semibold text-asosiy-matn">
+              <span className="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-panel-belgi px-1.5 text-xs font-bold text-panel-faol">
                 {h.soni > 99 ? "99+" : h.soni}
                 <span className="faqat-oquvchi"> ta o'qilmagan xabar</span>
               </span>
@@ -130,7 +156,7 @@ function PanelIchi({
         <Link
           href="/"
           onClick={yop}
-          className="flex min-h-11 min-w-0 items-center truncate font-display font-bold tracking-tight text-matn"
+          className="flex min-h-11 min-w-0 items-center truncate font-display font-bold tracking-tight text-panel-matn"
         >
           Muammolar ombori
         </Link>
@@ -140,7 +166,7 @@ function PanelIchi({
         <Havolalar havolalar={havolalar} yop={yop} />
       </div>
 
-      <div className="shrink-0 border-t border-chegara p-3">{poyloq}</div>
+      <div className="shrink-0 border-t border-panel-chegara p-3">{poyloq}</div>
     </>
   );
 }
@@ -190,7 +216,7 @@ export function YonPanel({
   return (
     <>
       {/* ── Doimiy ustun: faqat katta ekranda ── */}
-      <aside className="chop-etilmasin fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-chegara bg-yuza lg:flex">
+      <aside className="chop-etilmasin fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-panel text-panel-matn lg:flex">
         <PanelIchi havolalar={havolalar} poyloq={poyloq} />
       </aside>
 
@@ -222,14 +248,14 @@ export function YonPanel({
         ref={tortma}
         onClick={fondaBosildi}
         aria-label="Menyu"
-        className="oyna-chap m-0 h-full max-h-none w-72 max-w-[85vw] border-r border-chegara bg-yuza p-0 text-matn shadow-3 lg:hidden"
+        className="oyna-chap m-0 h-full max-h-none w-72 max-w-[85vw] bg-panel p-0 text-panel-matn shadow-3 lg:hidden"
       >
         <div className="relative flex h-full flex-col">
           <button
             type="button"
             onClick={yop}
             aria-label="Menyuni yopish"
-            className="absolute right-2 top-2 inline-flex size-11 items-center justify-center rounded-lg text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"
+            className="absolute right-2 top-2 inline-flex size-11 items-center justify-center rounded-lg text-panel-matn transition-colors hover:bg-panel-hover"
           >
             <X size={20} aria-hidden="true" />
           </button>

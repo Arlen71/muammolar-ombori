@@ -34,9 +34,15 @@ const TUGMA_KORINISHI: Record<TugmaKorinishi, string> = {
     "bg-asosiy text-asosiy-matn hover:bg-asosiy-quyuq " +
     "hover:shadow-[0_4px_14px_-4px_var(--u-asosiy)] " +
     "disabled:bg-yuza-3 disabled:text-matn-uchinchi disabled:shadow-none",
+  /*
+    Konturi `chegara` emas, `chegara-kuchli`. Ikkilamchi tugmaning yagona
+    ko'rinadigan belgisi — o'sha kontur; kartochkalardan soya olib
+    tashlangach, xira chiziq oq fonda deyarli yo'qoladi va tugma matn
+    bo'lib qoladi. WCAG 1.4.11 interfeys elementi uchun 3:1 talab qiladi.
+  */
   ikkilamchi:
-    "bg-yuza text-matn ring-1 ring-inset ring-chegara hover:bg-yuza-2 " +
-    "disabled:text-matn-uchinchi",
+    "bg-yuza text-matn ring-1 ring-inset ring-chegara-kuchli hover:bg-yuza-2 " +
+    "disabled:text-matn-uchinchi disabled:ring-chegara",
   xavfli: "bg-xato text-yuza hover:opacity-90 disabled:bg-yuza-3 disabled:text-matn-uchinchi",
   shaffof: "bg-transparent text-matn-ikkilamchi hover:bg-yuza-2 hover:text-matn",
 };
@@ -81,7 +87,14 @@ export function Tugma({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-medium",
+        /*
+          Kapsula shakli — my.gov.uz tugmalarining eng ko'zga tashlanadigan
+          belgisi ("Kirish", "Bosh sahifaga"). To'liq yumaloqlik tugmani
+          matn bloklaridan ajratib turadi: to'rtburchak kartochkalar
+          orasida faqat u yumaloq, ya'ni bosiladigan narsa ko'zga birinchi
+          tashlanadi.
+        */
+        "inline-flex items-center justify-center rounded-full font-semibold",
         /*
           `transition` (hammasi) — rang bilan birga transform ham o'tsin.
           `active:scale-[0.98]` — bosilganda tugma barmoq ostida bir
@@ -205,7 +218,7 @@ export function Nishoncha({
 export function Quti({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("rounded-2xl border border-chegara bg-yuza p-5 shadow-1", className)}
+      className={cn("rounded-quti bg-yuza p-5 ring-1 ring-inset ring-quti-chegara", className)}
       {...props}
     >
       {children}
@@ -308,7 +321,7 @@ export function KPIKartochka({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-chegara bg-yuza px-5 py-4 shadow-1",
+        "rounded-quti bg-yuza px-5 py-4 ring-1 ring-inset ring-quti-chegara",
         className
       )}
       style={style}
@@ -343,7 +356,7 @@ export function Jadval({
   ...props
 }: React.ComponentProps<"table">) {
   return (
-    <div className="w-full overflow-x-auto rounded-2xl border border-chegara bg-yuza shadow-1">
+    <div className="w-full overflow-x-auto rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
       <table className={cn("w-full min-w-[40rem] border-collapse text-sm", className)} {...props}>
         {children}
       </table>
@@ -359,9 +372,15 @@ export function JadvalBosh({ className, children, ...props }: React.ComponentPro
   );
 }
 
+/*
+  Qatorlar chiziq bilan emas, navbatma-navbat ochiq ko'k fon bilan
+  ajratiladi — my.gov.uz jadvallari aynan shunday. Chiziq ham, zebra ham
+  bir vaqtda bo'lsa jadval to'rga aylanadi: ko'z ma'lumotni emas,
+  to'rning o'zini o'qiy boshlaydi.
+*/
 export function JadvalTana({ className, children, ...props }: React.ComponentProps<"tbody">) {
   return (
-    <tbody className={cn("divide-y divide-chegara", className)} {...props}>
+    <tbody className={cn("[&>tr:nth-child(even)]:bg-asosiy-ochiq", className)} {...props}>
       {children}
     </tbody>
   );
@@ -369,7 +388,7 @@ export function JadvalTana({ className, children, ...props }: React.ComponentPro
 
 export function JadvalQator({ className, children, ...props }: React.ComponentProps<"tr">) {
   return (
-    <tr className={cn("transition-colors hover:bg-yuza-2/70", className)} {...props}>
+    <tr className={cn("transition-colors hover:bg-yuza-2", className)} {...props}>
       {children}
     </tr>
   );
@@ -422,7 +441,7 @@ export function Skelet({ className }: { className?: string }) {
 /** Jadval yuklanayotganda ko'rsatiladigan qatorlar. */
 export function SkeletJadval({ qatorlar = 5 }: { qatorlar?: number }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-chegara bg-yuza shadow-1">
+    <div className="overflow-hidden rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara">
       <div className="border-b border-chegara bg-yuza-2 px-4 py-3">
         <Skelet className="h-4 w-40" />
       </div>
@@ -454,7 +473,7 @@ export function BoshHolat({
   amal?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-chegara bg-yuza px-6 py-14 text-center">
+    <div className="rounded-quti border border-dashed border-chegara bg-yuza px-6 py-14 text-center">
       <p className="text-base font-medium text-matn">{sarlavha}</p>
       {izoh && <p className="mx-auto mt-1.5 max-w-md text-sm text-matn-ikkilamchi">{izoh}</p>}
       {amal && <div className="mt-5 flex justify-center">{amal}</div>}

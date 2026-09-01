@@ -78,7 +78,7 @@ export default async function RahbarBoshSahifa() {
                   <Link
                     key={m.id}
                     href={`/rahbar/muammo/${m.id}/1`}
-                    className="kotarilish block rounded-2xl"
+                    className="kotarilish block rounded-quti"
                   >
                     <Quti className="flex flex-wrap items-center justify-between gap-3 p-4">
                       <div className="min-w-0">

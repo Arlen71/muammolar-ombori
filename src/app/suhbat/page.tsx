@@ -120,7 +120,7 @@ export default async function SuhbatlarSahifasi() {
               >
                 <Link
                   href={`/suhbat/${s.id}`}
-                  className="kotarilish flex items-start gap-3 rounded-2xl border border-chegara bg-yuza p-4 shadow-1 hover:border-asosiy"
+                  className="kotarilish flex items-start gap-3 p-4 rounded-quti bg-yuza ring-1 ring-inset ring-quti-chegara hover:ring-asosiy"
                 >
                   <Avatar
                     ism={s.developer.fullName}

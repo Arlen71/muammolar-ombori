@@ -39,7 +39,7 @@ export function Modal({
       onClick={fondaBosildi}
       aria-labelledby={sarlavhaId}
       className={cn(
-        "oyna-markaz m-auto w-[calc(100vw-2rem)] rounded-xl border border-chegara bg-yuza p-0 text-matn shadow-3",
+        "oyna-markaz m-auto w-[calc(100vw-2rem)] rounded-quti bg-yuza p-0 text-matn shadow-3 ring-1 ring-inset ring-quti-chegara",
         "max-h-[calc(100dvh-4rem)]",
         kenglik
       )}

@@ -103,7 +103,7 @@ export function Oqim({
       {bosqichlar.map((b, i) => (
         <li
           key={b.yorliq}
-          className="relative rounded-xl border border-chegara bg-yuza-2 px-4 py-3"
+          className="relative rounded-quti bg-yuza-2 px-4 py-3"
         >
           <p className="truncate text-xs text-matn-ikkilamchi">{b.yorliq}</p>
           <p

@@ -73,7 +73,7 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm test` | Hisob-kitob mantiqi testlari |
 | `npm run e2e` | Rollar va ruxsatlar — 36 ta tekshiruv (dev server ochiq bo'lsin) |
 | `npm run security` | Xavfsizlik tekshiruvi — 52 ta hujum stsenariysi |
-| `npm run contrast` | Rang kontrasti — ikkala mavzu WCAG AA dan o'tishi |
+| `npm run contrast` | Rang kontrasti — 58 juftlik, ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
 | `npm run admin:create` | Administrator yaratish yoki parolini tiklash |
@@ -203,11 +203,45 @@ Gorizontal ustunlar va oqim uchun `div` va `width: %` yetarli. Har bir
 diagrammada raqam ustunning yonida matn bo'lib turadi — ma'no faqat
 uzunlik bilan berilmaydi (WCAG 1.4.1).
 
-**Vizual til Qashqadaryodan olingan.** Brend rangi — lojuvard
-(`#2447b8`), Shahrisabzdagi Oqsaroy koshinlaridan; fon naqshi
-(`naqsh.tsx`) o'sha koshinlarning sakkiz qirrali yulduz motivi.
-Shriftlar uch rolda: Inter (matn), Schibsted Grotesk (sarlavha va yirik
-raqamlar), JetBrains Mono (muammo kodlari — nol va O ajralib turadi).
+**Vizual til my.gov.uz dan olingan.** Rahbar ham, dasturchi ham Yagona
+interaktiv davlat xizmatlari portalini har kuni ochadi. Bu tizim o'sha
+oiladan ekani birinchi qarashda ko'rinishi kerak — begona ko'ringan
+davlat sayti ishonch uyg'otmaydi. Portaldan olingani:
+
+| Element | Qiymat |
+|---|---|
+| Brend ko'ki | `#0068e0` (bosilganda `#0153b2`) |
+| Sahifa foni | `#f2f4f7` — kartochkalar oq, fondan o'zi ajraladi |
+| Urg'u | `#00dc82` — gradient va faol menyu belgisi |
+| Shrift | Montserrat (kodlar uchun JetBrains Mono qoldi) |
+| Radius | 14 px |
+| Yon panel | To'q ko'k ustun, oq yozuvlar |
+| Jadval | Navbatma-navbat oq va `#eaf4ff` qatorlar |
+| Tugma | Kapsula shakli |
+
+Kartochkalarda kontur ham, soya ham yo'q — my.gov.uz da ham shunday:
+oq to'rtburchak kulrang fondan o'zi ajralib turadi. Qorong'i mavzuda
+yuzalar orasidagi farq kichrayadi, shuning uchun u yerda nozik kontur
+qaytariladi. Bu `--u-quti-chegara` tokeni orqali qilinadi (yorug'da
+`transparent`), ya'ni komponentlarda `dark:` varianti yo'q.
+
+Portaldan olinmagani ham bor. Ularning bosh sahifasidagi
+illyustratsiyalar o'rnida bizda Oqsaroy koshinlarining sakkiz qirrali
+yulduz naqshi (`naqsh.tsx`) qoldi — pilot Qashqadaryoda va bu naqsh
+gradient panelni tekis rangdan chiqaradi. Ikonkalarga o'ralgan
+gorizontal karusel ham olinmadi: bu ichki ish quroli, xizmat vitrinasi
+emas.
+
+**Gradientdagi matn kontrasti alohida hisoblangan.** Ko'k bilan
+yashilning o'rtasi feruza (`#00a7ad`) bo'lib chiqadi va oq matn u yerda
+2.9:1 beradi — AA dan past. my.gov.uz da bu sezilmaydi, chunki
+ularning sarlavhasi ikki so'z va chap chekkada turadi; bizda esa u
+to'liq jumla. Shu sababli `.gradient-brend` ikki qatlamli: pastda qiya
+gradient, ustida chapdan o'ngga so'nuvchi toza brend ko'ki. Matn 70%
+gacha bo'lgan qismda turadi va u yerda fon aynan `#0068e0` (5.2:1),
+yashil esa o'ng yuqori burchakda — matnsiz joyda. 1024 pikseldan tor
+ekranda matn panelning butun kengligini egallaydi, himoyalanadigan joy
+qolmaydi — u yerda gradient butunlay ko'k.
 
 **Harakat faqat birinchi taassurot joyida.** Pog'onali kirish
 (`.jonlanish`) va sanaladigan raqamlar (`Sanoq`) — ochiq sahifa bilan
