@@ -127,7 +127,7 @@ qanday texnik atama ishlatmasligi kerak.
 | T-3.10 | «Yechim taqdim etildi» deb belgilash (izoh bilan) | ✅ |
 | T-3.11 | «Men olgan muammolar» ro'yxati | ✅ |
 | T-3.12 | Biriktirilgan fayllarni yuklab olish | ✅ |
-| T-3.13 | Rahbarga tizim orqali aniqlashtiruvchi savol berish | ⏳ |
+| T-3.13 | Rahbarga tizim orqali aniqlashtiruvchi savol berish | ✅ (T-8.24, suhbat) |
 
 ### 3.4 Administrator (T-4)
 
@@ -136,8 +136,8 @@ qanday texnik atama ishlatmasligi kerak.
 | T-4.1 | Tashkilot yaratish (nom, tur, hudud, tuman, STIR) | ✅ |
 | T-4.2 | Foydalanuvchi akkaunti yaratish, parol avtomatik generatsiya | ✅ |
 | T-4.3 | Parolni tiklash (eski sessiyalar uziladi) | ✅ |
-| T-4.4 | Moderatsiya navbati: tasdiqlash yoki sabab bilan qaytarish | ✅ |
-| T-4.5 | Moderatsiyada o'xshash muammolar haqida ogohlantirish | ✅ |
+| T-4.4 | So'nggi qo'shilganlar oqimi: sabab bilan arxivlash va qaytarish | ✅ (T-8.23 dan keyin qayta yozildi) |
+| T-4.5 | O'xshash muammolar haqida ogohlantirish (dublikatlar bo'limida) | ✅ |
 | T-4.6 | Dasturchini tasdiqlash yoki bloklash | ✅ |
 | T-4.7 | Dublikatlarni birlashtirish | ✅ |
 | T-4.8 | Boshqaruv paneli: kutayotgan ishlar va so'nggi harakatlar | ✅ |
