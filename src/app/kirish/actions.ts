@@ -125,8 +125,7 @@ export async function kirishAmali(
   redirect(manzil);
 }
 
-export async function chiqishAmali() {
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSIYA_COOKIE);
-  redirect("/kirish");
-}
+/*
+  Chiqish bu yerda emas — `src/app/chiqish/route.ts` da, oddiy POST
+  marshruti sifatida. Sababi o'sha faylda yozilgan.
+*/

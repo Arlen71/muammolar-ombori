@@ -188,11 +188,28 @@ async function main() {
 
     Ombordagi haqiqiy muammo olinadi — suhbat faqat shundaylar bo'yicha
     ochiladi.
+
+    Muammo AYNAN shu rahbarning tashkilotiga tegishli bo'lishi shart.
+    Rahbar suhbatga o'z tashkiloti orqali kiradi (`suhbatRoli`), ya'ni
+    boshqa tashkilotning muammosi olinsa tekshiruv 404 beradi va
+    mahsulotda nuqson bordek ko'rinadi. Ilgari bu yerda shunchaki
+    birinchi topilgan muammo olinardi va tekshiruv bazadagi qatorlar
+    tartibiga bog'liq bo'lib qolgan edi.
   */
-  const ochiqMuammo = await db.problem.findFirstOrThrow({
-    where: { status: "APPROVED", canonicalId: null },
+  const ochiqMuammo = await db.problem.findFirst({
+    where: {
+      status: "APPROVED",
+      canonicalId: null,
+      organizationId: rahbar.organizationId!,
+    },
     select: { id: true },
   });
+  if (!ochiqMuammo) {
+    throw new Error(
+      `Suhbat tekshiruvi uchun ${rahbar.fullName} tashkilotida omborga tushgan ` +
+        "muammo topilmadi. Seed'ni qayta yurgizing yoki rahbarni almashtiring."
+    );
+  }
 
   const sinovSuhbati = await db.suhbat.create({
     data: {

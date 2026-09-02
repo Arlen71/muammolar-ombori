@@ -71,7 +71,7 @@ SEED_PASSWORD="..." npm run db:seed
 | `npm run dev` | Ishlab chiqish serveri |
 | `npm run build` | Ishlab chiqarish uchun yig'ish |
 | `npm test` | Hisob-kitob mantiqi testlari |
-| `npm run e2e` | Rollar va ruxsatlar — 36 ta tekshiruv (dev server ochiq bo'lsin) |
+| `npm run e2e` | Rollar va ruxsatlar — 39 ta tekshiruv (dev server ochiq bo'lsin) |
 | `npm run security` | Xavfsizlik tekshiruvi — 52 ta hujum stsenariysi |
 | `npm run contrast` | Rang kontrasti — 58 juftlik, ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
@@ -330,6 +330,27 @@ Ruxsat mantig'i `src/lib/suhbat.ts` da, bitta joyda — sahifa, fayl
 marshruti va yuklash tokeni o'sha funksiyani chaqiradi. Begona
 foydalanuvchiga **404** qaytariladi, 403 emas: 403 "bunday suhbat bor"
 degani bo'lardi. Buni `npm run security` tekshiradi.
+
+**Chiqish tugmasi — oddiy forma, server action emas.** Next server
+action'ni URL bilan emas, yig'ish paytida hisoblangan xesh bilan
+chaqiradi. Yangi versiya joylashtirilganda xeshlar almashadi, brauzerda
+ochiq turgan sahifa esa eskisicha qoladi: bosilgan tugma endi mavjud
+bo'lmagan xeshni yuboradi va javob «Server action not found» (404)
+bo'ladi — foydalanuvchi buni «Kutilmagan xatolik» ekrani sifatida
+ko'radi. Ish sahifasi kun bo'yi ochiq turadigan rahbar buni albatta
+uchratadi.
+
+Chiqish esa aynan nimadir noto'g'ri ketganda bosiladigan tugma, ya'ni
+u ilovaning eng ishonchli qismi bo'lishi kerak. Shuning uchun u
+`POST /chiqish` marshrutiga yuboradigan oddiy HTML forma
+(`src/app/chiqish/route.ts`): JavaScript ham, xesh ham, klient holati
+ham ishtirok etmaydi. Faqat POST — GET bo'lsa begona saytdagi `<img>`
+odamni tizimdan chiqarib yuborardi.
+
+Qolgan action'lar uchun `next.config.ts` da `deploymentId` bor. Vercel
+loyihasida **Settings → Advanced → Skew Protection** yoqilsa, eski
+versiyadan kelgan so'rov o'sha versiyaga yo'naltiriladi va eskirgan
+sahifa ham ishlab ketaveradi.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.

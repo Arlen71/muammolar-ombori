@@ -45,6 +45,25 @@ async function ol(yol: string, cookie?: string): Promise<Javob> {
   return { status: javob.status, manzil, matn };
 }
 
+/** Faqat chiqish marshruti uchun: POST yuboradi va cookie javobini qaytaradi. */
+async function post(yol: string, cookie?: string): Promise<Javob & { cookieOchirildi: boolean }> {
+  const javob = await fetch(`${ASOS}${yol}`, {
+    method: "POST",
+    redirect: "manual",
+    headers: cookie ? { cookie: `${SESSIYA_COOKIE}=${cookie}` } : {},
+  });
+  const ornatilgan = javob.headers.getSetCookie?.() ?? [];
+  return {
+    status: javob.status,
+    manzil: javob.headers.get("location"),
+    matn: "",
+    // Cookie o'chirilishi = bo'sh qiymat yoki o'tmishdagi muddat
+    cookieOchirildi: ornatilgan.some(
+      (c) => c.startsWith(`${SESSIYA_COOKIE}=;`) || /expires=Thu, 01 Jan 1970/i.test(c)
+    ),
+  };
+}
+
 function yonaltiradi(j: Javob, yol: string): boolean {
   if (j.status !== 307 && j.status !== 302 && j.status !== 303) return false;
   if (!j.manzil) return false;
@@ -169,6 +188,20 @@ async function main() {
       const j = await ol(`/api/fayl/${m.faylId}`);
       tekshir("fayl API avtorizatsiyasiz 401 qaytaradi", j.status === 401, `status ${j.status}`);
     }
+
+    /*
+      Chiqish marshruti — server action emas, oddiy POST. Sababi
+      `src/app/chiqish/route.ts` da: server action xeshi yangi versiya
+      joylashtirilganda eskirib qoladi va ochiq turgan sahifadagi
+      tugma «Server action not found» beradi. Bu tekshiruv shu
+      xatolikning qaytib kelmasligini kafolatlaydi.
+    */
+    const chiqishGet = await ol("/chiqish");
+    tekshir(
+      "chiqish GET bilan ishlamaydi (405)",
+      chiqishGet.status === 405,
+      `status ${chiqishGet.status}`
+    );
   }
 
   console.log("\nTashkilot rahbari:");
@@ -185,6 +218,14 @@ async function main() {
       "kirish sahifasidan ish stoliga qaytariladi",
       yonaltiradi(await ol("/kirish", m.rahbarC), "/rahbar")
     );
+
+    const chiqish = await post("/chiqish", m.rahbarC);
+    tekshir(
+      "chiqish 303 bilan kirish sahifasiga yuboradi",
+      chiqish.status === 303 && yonaltiradi(chiqish, "/kirish"),
+      `status ${chiqish.status}, manzil ${chiqish.manzil}`
+    );
+    tekshir("chiqish sessiya cookie'sini o'chiradi", chiqish.cookieOchirildi);
 
     if (m.begonaMuammoId) {
       const j = await ol(`/rahbar/muammo/${m.begonaMuammoId}/korish`, m.rahbarC);

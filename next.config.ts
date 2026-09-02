@@ -1,6 +1,27 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /*
+    Har bir joylashtirishga o'z belgisi.
+
+    Server action'lar URL bilan emas, yig'ish paytida hisoblangan xesh
+    bilan chaqiriladi. Yangi versiya chiqqanda xeshlar almashadi,
+    brauzerda ochiq turgan eski sahifa esa eskisini yuboradi va javob
+    «Server action not found» bo'ladi — foydalanuvchi buni «Kutilmagan
+    xatolik» ekrani sifatida ko'radi. Bu ayniqsa uzoq ochiq turadigan
+    ish sahifalarida sezilarli: rahbar ertalab ochgan sahifa kun
+    davomida shunday «buzilib» qolishi mumkin.
+
+    Bu qiymat so'rovga qaysi versiyadan kelganini yozib qo'yadi.
+    Vercel'da loyiha sozlamalarida «Skew Protection» yoqilgan bo'lsa
+    (Settings → Advanced), platforma bunday so'rovni o'sha eski
+    versiyaga yo'naltiradi va u ishlab ketaveradi.
+
+    Chiqish tugmasi baribir bunga bog'liq emas: u oddiy forma bo'lib
+    qat'iy manzilga POST qiladi (`src/app/chiqish/route.ts`).
+  */
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
+
   experimental: {
     serverActions: {
       /*

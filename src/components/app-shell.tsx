@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { chiqishAmali } from "@/app/kirish/actions";
 import { Avatar } from "@/components/avatar";
 import { MavzuTugmasi } from "@/components/mavzu";
 import { YonPanel, type Havola } from "@/components/yon-panel";
@@ -61,7 +60,14 @@ export function AppShell({
         <MavzuTugmasi className="shrink-0 text-panel-matn hover:bg-panel-hover hover:text-panel-matn" />
       </div>
 
-      <form action={chiqishAmali}>
+      {/*
+        Oddiy HTML forma, server action emas. Sababi
+        `src/app/chiqish/route.ts` da yozilgan: server action xesh bilan
+        chaqiriladi va yangi versiya joylashtirilganda ochiq turgan
+        sahifadagi xesh eskirib qoladi. Chiqish tugmasi esa aynan
+        nimadir noto'g'ri ketganda bosiladi — u ishlamay qolmasligi kerak.
+      */}
+      <form method="post" action="/chiqish">
         <button
           type="submit"
           className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm font-medium text-panel-matn transition-colors hover:bg-panel-hover"
@@ -99,7 +105,7 @@ export function AppShell({
           </span>
           <div className="ml-auto flex items-center gap-1">
             <MavzuTugmasi />
-            <form action={chiqishAmali}>
+            <form method="post" action="/chiqish">
               <button
                 type="submit"
                 className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-matn-ikkilamchi transition-colors hover:bg-yuza-2 hover:text-matn"

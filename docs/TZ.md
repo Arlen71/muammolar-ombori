@@ -346,6 +346,7 @@ Barcha uchta hisob-kitob **testlar bilan qoplangan** (`src/lib/scoring.test.ts`)
 | T-8.24 | Rahbar ↔ dasturchi suhbati, fayl almashinuvi bilan | ✅ |
 | T-8.25 | Suhbat yopiq: begona dasturchi ko'ra olmaydi (404) | ✅ |
 | T-8.26 | Interfeys my.gov.uz portalining dizayn tiliga moslandi | ✅ |
+| T-8.27 | Chiqish yangi versiya joylashtirilgandan keyin ham ishlaydi | ✅ |
 | T-8.12 | Xavfsizlik avtomatik tekshiriladi (`npm run security`, 52 ta hujum stsenariysi) | ✅ |
 
 ---
@@ -480,3 +481,4 @@ audit qilinishi va yillar davomida qo'llab-quvvatlanishi kerak.
 | 1.6 | 2026-08-21 | Fayl yuklash tuzatildi (T-8.22): Vercel'ning 4.5 MB cheklovi sababli fayllar endi brauzerdan omborga bevosita ketadi. Rasm chegarasi 2 → 10 MB |
 | 1.7 | 2026-09-01 | Moderatsiya olib tashlandi (T-8.23) va rahbar ↔ dasturchi suhbati qo'shildi (T-8.24, T-8.25). Sxemaga `Suhbat`, `SuhbatXabari`, `SuhbatFayli` jadvallari qo'shildi |
 | 1.8 | 2026-09-01 | Interfeys my.gov.uz dizayn tiliga moslandi (T-8.26): `#0068e0` palitra, Montserrat, ko'k yon panel, 14 px radius, ko'k→yashil gradient. Gradient ustidagi matn uchun kontrast qatlami qo'shildi |
+| 1.9 | 2026-09-01 | Chiqish tugmasi tuzatildi (T-8.27): server action o'rniga `POST /chiqish` marshruti — eskirgan sahifadagi tugma «Server action not found» bermaydi. `deploymentId` qo'shildi |
