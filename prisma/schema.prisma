@@ -325,6 +325,16 @@ model Problem {
   status         ProblemStatus @default(DRAFT)
   moderationNote String?
 
+  // ── Semantik qidiruv ──
+  /// Sarlavha + tavsif + hozirgi jarayondan olingan vektor.
+  /// `Float[]` emas, `Bytes`: baza HTTP orqali ulangan va JSON'dagi
+  /// sonlar baytlardan besh barobar ko'p joy egallaydi.
+  embedding      Bytes?
+  /// Vektorni yasagan model. Model almashsa eski vektorlar yaroqsiz.
+  embeddingModel String?
+  /// Vektor olingan matnning belgisi — matn tahrirlansa qayta hisoblanadi.
+  embeddingHash  String?
+
   // ── Dublikat ──
   /// Bu muammo boshqasining takrori bo'lsa — asosiy muammo id'si
   canonicalId String?

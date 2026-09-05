@@ -15,7 +15,12 @@ import {
   type QadamRaqami,
 } from "@/lib/problem-schema";
 import { qadamMalumoti } from "@/lib/problem-form";
-import { oxshashMuammolar, type OxshashMuammo } from "@/lib/similar";
+import { muammoMatni } from "@/lib/vektor";
+import {
+  muammoVektoriniYangila,
+  oxshashMuammolar,
+  type OxshashMuammo,
+} from "@/lib/similar";
 import { zodXatolari, type AmalNatijasi } from "@/lib/validation";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -372,6 +377,15 @@ export async function muammoniYubor(
     entityId: muammoId,
   });
 
+  /*
+    Semantik qidiruv uchun vektor. Ataylab `await` bilan, lekin xatosi
+    yutiladi (`muammoVektoriniYangila` hech qachon tashlamaydi): muammo
+    allaqachon omborda, embedding xizmati ishlamagani uchun rahbarning
+    ishi to'xtab qolishi mumkin emas. Yozilmay qolgan vektorlarni
+    keyinroq `npm run embedding` to'ldiradi.
+  */
+  await muammoVektoriniYangila(muammoId);
+
   revalidatePath("/rahbar");
   redirect(`/rahbar/muammo/${muammoId}/korish?yuborildi=1`);
 }
@@ -407,16 +421,26 @@ export async function qoralamaniOchir(fd: FormData) {
 // ─────────────────────────────────────────────────────────────────────
 
 /**
- * Sarlavha yozilayotganda o'xshash muammolarni qidiradi.
- * Sehrgarning 1-qadami buni chaqiradi va rahbarga "bunga o'xshash muammo bor"
- * deb ko'rsatadi — shu tarzda ombor dublikatlarga to'lib ketmaydi.
+ * Yozilayotgan paytda o'xshash muammolarni qidiradi.
+ *
+ * Sehrgarning 1-qadami buni chaqiradi va rahbarga «bunga o'xshash muammo
+ * bor» deb ko'rsatadi — shu tarzda ombor dublikatlarga to'lib ketmaydi.
+ *
+ * Sarlavha bilan birga TAVSIF ham yuboriladi. Saqlangan vektorlar
+ * `muammoMatni()` — ya'ni sarlavha + tavsif — dan olingan. So'rovga faqat
+ * sarlavha berilsa, u vektor fazosining boshqa joyiga tushadi va ballar
+ * sun'iy ravishda pasayadi. Trigramga tushib qolganda esa faqat birinchi
+ * qator ishlatiladi (`oxshashMuammolar` ichida), chunki `similarity()`
+ * uzun matnda cho'kib ketadi.
  */
 export async function oxshashlarniTop(
   sarlavha: string,
-  joriyMuammoId: string
+  joriyMuammoId: string,
+  tavsif?: string
 ): Promise<OxshashMuammo[]> {
   await talabRahbar();
-  return oxshashMuammolar(sarlavha, { chiqarilsin: [joriyMuammoId], soni: 4 });
+  const matn = muammoMatni({ title: sarlavha, description: tavsif });
+  return oxshashMuammolar(matn, { chiqarilsin: [joriyMuammoId], soni: 4 });
 }
 
 // ─────────────────────────────────────────────────────────────────────

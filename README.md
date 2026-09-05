@@ -70,9 +70,10 @@ SEED_PASSWORD="..." npm run db:seed
 |---|---|
 | `npm run dev` | Ishlab chiqish serveri |
 | `npm run build` | Ishlab chiqarish uchun yig'ish |
-| `npm test` | Hisob-kitob mantiqi testlari |
+| `npm test` | Hisob-kitob va vektor mantiqi — 30 ta test |
 | `npm run e2e` | Rollar va ruxsatlar — 39 ta tekshiruv (dev server ochiq bo'lsin) |
 | `npm run security` | Xavfsizlik tekshiruvi — 52 ta hujum stsenariysi |
+| `npm run embedding` | Muammolarning vektorlarini to'ldiradi (`-- --kalibrlash` — chegarani tanlash) |
 | `npm run contrast` | Rang kontrasti — 58 juftlik, ikkala mavzu WCAG AA dan o'tishi |
 | `npm run typecheck` | TypeScript tekshiruvi |
 | `npm run lint` | ESLint |
@@ -351,6 +352,44 @@ Qolgan action'lar uchun `next.config.ts` da `deploymentId` bor. Vercel
 loyihasida **Settings → Advanced → Skew Protection** yoqilsa, eski
 versiyadan kelgan so'rov o'sha versiyaga yo'naltiriladi va eskirgan
 sahifa ham ishlab ketaveradi.
+
+**Dublikat qidiruvi ma'no bo'yicha ishlaydi.** Ilgari `pg_trgm` so'zlarni
+uch harfli bo'laklarga bo'lib solishtirardi va umumiy so'z bo'lmasa hech
+narsa topmasdi:
+
+    «Xodimlar ta'til so'rovini qog'ozda yozadi»
+    «Mehnat ta'tili hujjatlari jurnalda yuritiladi»
+
+Bu bitta muammo, lekin ularda birgina umumiy so'z yo'q. Endi sarlavha,
+tavsif va hozirgi jarayon vektorga aylantiriladi (`embedding.ts`) va
+solishtirish ma'no bo'yicha ketadi. Bu omborning eng kuchli signali uchun
+muhim: dasturchi «37 ta tashkilotda shu muammo bor» degan raqamga qarab
+tanlaydi, dublikat topilmasa esa bitta muammo o'nta yozuv bo'lib
+tarqalib ketadi.
+
+Qidiruv **qaror qabul qilmaydi**. U nomzodlarni ball bilan qaytaradi,
+birlashtirishni odam bosadi: birlashtirish bir tashkilotning muammosini
+ombordan olib tashlab, boshqasining kartochkasidagi «+1» ga aylantiradi
+va uni bekor qilib bo'lmaydi.
+
+Uch bosqichli zaxira: vektor → `pg_trgm` → oddiy so'z qidiruvi. Kalit
+berilmasa yoki xizmat javob bermasa, qidiruv eski usulda ishlayveradi —
+bu qo'shimcha imkoniyat, majburiy bog'liqlik emas.
+
+`pgvector` ishlatilmaydi: pilot hajmida barcha vektorlarni o'qib,
+kosinusni Node ichida hisoblash bir necha millisekund. Bu bazani
+O'zbekistondagi serverga ko'chirishni osonlashtiradi. O'n mingdan
+oshganda `pgvector` ga o'tish kerak bo'ladi — interfeys o'zgarmaydi.
+
+So'rov OpenAI ning `/v1/embeddings` shakliga yuboriladi. Ollama, vLLM va
+llama.cpp ham shu shaklni beradi, ya'ni o'z serveringizga ko'chganda kod
+emas, faqat `EMBEDDING_URL` o'zgaradi.
+
+**Chegarani taxmin bilan tanlab bo'lmaydi.** Kosinus balli mutlaq
+ma'noga ega emas. `npm run embedding -- --kalibrlash` bazadagi barcha
+juftliklarni ball bo'yicha tartiblab ko'rsatadi — haqiqiy dublikatlar
+bilan begona juftliklar orasidagi uzilish qayerda bo'lsa, chegara o'sha
+yerda.
 
 **Aloqa raqami muammoni olgan dasturchigagina ko'rinadi.** Bu tashkilot
 rahbarini keraksiz qo'ng'iroqlardan himoya qiladi.

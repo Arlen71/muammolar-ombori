@@ -18,7 +18,8 @@
     "e2e": "tsx scripts/e2e-check.ts",
     "admin:create": "tsx scripts/create-admin.ts",
     "security": "tsx scripts/security-check.ts",
-    "contrast": "tsx scripts/contrast-check.ts"
+    "contrast": "tsx scripts/contrast-check.ts",
+    "embedding": "tsx --conditions=react-server scripts/embedding.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.0",

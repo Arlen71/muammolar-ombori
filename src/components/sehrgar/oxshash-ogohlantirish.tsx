@@ -26,18 +26,31 @@ export function OxshashOgohlantirish({
 
   useEffect(() => {
     const sarlavhaMaydoni = document.getElementById("title") as HTMLInputElement | null;
+    const tavsifMaydoni = document.getElementById("description") as HTMLTextAreaElement | null;
     if (!sarlavhaMaydoni) return;
 
     let taymer: ReturnType<typeof setTimeout>;
     let bekor = false;
+    /*
+      Oxirgi so'ralgan matn. Semantik qidiruv har chaqiruvda tashqi
+      xizmatga so'rov yuboradi, ya'ni u tekin emas: bir xil matn uchun
+      ikkinchi marta so'ramaymiz. Faqat kechikish (debounce) yetarli
+      emas — bosh harfni tuzatish yoki nuqta qo'yish ham 800 ms dan
+      keyin yangi so'rovga aylanardi.
+    */
+    let oxirgiSoralgan = "";
 
-    async function tekshir(qiymat: string) {
-      if (qiymat.trim().length < 15) {
+    async function tekshir(sarlavha: string, tavsif: string) {
+      if (sarlavha.trim().length < 15) {
         setOxshashlar([]);
         return;
       }
+      const kalit = `${sarlavha}\u0000${tavsif}`;
+      if (kalit === oxirgiSoralgan) return;
+      oxirgiSoralgan = kalit;
+
       try {
-        const natija = await oxshashlarniTop(qiymat, muammoId);
+        const natija = await oxshashlarniTop(sarlavha, muammoId, tavsif);
         if (!bekor) setOxshashlar(natija);
       } catch {
         // Qidiruv ishlamasa jim qolamiz — bu forma to'ldirishga xalaqit bermasligi kerak
@@ -46,17 +59,22 @@ export function OxshashOgohlantirish({
 
     function ozgardi() {
       clearTimeout(taymer);
-      taymer = setTimeout(() => tekshir(sarlavhaMaydoni!.value), 800);
+      taymer = setTimeout(
+        () => tekshir(sarlavhaMaydoni!.value, tavsifMaydoni?.value ?? ""),
+        800
+      );
     }
 
     sarlavhaMaydoni.addEventListener("input", ozgardi);
-    // Sahifa ochilganda mavjud sarlavha bo'yicha ham tekshiramiz
-    void tekshir(boshlangichSarlavha);
+    tavsifMaydoni?.addEventListener("input", ozgardi);
+    // Sahifa ochilganda mavjud matn bo'yicha ham tekshiramiz
+    void tekshir(boshlangichSarlavha, tavsifMaydoni?.value ?? "");
 
     return () => {
       bekor = true;
       clearTimeout(taymer);
       sarlavhaMaydoni.removeEventListener("input", ozgardi);
+      tavsifMaydoni?.removeEventListener("input", ozgardi);
     };
   }, [muammoId, boshlangichSarlavha]);
 
