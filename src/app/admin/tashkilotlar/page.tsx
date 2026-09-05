@@ -130,7 +130,7 @@ export default async function TashkilotlarSahifasi() {
         <KPIKartochka
           yorliq="Omborga tushgan"
           qiymat={qator.reduce((s, t) => s + t.omborda, 0)}
-          izoh="Moderatsiyadan o'tgan"
+          izoh="Dasturchilarga ko'rinadi"
         />
       </div>
 

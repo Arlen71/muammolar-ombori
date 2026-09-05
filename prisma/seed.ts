@@ -825,7 +825,7 @@ async function main() {
               fromStatus: "DRAFT",
               toStatus: "SUBMITTED",
               actorId: rahbar.id,
-              comment: "Muammo moderatsiyaga yuborildi",
+              comment: "Muammo omborga yuborildi",
             },
           ],
         },
